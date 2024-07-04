@@ -1,6 +1,6 @@
 # artefacts-2019_2023
 
-Collection of some interesting pieces of my projects. Spark, Scala, Python, sh
+Collection of some interesting pieces from my projects. Spark, Scala, Python, sh
 
 Two main categories:
 - [Spark/Scala stuff](./etl-ml-pieces.scala/readme.md)
