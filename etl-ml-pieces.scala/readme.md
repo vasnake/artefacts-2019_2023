@@ -2,16 +2,20 @@
 
 Collection of some interesting pieces from my projects.
 
-Spark 2.4.8; Scala 2.12.19; sbt 1.10.0
+Spark 2.4.8; Scala 2.12.19; sbt 1.10.0 (migration to Spark 3 is WIP)
 
 My local station env (win11 + wsl2)
 ```sh
 # run project sbt
 alias psbt='export JAVA_OPTS="-XX:MaxMetaspaceSize=1G -Xmx4G -XX:+UseParallelGC" && pushd /mnt/c/Users/valik/data/github/artefacts-2019_2023/etl-ml-pieces.scala/ && sbt -v && popd'
 
+# coursier update
+cs setup
+
 # etl-ml-pieces-1923
 pushd /mnt/c/Users/valik/data/github/artefacts-2019_2023/etl-ml-pieces.scala/
 sbt new devinsideyou/scala-seed.g8
+
 # produced project with this parameters:
     name [etl-ml-pieces-1923]:
     organization [com.github.vasnake]:
@@ -24,6 +28,23 @@ WSL shit
 
 Надо это как-то распихать по отдельным проектам билда.
 Принцип деления: набор зависимостей, от ядра "нет зависимостей", до доменной логики "зависит от всего".
+
+А еще куда-то как-то надо тесты интеграционные запихать. В виде скриптов и доки по использованию.
+
+### dmscala-grinder_jobs
+~\data\gitlab\dm.dmscala\dmscala-grinder_jobs\
+
+- EtlFeaturesApp
+- JoinExpressionParser
+- DatasetAggregators
+- DefaultHiveWriter
+- CheckpointService
+- toolboxes
+    * file
+    * string
+
+### grinder_transformers
+~\data\gitlab\dm.dmscala\dmscala\grinder_transformers\
 
 - toolboxes
     * file
@@ -96,3 +117,56 @@ WSL shit
 - etl helpers (data adapters):
     * GroupedFeatures
     * (Grouped)FeaturesRowDecoder (convert grouped features to vector)
+
+### proposed projects schema
+
+- core
+    * parser (join expression)
+    * configured aggregators (pipeline + config)
+    * FileToolbox
+    * StringToolbox
+    * VectorToolbox
+    * num-sci-py lib
+
+- etl-core
+    * grouped features
+
+- ml-core
+    * estimators
+    * transformers
+
+- ml-models
+
+- json
+    * json toolbox
+
+- hive udf (java)
+
+- spark-logging
+    * logging
+
+- spark-java-api udf
+- spark-catalyst-api udf
+- spark-udf-catalog
+
+- spark-io
+    * checkpoint
+    * HDFSFileToolbox
+    * hive (partition) writer (два, из джойнилки и из трансформеров)
+    * HiveExternalCatalog
+    * MetastoreQueryProcessorWithConnPool
+
+- spark-transformers
+    * column aggregator (configureg)
+    * dataset aggregator
+    * Stratified Sampling
+
+- spark-ml
+    * transformers
+    * estimators
+    * models
+    * params
+
+- spark-apps
+    * etl features
+    * apply models transformer

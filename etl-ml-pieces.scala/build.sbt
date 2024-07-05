@@ -10,8 +10,8 @@ lazy val `etl-ml-pieces-1923` =
     .dependsOn(macros % Cctt)
     .settings(name := "etl-ml-pieces-1923")
     .settings(commonSettings)
-//    .settings(autoImportSettings)
     .settings(dependencies)
+    //    .settings(autoImportSettings)
     .aggregate(macros)
 
 lazy val macros =
