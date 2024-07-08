@@ -10,17 +10,24 @@ lazy val `etl-ml-pieces-1923` =
   project
     .in(file("."))
     // to compile and test this project you need this dependencies:
-    .dependsOn(Seq(text, macros).map(_ % Cctt) *)
+    .dependsOn(Seq(core, text, macros).map(_ % Cctt) *)
     .settings(name := "etl-ml-pieces-1923")
     .settings(commonSettings)
     .settings(commonDependencies)
     //    .settings(autoImportSettings)
     // Aggregation means that running a task on the aggregate project will also run it on the aggregated projects:
-    .aggregate(text, macros)
+    .aggregate(core, text, macros)
+
+lazy val core =
+  project
+    .in(file("core"))
+    .settings(commonSettings)
+    .settings(commonDependencies)
+    .settings(libraryDependencies ++= Seq(`commons-io`.`commons-io`))
 
 lazy val text =
   project
-    .in(file("core"))
+    .in(file("text"))
     .settings(commonSettings)
     .settings(commonDependencies)
     .settings(libraryDependencies ++= Seq(org.`scala-lang`.modules.`scala-parser-combinators`))

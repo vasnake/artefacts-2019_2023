@@ -8,7 +8,8 @@ addCommandAlias("root", "cd etl-ml-pieces-1923")
 addCommandAlias("c", "compile")
 addCommandAlias("ca", "Test / compile")
 addCommandAlias("t", "test")
-addCommandAlias("r", "run")
+addCommandAlias("r", "reload")
+addCommandAlias("rn", "run")
 addCommandAlias("rs", "reStart")
 addCommandAlias("s", "reStop")
 addCommandAlias("star", "thankYouStars")
@@ -36,7 +37,8 @@ onLoadMessage +=
       |│ ${styled("c")}           │ compile           │
       |│ ${styled("ca")}          │ compile all       │
       |│ ${styled("t")}           │ test              │
-      |│ ${styled("r")}           │ run               │
+      |│ ${styled("r")}           │ reload            │
+      |│ ${styled("rn")}          │ run               │
       |│ ${styled("rs")}          │ reStart           │
       |│ ${styled("s")}           │ reStop            │
       |│ ${styled("star")}        │ thankYouStars     │

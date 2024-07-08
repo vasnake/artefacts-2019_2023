@@ -122,12 +122,12 @@ For `build.sbt` tricks see https://github.com/DevInsideYou/tagless-final/blob/ma
 
 ### proposed projects schema
 
-- core
-    * configured aggregators (pipeline + config)
+- core (com.github.vasnake.core)
     * FileToolbox
     * StringToolbox
     * VectorToolbox
     * num-sci-py lib
+    * configured aggregators (pipeline + config) from joiner
 
 - text
     * com.github.vasnake.text.parser.JoinExpressionParser

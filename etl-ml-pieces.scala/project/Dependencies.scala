@@ -16,6 +16,13 @@ object Dependencies {
     }
   }
 
+  object `commons-io` {
+    // https://mvnrepository.com/artifact/commons-io/commons-io
+    //  libraryDependencies += "commons-io" % "commons-io" % "2.16.1"
+    val `commons-io` =
+      "commons-io" % "commons-io" % "2.16.1"
+  }
+
   object org {
     object `scala-lang` {
       object modules {
