@@ -24,6 +24,8 @@ sbt new devinsideyou/scala-seed.g8
 ```
 WSL shit
 
+For `build.sbt` tricks see https://github.com/DevInsideYou/tagless-final/blob/master/expression-problem/build.sbt
+
 ## What do we have here
 
 Надо это как-то распихать по отдельным проектам билда.
@@ -121,12 +123,17 @@ WSL shit
 ### proposed projects schema
 
 - core
-    * parser (join expression)
     * configured aggregators (pipeline + config)
     * FileToolbox
     * StringToolbox
     * VectorToolbox
     * num-sci-py lib
+
+- text
+    * com.github.vasnake.text.parser.JoinExpressionParser
+    * com.github.vasnake.text.evaluator.JoinExpressionEvaluator
+    * TODO: add stack-based parser (based on python module)
+    * TODO: add tests
 
 - etl-core
     * grouped features
@@ -150,16 +157,17 @@ WSL shit
 - spark-udf-catalog
 
 - spark-io
-    * checkpoint
+    * checkpoint (CheckpointService)
     * HDFSFileToolbox
-    * hive (partition) writer (два, из джойнилки и из трансформеров)
+    * hive (partition) writer (два, из джойнилки и из трансформеров: DefaultHiveWriter)
     * HiveExternalCatalog
     * MetastoreQueryProcessorWithConnPool
 
 - spark-transformers
     * column aggregator (configureg)
-    * dataset aggregator
+    * dataset aggregator (DatasetAggregators)
     * Stratified Sampling
+    * joiner: from com.mrg.dm.grinder.jobs.etl_features.config.join.JoinRule
 
 - spark-ml
     * transformers
@@ -168,5 +176,5 @@ WSL shit
     * params
 
 - spark-apps
-    * etl features
+    * etl features (EtlFeaturesApp)
     * apply models transformer

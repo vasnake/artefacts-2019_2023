@@ -1,6 +1,7 @@
 import sbt._
 
 object Dependencies {
+
   object com {
     object eed3si9n {
       object expecty {
@@ -16,6 +17,15 @@ object Dependencies {
   }
 
   object org {
+    object `scala-lang` {
+      object modules {
+        // https://mvnrepository.com/artifact/org.scala-lang.modules/scala-parser-combinators
+        //libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "2.4.0"
+        val `scala-parser-combinators` =
+          "org.scala-lang.modules" %% "scala-parser-combinators" % "2.4.0"
+      }
+    }
+
     object augustjune {
       val `context-applied` =
         "org.augustjune" %% "context-applied" % "0.1.4"

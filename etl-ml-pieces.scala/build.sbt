@@ -1,24 +1,35 @@
 import Dependencies._
 import MyUtil._
 
+// Spark 2.4.8; Scala 2.12.19
+
 ThisBuild / organization := "com.github.vasnake"
 ThisBuild / scalaVersion := "2.12.19"
 
 lazy val `etl-ml-pieces-1923` =
   project
     .in(file("."))
-    .dependsOn(macros % Cctt)
+    // to compile and test this project you need this dependencies:
+    .dependsOn(Seq(text, macros).map(_ % Cctt) *)
     .settings(name := "etl-ml-pieces-1923")
     .settings(commonSettings)
-    .settings(dependencies)
+    .settings(commonDependencies)
     //    .settings(autoImportSettings)
-    .aggregate(macros)
+    // Aggregation means that running a task on the aggregate project will also run it on the aggregated projects:
+    .aggregate(text, macros)
+
+lazy val text =
+  project
+    .in(file("core"))
+    .settings(commonSettings)
+    .settings(commonDependencies)
+    .settings(libraryDependencies ++= Seq(org.`scala-lang`.modules.`scala-parser-combinators`))
 
 lazy val macros =
   project
     .in(file("macros"))
     .settings(commonSettings)
-    .settings(dependencies)
+    .settings(commonDependencies)
 
 lazy val commonSettings = {
   lazy val commonCompilerPlugins = Seq(
@@ -51,7 +62,7 @@ lazy val commonSettings = {
   ).reduceLeft(_ ++ _)
 }
 
-lazy val dependencies = Seq(
+lazy val commonDependencies = Seq(
   libraryDependencies ++= Seq(
     // main dependencies
   ),
