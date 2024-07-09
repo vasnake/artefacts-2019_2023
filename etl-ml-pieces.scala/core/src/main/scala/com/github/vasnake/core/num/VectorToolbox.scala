@@ -8,7 +8,8 @@ import scala.reflect.ClassTag
 object VectorToolbox {
 
   def selectIndexed[
-    @specialized(Double, Float) T: ClassTag
+    @specialized(Double, Float)
+    T : ClassTag
   ](src: Array[T], indices: Array[Int]): Array[T] = {
 
     if (src.isEmpty || indices.isEmpty) Array.empty

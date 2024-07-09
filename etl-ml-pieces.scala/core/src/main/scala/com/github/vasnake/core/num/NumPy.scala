@@ -199,9 +199,11 @@ object NumPy {
     res
   }
 
-  def cumulativeSum[@specialized(Double, Float, Int) T: ClassTag](xs: Array[T])(implicit ev: Numeric[T]): Array[T] = {
+  def cumulativeSum[
+    @specialized(Double, Float, Int)
+    T : ClassTag
+  ](xs: Array[T])(implicit ev: Numeric[T]): Array[T] = {
     // TODO: add docs, tests, optimizations
-
     val buf = xs.foldLeft(mutable.ArrayBuffer.empty[T])((acc, itm) => {
       if (acc.nonEmpty) acc.append(ev.plus(itm, acc.last))
       else acc.append(itm)
