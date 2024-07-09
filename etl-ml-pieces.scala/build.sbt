@@ -9,18 +9,24 @@ ThisBuild / scalaVersion := "2.12.19"
 lazy val `etl-ml-pieces-1923` =
   project
     .in(file("."))
-    // to compile and test this project you need this dependencies:
-    .dependsOn(Seq(core, text, macros).map(_ % Cctt) *)
+    // To compile and test this project you need this dependencies:
+    .dependsOn(Seq(core, common, text).map(_ % Cctt) :_*)
+    // Aggregation means that running a task on the aggregate project will also run it on the aggregated projects:
+    .aggregate(core, common, text)
     .settings(name := "etl-ml-pieces-1923")
     .settings(commonSettings)
     .settings(commonDependencies)
-    //    .settings(autoImportSettings)
-    // Aggregation means that running a task on the aggregate project will also run it on the aggregated projects:
-    .aggregate(core, text, macros)
+    //.settings(autoImportSettings)
 
 lazy val core =
   project
     .in(file("core"))
+    .settings(commonSettings)
+    .settings(commonDependencies)
+
+lazy val common =
+  project
+    .in(file("common"))
     .settings(commonSettings)
     .settings(commonDependencies)
     .settings(libraryDependencies ++= Seq(`commons-io`.`commons-io`))
@@ -31,12 +37,6 @@ lazy val text =
     .settings(commonSettings)
     .settings(commonDependencies)
     .settings(libraryDependencies ++= Seq(org.`scala-lang`.modules.`scala-parser-combinators`))
-
-lazy val macros =
-  project
-    .in(file("macros"))
-    .settings(commonSettings)
-    .settings(commonDependencies)
 
 lazy val commonSettings = {
   lazy val commonCompilerPlugins = Seq(

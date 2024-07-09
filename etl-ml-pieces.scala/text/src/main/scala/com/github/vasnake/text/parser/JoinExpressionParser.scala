@@ -1,9 +1,18 @@
 /**
  * Created by vasnake@gmail.com on 2024-07-08
+ *
+ * TODO: review this standalone project:
+ * https://github.com/vasnake/join-expression-parser
+ * and decide what to do with code duplication.
+ * Probably nothing, here we have dependency for ETL job and there we have tech demo.
+ * At least I need to cross-ref both codebases.
  */
 package com.github.vasnake.text.parser
 
 import scala.util.parsing.combinator.RegexParsers
+
+// TODO: add stack-based parser (port from python module)
+// TODO: add tests
 
 object JoinExpressionParser {
 

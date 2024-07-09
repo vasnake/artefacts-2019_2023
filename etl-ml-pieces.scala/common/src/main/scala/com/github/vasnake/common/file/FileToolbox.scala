@@ -1,15 +1,13 @@
 /**
  * Created by vasnake@gmail.com on 2024-07-08
  */
-package com.github.vasnake.core.file
+package com.github.vasnake.common.file
 
-// TODO: remove dependency (or move module from core)
 import org.apache.commons.io.FilenameUtils
-
 import java.io.File
 import java.net.URI
 
-// TODO: add tests
+// TODO: add docstrings, tests
 
 object FileToolbox {
 
@@ -76,7 +74,41 @@ object FileToolbox {
    */
   def getResourcePath(obj: Any, name: String): String = getResourceURI(obj, name).getRawPath
 
-  def getAbsolutePath(relpath: String): String = {
-    new File(relpath).getAbsolutePath
+  def getAbsolutePath(relativePath: String): String = {
+    (new File(relativePath)).getAbsolutePath
   }
+
+  def makeDirs(path: String): Boolean = {
+    (new File(path)).mkdirs()
+  }
+
+  private val dont_forget_to_drop_this_HDFSFileToolbox =
+    """
+
+object HDFSFileToolbox {
+  import org.apache.spark.sql.SparkSession
+
+  /**
+    * Read text from `path` using sparkContext.textFile.
+    * Obtain spark session using `SparkSession.builder().getOrCreate()`.
+    *
+    * @param path path to text file on hdfs (or local disk)
+    * @return text combined from lines separated with '\n'
+    */
+  def loadTextFile(path: String): String = {
+    val  spark: SparkSession = SparkSession.builder().getOrCreate()
+    val sc = spark.sparkContext
+
+    // sort lines by index in attempt to preserve lines order in file
+    val lines = sc.textFile(path, minPartitions = 1)
+      .zipWithIndex
+      .collect
+      .sortBy(_._2).map(_._1)
+
+    lines.mkString("\n")
+  }
+
+}
+
+      """
 }

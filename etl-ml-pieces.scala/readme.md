@@ -123,13 +123,15 @@ For `build.sbt` tricks see https://github.com/DevInsideYou/tagless-final/blob/ma
 ### proposed projects schema
 
 - core (com.github.vasnake.core)
-    * FileToolbox
-    * StringToolbox
+    * StringToolbox com.github.vasnake.core.text.StringToolbox
     * VectorToolbox
     * num-sci-py lib
     * configured aggregators (pipeline + config) from joiner
 
-- text
+- common com.github.vasnake.common (apache commons)
+    * FileToolbox com.github.vasnake.common.file.FileToolbox
+
+- text (parser combinators)
     * com.github.vasnake.text.parser.JoinExpressionParser
     * com.github.vasnake.text.evaluator.JoinExpressionEvaluator
     * TODO: add stack-based parser (based on python module)
