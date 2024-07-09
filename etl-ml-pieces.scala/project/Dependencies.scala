@@ -24,6 +24,15 @@ object Dependencies {
   }
 
   object org {
+    object apache {
+      object commons {
+        // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
+        //libraryDependencies += "org.apache.commons" % "commons-math3" % "3.6.1"
+        val `commons-math3` =
+          "org.apache.commons" % "commons-math3" % "3.6.1"
+      }
+    }
+
     object `scala-lang` {
       object modules {
         // https://mvnrepository.com/artifact/org.scala-lang.modules/scala-parser-combinators

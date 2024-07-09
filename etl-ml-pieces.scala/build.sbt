@@ -29,7 +29,10 @@ lazy val common =
     .in(file("common"))
     .settings(commonSettings)
     .settings(commonDependencies)
-    .settings(libraryDependencies ++= Seq(`commons-io`.`commons-io`))
+    .settings(libraryDependencies ++= Seq(
+      `commons-io`.`commons-io`,
+      org.apache.commons.`commons-math3`,
+    ))
 
 lazy val text =
   project

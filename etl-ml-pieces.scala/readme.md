@@ -126,10 +126,13 @@ For `build.sbt` tricks see https://github.com/DevInsideYou/tagless-final/blob/ma
     * StringToolbox com.github.vasnake.core.text.StringToolbox
     * VectorToolbox com.github.vasnake.core.num.VectorToolbox
     * num-sci-py lib
+        - com.github.vasnake.core.num.NumPy
+        - com.github.vasnake.core.num.SciPy.PCHIP
     * configured aggregators (pipeline + config) from joiner
 
 - common com.github.vasnake.common (apache commons)
     * FileToolbox com.github.vasnake.common.file.FileToolbox
+    * numpy com.github.vasnake.common.num.NumPy
 
 - text (parser combinators)
     * com.github.vasnake.text.parser.JoinExpressionParser
