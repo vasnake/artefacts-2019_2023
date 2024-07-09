@@ -124,7 +124,7 @@ For `build.sbt` tricks see https://github.com/DevInsideYou/tagless-final/blob/ma
 
 - core (com.github.vasnake.core)
     * StringToolbox com.github.vasnake.core.text.StringToolbox
-    * VectorToolbox
+    * VectorToolbox com.github.vasnake.core.num.VectorToolbox
     * num-sci-py lib
     * configured aggregators (pipeline + config) from joiner
 

@@ -24,7 +24,7 @@ object StringToolbox {
   }
 
   /**
-   * base64 extra chars mapping from python implementation
+   * base64 extra chars mapping, from python implementation
    * https://tools.ietf.org/html/rfc3548
    */
   object DefaultB64Mapping {
@@ -48,14 +48,14 @@ object StringToolbox {
      * Split string by separator, take item in `pos` position and convert it to double
      * @param pos zero-based item position in the string
      * @param sep splitting marker
-     * @return a parsed number or None
+     * @return parsed number or None
      */
     def extractNumber(pos: Int)(implicit  sep: Separators): Option[Double] = {
       Try { src.splitTrim(sep)(pos).toDouble }.toOption
     }
 
     /**
-     * Convert string to array of trimmed strings, empty items will be filter out.
+     * Convert string to array of trimmed strings, empty items will be filtered out.
      * @param sep split marker
      * @return empty array or array of trimmed strings
      */
