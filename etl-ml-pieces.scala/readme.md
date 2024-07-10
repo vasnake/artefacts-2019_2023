@@ -143,8 +143,7 @@ For `build.sbt` tricks see
     * num-sci-py lib
         - com.github.vasnake.core.num.NumPy
         - com.github.vasnake.core.num.SciPy.PCHIP
-https://scastie.scala-lang.org/vasnake/09scQtySSlCLMkaHD71trQ/5
-    * configured aggregators (pipeline + config) from joiner
+    * configured aggregators (pipeline + config) from joiner com.github.vasnake.core.aggregation.TransformersPipeline
 
 - common com.github.vasnake.common (apache commons)
     * FileToolbox com.github.vasnake.common.file.FileToolbox
