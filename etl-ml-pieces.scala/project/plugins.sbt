@@ -1,4 +1,4 @@
-ThisBuild / autoStartServer := false
+//ThisBuild / autoStartServer := false
 
 // The std library for sbt is handled by sbt itself so no need to include it in the report.
 dependencyUpdatesFilter -= moduleFilter(name = "scala-library")

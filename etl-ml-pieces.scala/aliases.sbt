@@ -6,13 +6,8 @@ addCommandAlias("ls", "projects")
 addCommandAlias("cd", "project")
 addCommandAlias("root", "cd etl-ml-pieces-1923")
 addCommandAlias("c", "compile")
-addCommandAlias("ca", "Test / compile")
 addCommandAlias("t", "test")
 addCommandAlias("r", "reload")
-addCommandAlias("rn", "run")
-addCommandAlias("rs", "reStart")
-addCommandAlias("s", "reStop")
-addCommandAlias("star", "thankYouStars")
 addCommandAlias(
   "styleCheck",
   "scalafmtSbtCheck; scalafmtCheckAll; Test / compile; scalafixAll --check",
@@ -35,14 +30,10 @@ onLoadMessage +=
       |│ ${styled("cd")}          │ project           │
       |│ ${styled("root")}        │ cd root           │
       |│ ${styled("c")}           │ compile           │
-      |│ ${styled("ca")}          │ compile all       │
       |│ ${styled("t")}           │ test              │
       |│ ${styled("r")}           │ reload            │
-      |│ ${styled("rn")}          │ run               │
-      |│ ${styled("rs")}          │ reStart           │
-      |│ ${styled("s")}           │ reStop            │
-      |│ ${styled("star")}        │ thankYouStars     │
       |│ ${styled("styleCheck")}  │ fmt & fix checks  │
       |│ ${styled("styleFix")}    │ fix then fmt      │
       |│ ${styled("up2date")}     │ dependencyUpdates │
       |╰─────────────┴───────────────────╯""".stripMargin
+// print onLoadMessage

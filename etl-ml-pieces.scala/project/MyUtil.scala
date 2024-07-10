@@ -4,6 +4,9 @@ import scala.sys.process._
 import sbt._
 
 object MyUtil {
+  val Cctt: String =
+    "compile->compile;test->test"
+
   def styled(in: Any): String =
     scala.Console.CYAN + in + scala.Console.RESET
 
@@ -20,6 +23,8 @@ object MyUtil {
       .extract(state)
       .currentRef
       .project
+
+  // hidden
 
   private def gitPrompt: Option[String] =
     for {
@@ -44,7 +49,4 @@ object MyUtil {
 
   private val noopProcessLogger: ProcessLogger =
     ProcessLogger(_ => (), _ => ())
-
-  val Cctt: String =
-    "compile->compile;test->test"
 }

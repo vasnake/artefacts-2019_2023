@@ -1,4 +1,4 @@
 import Dependencies._
 
-ThisBuild / semanticdbEnabled := true
-ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
+ThisBuild / semanticdbEnabled := true // produce semanticdb files to run semantic rules like RemoveUnused
+ThisBuild / semanticdbVersion := scalafixSemanticdb.revision // print semanticdbVersion

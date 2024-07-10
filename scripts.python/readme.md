@@ -2,6 +2,8 @@
 
 Collection of some interesting pieces from my projects.
 
+WIP
+
 ## What do we have here
 
 - npz_to_json.py
@@ -10,5 +12,3 @@ Collection of some interesting pieces from my projects.
 - integration tests scripts (sh, py)
 - wrappers for spark-scala classes, functions
 - apps: learn, apply, export, join
-
-TBD

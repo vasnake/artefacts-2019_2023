@@ -2,13 +2,12 @@
 
 Collection of some interesting pieces from my projects.
 
+WIP
+
 Spark 2.4.8; Scala 2.12.19; sbt 1.10.0 (migration to Spark 3 is WIP)
 
 My local station env (win11 + wsl2)
 ```sh
-# run project sbt
-alias psbt='export JAVA_OPTS="-XX:MaxMetaspaceSize=1G -Xmx4G -XX:+UseParallelGC" && pushd /mnt/c/Users/valik/data/github/artefacts-2019_2023/etl-ml-pieces.scala/ && sbt -v && popd'
-
 # coursier update
 cs setup
 
@@ -20,11 +19,27 @@ sbt new devinsideyou/scala-seed.g8
     name [etl-ml-pieces-1923]:
     organization [com.github.vasnake]:
     package [interesting.pieces.1923]:
-# some tuning required
+# some tuning required ...
+
+# start project sbt
+alias psbt='export JAVA_OPTS="-XX:MaxMetaspaceSize=1G -Xmx4G -XX:+UseParallelGC" && pushd /mnt/c/Users/valik/data/github/artefacts-2019_2023/etl-ml-pieces.scala/ && sbt -v && popd'
+
+psbt
 ```
 WSL shit
 
-For `build.sbt` tricks see https://github.com/DevInsideYou/tagless-final/blob/master/expression-problem/build.sbt
+Sometimes I want to run sbt in PS
+```s
+pushd ($env:HOMEDRIVE + $env:HOMEPATH + "\.")
+pushd .\data\github\artefacts-2019_2023\etl-ml-pieces.scala\
+$OutputEncoding = [console]::InputEncoding = [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
+sbt -v "-Dfile.encoding=UTF-8"
+```
+PowerShell shit
+
+For `build.sbt` tricks see
+- https://github.com/DevInsideYou/tagless-final/blob/master/expression-problem/build.sbt
+- https://github.com/tofu-tf/tofu/blob/master/build.sbt#L555
 
 ## What do we have here
 
@@ -128,6 +143,7 @@ For `build.sbt` tricks see https://github.com/DevInsideYou/tagless-final/blob/ma
     * num-sci-py lib
         - com.github.vasnake.core.num.NumPy
         - com.github.vasnake.core.num.SciPy.PCHIP
+https://scastie.scala-lang.org/vasnake/09scQtySSlCLMkaHD71trQ/5
     * configured aggregators (pipeline + config) from joiner
 
 - common com.github.vasnake.common (apache commons)
@@ -137,8 +153,7 @@ For `build.sbt` tricks see https://github.com/DevInsideYou/tagless-final/blob/ma
 - text (parser combinators)
     * com.github.vasnake.text.parser.JoinExpressionParser
     * com.github.vasnake.text.evaluator.JoinExpressionEvaluator
-    * TODO: add stack-based parser (based on python module)
-    * TODO: add tests
+    * TODO: integrate with https://github.com/vasnake/join-expression-parser; add stack-based parser (based on python module); add tests
 
 - etl-core
     * grouped features

@@ -1,7 +1,6 @@
 import sbt._
 
 object Dependencies {
-
   object com {
     object eed3si9n {
       object expecty {
@@ -27,7 +26,7 @@ object Dependencies {
     object apache {
       object commons {
         // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
-        //libraryDependencies += "org.apache.commons" % "commons-math3" % "3.6.1"
+        // libraryDependencies += "org.apache.commons" % "commons-math3" % "3.6.1"
         val `commons-math3` =
           "org.apache.commons" % "commons-math3" % "3.6.1"
       }
@@ -36,7 +35,7 @@ object Dependencies {
     object `scala-lang` {
       object modules {
         // https://mvnrepository.com/artifact/org.scala-lang.modules/scala-parser-combinators
-        //libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "2.4.0"
+        // libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "2.4.0"
         val `scala-parser-combinators` =
           "org.scala-lang.modules" %% "scala-parser-combinators" % "2.4.0"
       }
