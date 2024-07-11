@@ -4,7 +4,7 @@ package com.github.vasnake.core.num
 
 import scala.collection.mutable
 
-import com.github.vasnake.core.num.NumPy.transpose
+import com.github.vasnake.core.num.NumPy._
 
 object SciPy {
 
@@ -136,6 +136,41 @@ object SciPy {
       if (mmm) 3.0 * m0
       else if (mask) 0.0
       else d
+    }
+  }
+
+  /** simplified copy-paste from scipy/interpolate/_ppoly.so evaluate_bernstein
+    *
+    * https://github.com/scipy/scipy/blob/3cfd10e463da4c04732639ceafd9427bf3bb2a8a/scipy/interpolate/_ppoly.pyx#L1126
+    */
+  object PPolyBernsteinCubic {
+    def interpolate(
+      xval: Double,
+      coefficients: Array[Array[Double]],
+      intervals: Array[Double],
+    ): Double = {
+      val idx = searchSorted(intervals, xval)
+
+      if (idx < 0) Double.NaN
+      else
+        evaluateBpoly(
+          (xval - intervals(idx)) / (intervals(idx + 1) - intervals(idx)),
+          coefficients,
+          idx,
+        )
+    }
+
+    @inline private def evaluateBpoly(
+      point: Double,
+      coefficients: Array[Array[Double]],
+      idx: Int,
+    ): Double = {
+      val one = 1.0 - point
+
+      coefficients(0)(idx) * one * one * one +
+        coefficients(1)(idx) * 3.0 * one * one * point +
+        coefficients(2)(idx) * 3.0 * one * point * point +
+        coefficients(3)(idx) * point * point * point
     }
   }
 }

@@ -167,6 +167,7 @@ For `build.sbt` tricks see
 
 - ml-models (Grinder complex models i.e. pipelines)
     * com.github.vasnake.`ml-models`.complex.GrinderMLModel
+    * com.github.vasnake.`ml-models`.complex.LalBinarizedMultinomialNb
 
 - json
     * json toolbox
