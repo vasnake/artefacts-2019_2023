@@ -9,11 +9,11 @@ addCommandAlias("c", "compile")
 addCommandAlias("t", "test")
 addCommandAlias("r", "reload")
 addCommandAlias(
-  "styleCheck",
+  "sc", // fmt, fix checks
   "scalafmtSbtCheck; scalafmtCheckAll; Test / compile; scalafixAll --check",
 )
 addCommandAlias(
-  "styleFix",
+  "sf", // fix, fmt
   "Test / compile; scalafixAll; scalafmtSbt; scalafmtAll",
 )
 addCommandAlias(
@@ -32,8 +32,8 @@ onLoadMessage +=
       |│ ${styled("c")}           │ compile           │
       |│ ${styled("t")}           │ test              │
       |│ ${styled("r")}           │ reload            │
-      |│ ${styled("styleCheck")}  │ fmt & fix checks  │
-      |│ ${styled("styleFix")}    │ fix then fmt      │
+      |│ ${styled("sc")}          │ sfmt, sfix checks │
+      |│ ${styled("sf")}          │ sfix, sfmt        │
       |│ ${styled("up2date")}     │ dependencyUpdates │
       |╰─────────────┴───────────────────╯""".stripMargin
 // print onLoadMessage
