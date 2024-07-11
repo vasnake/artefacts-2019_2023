@@ -161,6 +161,7 @@ For `build.sbt` tricks see
     * com.github.vasnake.ml-core.models.ScoreQuantileThreshold
     * com.github.vasnake.ml-core.models.Binarizer
     * com.github.vasnake.ml-core.models.GroupedFeaturesTfidf
+    * com.github.vasnake.ml-core.models.Imputer
 
 - ml-models
 
