@@ -157,9 +157,8 @@ For `build.sbt` tricks see
 - etl-core
     * grouped features com.github.vasnake.etl-core.GroupedFeatures
 
-- ml-core
-    * estimators
-    * transformers
+- ml-core (double, array[double], fit, transform: estimators, transformers)
+    * com.github.vasnake.ml-core.models.ScoreQuantileThreshold
 
 - ml-models
 

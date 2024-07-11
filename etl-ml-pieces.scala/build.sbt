@@ -12,9 +12,9 @@ lazy val `etl-ml-pieces-1923` =
   project
     .in(file("."))
     // To compile and test this project you need this dependencies:
-    .dependsOn(Seq(core, common, text, `etl-core`).map(_ % Cctt): _*)
+    .dependsOn(Seq(core, common, text, `etl-core`, `ml-core`).map(_ % Cctt): _*)
     // Aggregation means that running a task on the aggregate project will also run it on the aggregated projects:
-    .aggregate(core, common, text, `etl-core`)
+    .aggregate(core, common, text, `etl-core`, `ml-core`)
     .settings(name := "etl-ml-pieces-1923")
     .settings(commonSettings)
     .settings(commonDependencies)
@@ -50,6 +50,13 @@ lazy val `etl-core` =
   project
     .in(file("etl-core"))
     .dependsOn(Seq(core).map(_ % Cctt): _*)
+    .settings(commonSettings)
+    .settings(commonDependencies)
+
+lazy val `ml-core` =
+  project
+    .in(file("ml-core"))
+    .dependsOn(Seq(core, common).map(_ % Cctt): _*)
     .settings(commonSettings)
     .settings(commonDependencies)
 
