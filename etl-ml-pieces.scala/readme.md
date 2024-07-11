@@ -160,6 +160,7 @@ For `build.sbt` tricks see
 - ml-core (double, array[double], fit, transform: estimators, transformers)
     * com.github.vasnake.ml-core.models.ScoreQuantileThreshold
     * com.github.vasnake.ml-core.models.Binarizer
+    * com.github.vasnake.ml-core.models.GroupedFeaturesTfidf
 
 - ml-models
 
