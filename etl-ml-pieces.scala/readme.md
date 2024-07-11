@@ -155,7 +155,7 @@ For `build.sbt` tricks see
     * TODO: integrate with https://github.com/vasnake/join-expression-parser; add stack-based parser (based on python module); add tests
 
 - etl-core
-    * grouped features
+    * grouped features com.github.vasnake.etl-core.GroupedFeatures
 
 - ml-core
     * estimators
