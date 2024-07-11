@@ -158,13 +158,14 @@ For `build.sbt` tricks see
     * grouped features com.github.vasnake.etl-core.GroupedFeatures
 
 - ml-core (double, array[double], fit, transform: estimators, transformers)
+    simple (one-stage) models
     * com.github.vasnake.ml-core.models.ScoreQuantileThreshold
     * com.github.vasnake.ml-core.models.Binarizer
     * com.github.vasnake.ml-core.models.GroupedFeaturesTfidf
     * com.github.vasnake.ml-core.models.Imputer
     * com.github.vasnake.`ml-core`.models.Scaler
 
-- ml-models
+- ml-models (Grinder complex models i.e. pipelines)
 
 - json
     * json toolbox
@@ -186,6 +187,7 @@ For `build.sbt` tricks see
     * MetastoreQueryProcessorWithConnPool
 
 - spark-transformers
+    * com.mrg.dm.grinder.features.CollectionColumnDecoder
     * column aggregator (configureg)
     * dataset aggregator (DatasetAggregators)
     * Stratified Sampling
