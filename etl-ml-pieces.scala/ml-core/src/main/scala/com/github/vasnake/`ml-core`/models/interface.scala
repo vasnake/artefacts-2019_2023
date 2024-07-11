@@ -3,7 +3,6 @@
 package com.github.vasnake.`ml-core`.models
 
 object interface {
-
   trait GroupedFeaturesTransformer { // TODO: rename to InplaceTransformer
     def transform(input: Array[Double]): Unit
   }
@@ -21,5 +20,4 @@ object interface {
   }
 
   trait PostprocessorConfig
-
 }

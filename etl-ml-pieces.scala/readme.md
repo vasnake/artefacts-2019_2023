@@ -166,6 +166,7 @@ For `build.sbt` tricks see
     * com.github.vasnake.`ml-core`.models.Scaler
 
 - ml-models (Grinder complex models i.e. pipelines)
+    * com.github.vasnake.`ml-models`.complex.GrinderMLModel
 
 - json
     * json toolbox
