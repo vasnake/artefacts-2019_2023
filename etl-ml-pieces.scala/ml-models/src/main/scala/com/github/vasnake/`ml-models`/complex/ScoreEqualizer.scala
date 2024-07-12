@@ -5,7 +5,7 @@ package com.github.vasnake.`ml-models`.complex
 import com.github.vasnake.`ml-core`.models.interface._
 import com.github.vasnake.common.num.FastMath
 import com.github.vasnake.core.num.SciPy.PPolyBernsteinCubic
-
+// TODO: move to ml-core
 case class ScoreEqualizerConfig(
   minval: Double,
   maxval: Double,
