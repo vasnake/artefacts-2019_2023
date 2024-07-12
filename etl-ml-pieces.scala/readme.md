@@ -172,10 +172,8 @@ For `build.sbt` tricks see
     * com.github.vasnake.`ml-models`.complex.ScoreAudienceModel
 
 - json
-    * json toolbox
-
+    * com.github.vasnake.json.JsonToolbox
 ???
-com.mrg.dm.toolbox.JsonToolbox
 com.mrg.dm.grinder.loaders.ModelsConfigJson
 
 - hive udf (java)

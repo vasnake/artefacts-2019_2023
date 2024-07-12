@@ -1,6 +1,16 @@
 import sbt._
 
 object Dependencies {
+  object io {
+    object circe {
+      // https://mvnrepository.com/artifact/io.circe/circe-core
+      // libraryDependencies += "io.circe" %% "circe-core" % "0.14.9"
+      val `circe-core` = "io.circe" %% "circe-core" % "0.14.9"
+      val `circe-generic` = "io.circe" %% "circe-generic" % "0.14.9"
+      val `circe-parser` = "io.circe" %% "circe-parser" % "0.14.9"
+    }
+  }
+
   object com {
     object eed3si9n {
       object expecty {
@@ -23,6 +33,11 @@ object Dependencies {
   }
 
   object org {
+    // https://mvnrepository.com/artifact/org.json4s/json4s-jackson
+    // libraryDependencies += "org.json4s" %% "json4s-jackson" % "4.0.7"
+    object json4s {
+      val `json4s-jackson` = "org.json4s" %% "json4s-jackson" % "4.0.7"
+    }
     object pmml4s {
       // https://mvnrepository.com/artifact/org.pmml4s/pmml4s
       // libraryDependencies += "org.pmml4s" %% "pmml4s" % "1.0.1"

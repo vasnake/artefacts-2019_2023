@@ -1,4 +1,5 @@
 import Dependencies._
+import Dependencies.{ io => dio } // conflict with sbt.io
 import MyUtil._
 
 // Spark 2.4.8; Scala 2.12.19: it was production setup for our team
@@ -12,9 +13,9 @@ lazy val `etl-ml-pieces-1923` =
   project
     .in(file("."))
     // To compile and test this project you need this dependencies:
-    .dependsOn(Seq(core, common, text, `etl-core`, `ml-core`, `ml-models`).map(_ % Cctt): _*)
+    .dependsOn(Seq(core, common, text, `etl-core`, `ml-core`, `ml-models`, json).map(_ % Cctt): _*)
     // Aggregation means that running a task on the aggregate project will also run it on the aggregated projects:
-    .aggregate(core, common, text, `etl-core`, `ml-core`, `ml-models`)
+    .aggregate(core, common, text, `etl-core`, `ml-core`, `ml-models`, json)
     .settings(name := "etl-ml-pieces-1923")
     .settings(commonSettings)
     .settings(commonDependencies)
@@ -45,6 +46,20 @@ lazy val text =
     .settings(commonSettings)
     .settings(commonDependencies)
     .settings(libraryDependencies ++= Seq(org.`scala-lang`.modules.`scala-parser-combinators`))
+
+lazy val json =
+  project
+    .in(file("json"))
+    .settings(commonSettings)
+    .settings(commonDependencies)
+    .settings(
+      libraryDependencies ++= Seq(
+        dio.circe.`circe-core`,
+        dio.circe.`circe-generic`,
+        dio.circe.`circe-parser`,
+        org.json4s.`json4s-jackson`,
+      )
+    )
 
 lazy val `etl-core` =
   project
