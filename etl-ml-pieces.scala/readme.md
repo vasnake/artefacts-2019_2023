@@ -173,8 +173,8 @@ For `build.sbt` tricks see
 
 - json
     * com.github.vasnake.json.JsonToolbox
-???
-com.mrg.dm.grinder.loaders.ModelsConfigJson
+- ml-models-json
+    * com.github.vasnake.json.read.ModelConfig
 
 - hive udf (java)
 

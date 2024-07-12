@@ -13,9 +13,13 @@ lazy val `etl-ml-pieces-1923` =
   project
     .in(file("."))
     // To compile and test this project you need this dependencies:
-    .dependsOn(Seq(core, common, text, `etl-core`, `ml-core`, `ml-models`, json).map(_ % Cctt): _*)
+    .dependsOn(
+      Seq(core, common, text, `etl-core`, `ml-core`, `ml-models`, json, `ml-models-json`).map(
+        _ % Cctt
+      ): _*
+    )
     // Aggregation means that running a task on the aggregate project will also run it on the aggregated projects:
-    .aggregate(core, common, text, `etl-core`, `ml-core`, `ml-models`, json)
+    .aggregate(core, common, text, `etl-core`, `ml-core`, `ml-models`, json, `ml-models-json`)
     .settings(name := "etl-ml-pieces-1923")
     .settings(commonSettings)
     .settings(commonDependencies)
@@ -82,6 +86,21 @@ lazy val `ml-models` =
     .dependsOn(Seq(`etl-core`, `ml-core`).map(_ % Cctt): _*)
     .settings(commonSettings)
     .settings(commonDependencies)
+
+lazy val `ml-models-json` =
+  project
+    .in(file("ml-models-json"))
+    .dependsOn(Seq(json, `ml-models`).map(_ % Cctt): _*)
+    .settings(commonSettings)
+    .settings(commonDependencies)
+//    .settings(
+//      libraryDependencies ++= Seq(
+//        dio.circe.`circe-core`,
+//        dio.circe.`circe-generic`,
+//        dio.circe.`circe-parser`,
+//        org.json4s.`json4s-jackson`,
+//      )
+//    )
 
 // settings
 

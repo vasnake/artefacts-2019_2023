@@ -3,10 +3,16 @@
 package com.github.vasnake.json
 
 // TODO: do you really need two libs?
-import io.circe.Json
+import io.circe._
 import org.json4s._
 
 object JsonToolbox {
+  def objExpectedErr: Nothing = sys.error("object expected")
+
+  def decodeErr: DecodingFailure => Nothing = (e: DecodingFailure) => sys.error(e.getMessage())
+
+  def j2m(j: Json): Map[String, Json] = j.asObject.getOrElse(objExpectedErr).toMap
+
   /** parse input text, return json object if it is an object
     * @param text json text
     * @return json object
