@@ -168,11 +168,15 @@ For `build.sbt` tricks see
 - ml-models (Grinder complex models i.e. pipelines)
     * com.github.vasnake.`ml-models`.complex.GrinderMLModel
     * com.github.vasnake.`ml-models`.complex.LalBinarizedMultinomialNb
-
-???
+    * com.github.vasnake.`ml-models`.complex.LalTfidfScaledSgdcModel
+    * com.github.vasnake.`ml-models`.complex.ScoreAudienceModel
 
 - json
     * json toolbox
+
+???
+com.mrg.dm.toolbox.JsonToolbox
+com.mrg.dm.grinder.loaders.ModelsConfigJson
 
 - hive udf (java)
 

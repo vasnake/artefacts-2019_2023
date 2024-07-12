@@ -5,6 +5,7 @@ package com.github.vasnake.core.aggregation
 import scala.annotation.tailrec
 
 import com.github.vasnake.core.aggregation.config._
+// TODO: move to etl-core
 
 /** list of stages
   */

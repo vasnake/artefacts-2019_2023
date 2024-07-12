@@ -3,6 +3,7 @@
 package com.github.vasnake.`ml-models`.complex
 
 import com.github.vasnake.`ml-core`.models.interface._
+// TODO: move to ml-core
 
 // SB: Sample Based, sample groups used to train model
 case class SBGroupedTransformerConfig(groups: Map[String, PostprocessorConfig])

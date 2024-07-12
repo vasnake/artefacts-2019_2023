@@ -4,7 +4,7 @@ package com.github.vasnake.`ml-models`.complex
 
 import com.github.vasnake.`ml-core`.models.interface.Estimator
 import com.github.vasnake.common.num.FastMath
-
+// TODO: move to ml-core
 case class MultinomialNB(config: MultinomialNBConfig) extends Estimator {
   // `predict_proba` from
   // https://github.com/scikit-learn/scikit-learn/blob/3743a55aed5c9ee18c8b94b95dfc4c41d0ae99f5/sklearn/naive_bayes.py#L102
