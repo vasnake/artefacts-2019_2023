@@ -23,6 +23,12 @@ object Dependencies {
   }
 
   object org {
+    object pmml4s {
+      // https://mvnrepository.com/artifact/org.pmml4s/pmml4s
+      // libraryDependencies += "org.pmml4s" %% "pmml4s" % "1.0.1"
+      val pmml4s = "org.pmml4s" %% "pmml4s" % "1.0.1"
+    }
+
     object apache {
       object commons {
         // https://mvnrepository.com/artifact/org.apache.commons/commons-math3

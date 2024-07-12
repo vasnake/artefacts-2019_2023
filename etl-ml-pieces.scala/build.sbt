@@ -59,6 +59,7 @@ lazy val `ml-core` =
     .dependsOn(Seq(core, common).map(_ % Cctt): _*)
     .settings(commonSettings)
     .settings(commonDependencies)
+    .settings(libraryDependencies ++= Seq(org.pmml4s.pmml4s))
 
 lazy val `ml-models` =
   project

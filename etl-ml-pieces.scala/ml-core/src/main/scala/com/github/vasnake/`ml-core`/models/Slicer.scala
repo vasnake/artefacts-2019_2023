@@ -1,6 +1,6 @@
-/** Created by vasnake@gmail.com on 2024-07-11
+/** Created by vasnake@gmail.com on 2024-07-12
   */
-package com.github.vasnake.`ml-models`.complex
+package com.github.vasnake.`ml-core`.models
 
 import com.github.vasnake.core.num.VectorToolbox
 
