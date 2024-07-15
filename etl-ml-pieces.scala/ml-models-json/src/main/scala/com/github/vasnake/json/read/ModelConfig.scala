@@ -10,7 +10,6 @@ import io.circe.Json
 
 object ModelConfig {
   // TODO: hide Json under toolbox wraps
-
   def loadSBGroupedEqualizersConfigFromJson(json: Json): SBGroupedTransformerConfig = {
     // TODO: simplify parsers code, apply that pattern to all parsers:
     val equalizerConfig = j2m(json)

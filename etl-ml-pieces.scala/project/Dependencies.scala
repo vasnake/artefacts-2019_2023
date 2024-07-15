@@ -45,6 +45,11 @@ object Dependencies {
     }
 
     object apache {
+      object hive {
+        // https://mvnrepository.com/artifact/org.apache.hive/hive-exec
+        // libraryDependencies += "org.apache.hive" % "hive-exec" % "2.1.1"
+        val `hive-exec` = "org.apache.hive" % "hive-exec" % "2.1.1"
+      }
       object commons {
         // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
         // libraryDependencies += "org.apache.commons" % "commons-math3" % "3.6.1"

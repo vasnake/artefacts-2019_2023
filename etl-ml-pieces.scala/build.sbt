@@ -14,12 +14,32 @@ lazy val `etl-ml-pieces-1923` =
     .in(file("."))
     // To compile and test this project you need this dependencies:
     .dependsOn(
-      Seq(core, common, text, `etl-core`, `ml-core`, `ml-models`, json, `ml-models-json`, `hive-udaf-java`).map(
+      Seq(
+        core,
+        common,
+        text,
+        `etl-core`,
+        `ml-core`,
+        `ml-models`,
+        json,
+        `ml-models-json`,
+        `hive-udaf-java`,
+      ).map(
         _ % Cctt
       ): _*
     )
     // Aggregation means that running a task on the aggregate project will also run it on the aggregated projects:
-    .aggregate(core, common, text, `etl-core`, `ml-core`, `ml-models`, json, `ml-models-json`, `hive-udaf-java`)
+    .aggregate(
+      core,
+      common,
+      text,
+      `etl-core`,
+      `ml-core`,
+      `ml-models`,
+      json,
+      `ml-models-json`,
+      `hive-udaf-java`,
+    )
     .settings(name := "etl-ml-pieces-1923")
     .settings(commonSettings)
     .settings(commonDependencies)
@@ -99,12 +119,12 @@ lazy val `hive-udaf-java` =
     .in(file("hive-udaf-java"))
     .settings(commonSettings)
     .settings(commonDependencies)
-    .settings(Seq(
-      libraryDependencies ++= Seq(
-        // https://mvnrepository.com/artifact/org.apache.hive/hive-exec
-        // libraryDependencies += "org.apache.hive" % "hive-exec" % "2.1.1"
-        "org.apache.hive" % "hive-exec" % "2.1.1"
-      )),
+    .settings(
+      Seq(
+        libraryDependencies ++= Seq(
+          org.apache.hive.`hive-exec`
+        )
+      ),
       javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint:deprecation"),
       javaOptions ++= Seq("-Xms512M", "-Xmx2048M", "-XX:+CMSClassUnloadingEnabled"),
       // libraryDependencies += "org.pentaho" % "pentaho-aggdesigner-algorithm" % "5.1.5-jhyde" % Test,
