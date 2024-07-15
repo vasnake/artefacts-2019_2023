@@ -14,12 +14,12 @@ lazy val `etl-ml-pieces-1923` =
     .in(file("."))
     // To compile and test this project you need this dependencies:
     .dependsOn(
-      Seq(core, common, text, `etl-core`, `ml-core`, `ml-models`, json, `ml-models-json`).map(
+      Seq(core, common, text, `etl-core`, `ml-core`, `ml-models`, json, `ml-models-json`, `hive-udaf-java`).map(
         _ % Cctt
       ): _*
     )
     // Aggregation means that running a task on the aggregate project will also run it on the aggregated projects:
-    .aggregate(core, common, text, `etl-core`, `ml-core`, `ml-models`, json, `ml-models-json`)
+    .aggregate(core, common, text, `etl-core`, `ml-core`, `ml-models`, json, `ml-models-json`, `hive-udaf-java`)
     .settings(name := "etl-ml-pieces-1923")
     .settings(commonSettings)
     .settings(commonDependencies)
@@ -93,14 +93,32 @@ lazy val `ml-models-json` =
     .dependsOn(Seq(json, `ml-models`).map(_ % Cctt): _*)
     .settings(commonSettings)
     .settings(commonDependencies)
-//    .settings(
-//      libraryDependencies ++= Seq(
-//        dio.circe.`circe-core`,
-//        dio.circe.`circe-generic`,
-//        dio.circe.`circe-parser`,
-//        org.json4s.`json4s-jackson`,
-//      )
-//    )
+
+lazy val `hive-udaf-java` =
+  project
+    .in(file("hive-udaf-java"))
+    .settings(commonSettings)
+    .settings(commonDependencies)
+    .settings(Seq(
+      libraryDependencies ++= Seq(
+        // https://mvnrepository.com/artifact/org.apache.hive/hive-exec
+        // libraryDependencies += "org.apache.hive" % "hive-exec" % "2.1.1"
+        "org.apache.hive" % "hive-exec" % "2.1.1"
+      )),
+      javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint:deprecation"),
+      javaOptions ++= Seq("-Xms512M", "-Xmx2048M", "-XX:+CMSClassUnloadingEnabled"),
+      // libraryDependencies += "org.pentaho" % "pentaho-aggdesigner-algorithm" % "5.1.5-jhyde" % Test,
+      resolvers += Resolver.mavenLocal,
+      resolvers += "huawei-maven" at "https://repo.huaweicloud.com/repository/maven/huaweicloudsdk/",
+    )
+// Note: problem with `Error downloading org.pentaho:pentaho-aggdesigner-algorithm`. Following not working:
+// > Note: this artifact is located at Spring Plugins repository (https://repo.spring.io/plugins-release/)
+// > https://mvnrepository.com/artifact/org.pentaho/pentaho-aggdesigner-algorithm
+// > libraryDependencies += "org.pentaho" % "pentaho-aggdesigner-algorithm" % "5.1.5-jhyde" % Test
+//      resolvers += "Cloudera Repository" at "https://repository.cloudera.com/artifactory/cloudera-repos/",
+//      resolvers += "Cascading repo" at "https://conjars.org/repo",
+//      resolvers += "Spring Plugins" at "https://repo.spring.io/plugins-release/",
+//      resolvers += "Nexus Pentaho" at "https://public.nexus.pentaho.org/repository/proxy-public-3rd-party-release",
 
 // settings
 

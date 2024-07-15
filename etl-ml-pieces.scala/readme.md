@@ -173,10 +173,12 @@ For `build.sbt` tricks see
 
 - json
     * com.github.vasnake.json.JsonToolbox
+
 - ml-models-json
     * com.github.vasnake.json.read.ModelConfig
 
 - hive udf (java)
+    * com.github.vasnake.hive.java.udaf.GenericAvgUDAF
 
 - spark-logging
     * logging
@@ -186,9 +188,9 @@ For `build.sbt` tricks see
 - spark-udf-catalog
 
 - spark-io
-    * checkpoint (CheckpointService)
     * HDFSFileToolbox
-    * hive (partition) writer (два, из джойнилки и из трансформеров: DefaultHiveWriter)
+    * checkpoint (CheckpointService)
+    * hive (partition) writer (два: из джойнилки и из трансформеров: DefaultHiveWriter)
     * HiveExternalCatalog
     * MetastoreQueryProcessorWithConnPool
 
