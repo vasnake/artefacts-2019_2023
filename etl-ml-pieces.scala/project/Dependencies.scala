@@ -33,9 +33,15 @@ object Dependencies {
   }
 
   object org {
-    // https://mvnrepository.com/artifact/org.json4s/json4s-jackson
-    // libraryDependencies += "org.json4s" %% "json4s-jackson" % "4.0.7"
+
+    object unbescape {
+      // https://mvnrepository.com/artifact/org.unbescape/unbescape
+      val unbescape = "org.unbescape" % "unbescape" % "1.1.6.RELEASE"
+    }
+
     object json4s {
+      // https://mvnrepository.com/artifact/org.json4s/json4s-jackson
+      // libraryDependencies += "org.json4s" %% "json4s-jackson" % "4.0.7"
       val `json4s-jackson` = "org.json4s" %% "json4s-jackson" % "4.0.7"
     }
     object pmml4s {

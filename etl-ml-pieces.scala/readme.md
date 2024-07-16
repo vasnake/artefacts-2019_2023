@@ -180,12 +180,12 @@ For `build.sbt` tricks see
 - hive udf (java)
     * com.github.vasnake.hive.java.udaf.GenericAvgUDAF
 
-- spark-logging
-    * logging
-
-- spark-java-api udf
-- spark-catalyst-api udf
-- spark-udf-catalog
+- spark-udf
+    * spark-udf-java-api
+        grep 'import org.apache.spark.sql.api.java.UDF*'
+com.github.vasnake.spark.udf.java-api.HtmlUnescapeUDF
+    * spark-catalyst-api udf
+    * spark-udf-catalog
 
 - spark-io
     * HDFSFileToolbox

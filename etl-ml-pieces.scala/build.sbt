@@ -6,6 +6,7 @@ import MyUtil._
 
 ThisBuild / organization := "com.github.vasnake"
 ThisBuild / scalaVersion := "2.12.19"
+val sparkVersion = "2.4.8"
 
 // project
 
@@ -24,6 +25,7 @@ lazy val `etl-ml-pieces-1923` =
         json,
         `ml-models-json`,
         `hive-udaf-java`,
+        `spark-udf`,
       ).map(
         _ % Cctt
       ): _*
@@ -39,6 +41,7 @@ lazy val `etl-ml-pieces-1923` =
       json,
       `ml-models-json`,
       `hive-udaf-java`,
+      `spark-udf`,
     )
     .settings(name := "etl-ml-pieces-1923")
     .settings(commonSettings)
@@ -69,7 +72,12 @@ lazy val text =
     .in(file("text"))
     .settings(commonSettings)
     .settings(commonDependencies)
-    .settings(libraryDependencies ++= Seq(org.`scala-lang`.modules.`scala-parser-combinators`))
+    .settings(
+      libraryDependencies ++= Seq(
+        org.`scala-lang`.modules.`scala-parser-combinators`,
+        org.unbescape.unbescape,
+      )
+    )
 
 lazy val json =
   project
@@ -119,18 +127,52 @@ lazy val `hive-udaf-java` =
     .in(file("hive-udaf-java"))
     .settings(commonSettings)
     .settings(commonDependencies)
-    .settings(
-      Seq(
-        libraryDependencies ++= Seq(
-          org.apache.hive.`hive-exec`
-        )
-      ),
-      javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint:deprecation"),
-      javaOptions ++= Seq("-Xms512M", "-Xmx2048M", "-XX:+CMSClassUnloadingEnabled"),
-      // libraryDependencies += "org.pentaho" % "pentaho-aggdesigner-algorithm" % "5.1.5-jhyde" % Test,
-      resolvers += Resolver.mavenLocal,
-      resolvers += "huawei-maven" at "https://repo.huaweicloud.com/repository/maven/huaweicloudsdk/",
+    .settings(hiveSettings)
+
+lazy val `spark-udf` =
+  project
+    .in(file("spark-udf"))
+    .dependsOn(Seq(text).map(_ % Cctt): _*)
+    .settings(commonSettings)
+    .settings(commonDependencies)
+    .settings(sparkSettings)
+
+// settings
+
+lazy val sparkSettings = {
+
+  lazy val sparkDeps = Seq(
+    "org.apache.spark" %% "spark-hive",
+    "org.apache.spark" %% "spark-core",
+    "org.apache.spark" %% "spark-sql",
+    "org.apache.spark" %% "spark-mllib"
+  ).map(_ % sparkVersion)
+
+  lazy val dependencies = Seq(
+    libraryDependencies ++= sparkDeps.map(_ % Provided)
+  )
+
+  dependencies
+}
+
+lazy val hiveSettings = {
+
+  lazy val dependencies = Seq(
+        libraryDependencies ++= Seq(org.apache.hive.`hive-exec`).map(_ % Provided)
+  )
+
+  lazy val options = Seq(
+    javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint:deprecation"),
+    javaOptions ++= Seq("-Xms512M", "-Xmx2048M", "-XX:+CMSClassUnloadingEnabled"),
+  )
+
+  // libraryDependencies += "org.pentaho" % "pentaho-aggdesigner-algorithm" % "5.1.5-jhyde" % Test,
+  lazy val repos = Seq (
+    resolvers ++= Seq(
+      Resolver.mavenLocal,
+      "huawei-maven" at "https://repo.huaweicloud.com/repository/maven/huaweicloudsdk/",
     )
+  )
 // Note: problem with `Error downloading org.pentaho:pentaho-aggdesigner-algorithm`. Following not working:
 // > Note: this artifact is located at Spring Plugins repository (https://repo.spring.io/plugins-release/)
 // > https://mvnrepository.com/artifact/org.pentaho/pentaho-aggdesigner-algorithm
@@ -140,7 +182,8 @@ lazy val `hive-udaf-java` =
 //      resolvers += "Spring Plugins" at "https://repo.spring.io/plugins-release/",
 //      resolvers += "Nexus Pentaho" at "https://public.nexus.pentaho.org/repository/proxy-public-3rd-party-release",
 
-// settings
+  dependencies ++ options ++ repos
+}
 
 lazy val commonSettings = {
 
