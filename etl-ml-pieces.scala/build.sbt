@@ -145,7 +145,7 @@ lazy val sparkSettings = {
     "org.apache.spark" %% "spark-hive",
     "org.apache.spark" %% "spark-core",
     "org.apache.spark" %% "spark-sql",
-    "org.apache.spark" %% "spark-mllib"
+    "org.apache.spark" %% "spark-mllib",
   ).map(_ % sparkVersion)
 
   lazy val dependencies = Seq(
@@ -158,7 +158,7 @@ lazy val sparkSettings = {
 lazy val hiveSettings = {
 
   lazy val dependencies = Seq(
-        libraryDependencies ++= Seq(org.apache.hive.`hive-exec`).map(_ % Provided)
+    libraryDependencies ++= Seq(org.apache.hive.`hive-exec`).map(_ % Provided)
   )
 
   lazy val options = Seq(
@@ -167,7 +167,7 @@ lazy val hiveSettings = {
   )
 
   // libraryDependencies += "org.pentaho" % "pentaho-aggdesigner-algorithm" % "5.1.5-jhyde" % Test,
-  lazy val repos = Seq (
+  lazy val repos = Seq(
     resolvers ++= Seq(
       Resolver.mavenLocal,
       "huawei-maven" at "https://repo.huaweicloud.com/repository/maven/huaweicloudsdk/",
