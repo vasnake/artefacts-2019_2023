@@ -181,9 +181,9 @@ For `build.sbt` tricks see
     * com.github.vasnake.hive.java.udaf.GenericAvgUDAF
 
 - spark-udf
-    * spark-udf-java-api
-        grep 'import org.apache.spark.sql.api.java.UDF*'
-com.github.vasnake.spark.udf.`java-api`.HtmlUnescapeUDF
+    * spark-udf-java-api: grep 'import org.apache.spark.sql.api.java.UDF*'
+        - com.github.vasnake.spark.udf.`java-api`.HtmlUnescapeUDF
+        - com.github.vasnake.spark.udf.`java-api`.MapValuesOrderedUDF
 
     * spark-catalyst-api udf
     * spark-udf-catalog
