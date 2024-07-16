@@ -188,6 +188,7 @@ For `build.sbt` tricks see
 com.github.vasnake.spark.udf.`java-api`.HashToUINT32UDF
 com.github.vasnake.spark.udf.`java-api`.MurmurHash3_32UDF
 com.github.vasnake.spark.udf.`java-api`.MapJoinUDF
+com.github.vasnake.spark.udf.`java-api`.Uid2UserUDF
 
     * spark-catalyst-api udf
     * spark-udf-catalog
