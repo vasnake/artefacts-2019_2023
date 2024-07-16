@@ -185,6 +185,9 @@ For `build.sbt` tricks see
         - com.github.vasnake.spark.udf.`java-api`.HtmlUnescapeUDF
         - com.github.vasnake.spark.udf.`java-api`.MapValuesOrderedUDF
         - com.github.vasnake.spark.udf.`java-api`.CheckUINT32UDF
+com.github.vasnake.spark.udf.`java-api`.HashToUINT32UDF
+com.github.vasnake.spark.udf.`java-api`.MurmurHash3_32UDF
+com.github.vasnake.spark.udf.`java-api`.MapJoinUDF
 
     * spark-catalyst-api udf
     * spark-udf-catalog
