@@ -20,4 +20,10 @@ object VectorToolbox {
 
       selected
     }
+
+  def isInvalid[A](x: A)(implicit ops: NumOpsI[A]): Boolean = {
+    if (x == null) true
+    else ops.isNaN(x) || ops.isInfinite(x)
+  }
+
 }

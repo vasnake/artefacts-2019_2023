@@ -183,7 +183,8 @@ For `build.sbt` tricks see
 - spark-udf
     * spark-udf-java-api
         grep 'import org.apache.spark.sql.api.java.UDF*'
-com.github.vasnake.spark.udf.java-api.HtmlUnescapeUDF
+com.github.vasnake.spark.udf.`java-api`.HtmlUnescapeUDF
+
     * spark-catalyst-api udf
     * spark-udf-catalog
 

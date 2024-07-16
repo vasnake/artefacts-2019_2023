@@ -132,7 +132,7 @@ lazy val `hive-udaf-java` =
 lazy val `spark-udf` =
   project
     .in(file("spark-udf"))
-    .dependsOn(Seq(text).map(_ % Cctt): _*)
+    .dependsOn(Seq(core, text).map(_ % Cctt): _*)
     .settings(commonSettings)
     .settings(commonDependencies)
     .settings(sparkSettings)
