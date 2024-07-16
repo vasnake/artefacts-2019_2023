@@ -1,15 +1,14 @@
-
-/**
- * Created by vasnake@gmail.com on 2024-07-16
- */
+/** Created by vasnake@gmail.com on 2024-07-16
+  */
 package com.github.vasnake.spark.udf.`java-api`
 
-import org.apache.spark.sql.api.java.UDF2
-import java.lang.{String => jString}
+import java.lang.{ String => jString }
+
 import scala.util.Try
 
-/**
-  * uid2user(uid, uid_type)
+import org.apache.spark.sql.api.java.UDF2
+
+/** uid2user(uid, uid_type)
   *
   * sparkSession.udf.registerJavaFunction("uid2user", "com.github.vasnake.spark.udf.`java-api`.Uid2UserUDF")
   */
@@ -20,14 +19,14 @@ class Uid2UserUDF extends UDF2[jString, jString, jString] {
 }
 
 object Uid2UserUDFImpl {
-  //UID: число в домене int64 в виде строки base10 (e.g. 1234567890) => uid:1234567890
-  //T1ID: число в домене int64 в виде строки base10 (e.g. 1234567890) => t1id:1234567890
-  //T2ID: число в домене int64 в виде строки base10 (e.g. 1234567890) => t2id:1234567890
-  //T3ID: число в домене int64 в виде строки base16 (e.g. 9A8F7B) => t3id:9A8F7B
-  //GAID: число в домене uint128 в виде строки base16 (e.g. B5CD47AA8F6B4534A0675C8C21EFD375) => gaid:b5cd47aa-8f6b-4534-a067-5c8c21efd375
-  //IDFA: число в домене uint128 в виде строки base16 (e.g. B5CD47AA8F6B4534A0675C8C21EFD375) => idfa:B5CD47AA-8F6B-4534-A067-5C8C21EFD375
-  //EMAIL: строка адреса email (e.g. foo@bar.baz) => email:foo@bar.baz
-  //MAIL: строка адреса email (e.g. foo@bar.baz) => mail:foo@bar.baz
+  // UID: число в домене int64 в виде строки base10 (e.g. 1234567890) => uid:1234567890
+  // T1ID: число в домене int64 в виде строки base10 (e.g. 1234567890) => t1id:1234567890
+  // T2ID: число в домене int64 в виде строки base10 (e.g. 1234567890) => t2id:1234567890
+  // T3ID: число в домене int64 в виде строки base16 (e.g. 9A8F7B) => t3id:9A8F7B
+  // GAID: число в домене uint128 в виде строки base16 (e.g. B5CD47AA8F6B4534A0675C8C21EFD375) => gaid:b5cd47aa-8f6b-4534-a067-5c8c21efd375
+  // IDFA: число в домене uint128 в виде строки base16 (e.g. B5CD47AA8F6B4534A0675C8C21EFD375) => idfa:B5CD47AA-8F6B-4534-A067-5C8C21EFD375
+  // EMAIL: строка адреса email (e.g. foo@bar.baz) => email:foo@bar.baz
+  // MAIL: строка адреса email (e.g. foo@bar.baz) => mail:foo@bar.baz
 
   // TODO: consider boosting performance by eliminating map, option, exception
   def uid2user(uid: String, uid_type: String): Option[String] =
@@ -44,18 +43,18 @@ object Uid2UserUDFImpl {
     "GAID" -> "gaid",
     "IDFA" -> "idfa",
     "EMAIL" -> "email",
-    "MAIL" -> "mail"
+    "MAIL" -> "mail",
   )
 
   private val uidMapping: Map[String, String => String] = Map(
-    "uid" -> {uid: String => int64Base10(uid)},
-    "t1id" -> {uid: String => int64Base10(uid)},
-    "t2id" -> {uid: String => int64Base10(uid)},
-    "t3id" -> {uid: String => int64Base16(uid)},
-    "gaid" -> {uid: String => canonicalUUID(uid.toLowerCase)},
-    "idfa" -> {uid: String => canonicalUUID(uid.toUpperCase)},
-    "email" -> {uid: String => email(uid)},
-    "mail" -> {uid: String => email(uid)}
+    "uid" -> { uid: String => int64Base10(uid) },
+    "t1id" -> { uid: String => int64Base10(uid) },
+    "t2id" -> { uid: String => int64Base10(uid) },
+    "t3id" -> { uid: String => int64Base16(uid) },
+    "gaid" -> { uid: String => canonicalUUID(uid.toLowerCase) },
+    "idfa" -> { uid: String => canonicalUUID(uid.toUpperCase) },
+    "email" -> { uid: String => email(uid) },
+    "mail" -> { uid: String => email(uid) },
   ).withDefault(_ => identity)
 
   // Validate and transform. If value is invalid throw an exception
@@ -114,11 +113,13 @@ object Uid2UserUDFImpl {
     require(compact.length == 32, s"UUID string length != 32, `${compact}`")
 
     require(
-      compact.forall(c => (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') || (c >= '0' && c <= '9')),
-      s"Invalid chars in UUID string, `${compact}`"
+      compact.forall(c =>
+        (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') || (c >= '0' && c <= '9')
+      ),
+      s"Invalid chars in UUID string, `${compact}`",
     )
 
-    s"${compact.substring(0, 8)}-${compact.substring(8, 12)}-${compact.substring(12, 16)}-${compact.substring(16, 20)}-${compact.substring(20, 32)}"
+    s"${compact.substring(0, 8)}-${compact.substring(8, 12)}-${compact.substring(12, 16)}-${compact
+        .substring(16, 20)}-${compact.substring(20, 32)}"
   }
-
 }
