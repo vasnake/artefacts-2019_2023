@@ -1,8 +1,8 @@
 # Scripts and modules (Python)
 
-Collection of some interesting pieces from my projects.
-
 WIP
+
+Collection of some interesting pieces from my projects.
 
 ## What do we have here
 

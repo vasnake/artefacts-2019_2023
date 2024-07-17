@@ -6,7 +6,6 @@ import MyUtil._
 
 ThisBuild / organization := "com.github.vasnake"
 ThisBuild / scalaVersion := "2.12.19"
-val sparkVersion = "2.4.8"
 
 // project
 
@@ -132,7 +131,7 @@ lazy val `hive-udaf-java` =
 lazy val `spark-udf` =
   project
     .in(file("spark-udf"))
-    .dependsOn(Seq(core, text).map(_ % Cctt): _*)
+    .dependsOn(Seq(core, common, text).map(_ % Cctt): _*)
     .settings(commonSettings)
     .settings(commonDependencies)
     .settings(sparkSettings)
@@ -141,15 +140,8 @@ lazy val `spark-udf` =
 
 lazy val sparkSettings = {
 
-  lazy val sparkDeps = Seq(
-    "org.apache.spark" %% "spark-hive",
-    "org.apache.spark" %% "spark-core",
-    "org.apache.spark" %% "spark-sql",
-    "org.apache.spark" %% "spark-mllib",
-  ).map(_ % sparkVersion)
-
   lazy val dependencies = Seq(
-    libraryDependencies ++= sparkDeps.map(_ % Provided)
+    libraryDependencies ++= org.apache.spark.sparkModules.map(_ % Provided)
   )
 
   dependencies

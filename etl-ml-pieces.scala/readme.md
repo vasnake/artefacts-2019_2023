@@ -1,8 +1,8 @@
 # Spark/Scala modules (mainly)
 
-Collection of some interesting pieces from my projects.
-
 WIP
+
+Collection of some interesting pieces from my projects.
 
 Spark 2.4.8; Scala 2.12.19; sbt 1.10.0 (migration to Spark 3 is WIP)
 
@@ -191,6 +191,8 @@ For `build.sbt` tricks see
         - com.github.vasnake.spark.udf.`java-api`.Uid2UserUDF
 
     * spark-catalyst-api udf: grep 'import org.apache.spark.sql.catalyst.expressions'
+        - org.apache.spark.sql.catalyst.vasnake.udf.GenericMin
+
     * spark-udf-catalog
 
 - spark-io

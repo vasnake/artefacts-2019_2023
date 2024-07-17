@@ -43,6 +43,7 @@ object Dependencies {
       // libraryDependencies += "org.json4s" %% "json4s-jackson" % "4.0.7"
       val `json4s-jackson` = "org.json4s" %% "json4s-jackson" % "4.0.7"
     }
+
     object pmml4s {
       // https://mvnrepository.com/artifact/org.pmml4s/pmml4s
       // libraryDependencies += "org.pmml4s" %% "pmml4s" % "1.0.1"
@@ -50,6 +51,16 @@ object Dependencies {
     }
 
     object apache {
+      object spark {
+        val sparkVersion = "2.4.8"
+        val sparkModules = Seq(
+          "org.apache.spark" %% "spark-hive",
+          "org.apache.spark" %% "spark-core",
+          "org.apache.spark" %% "spark-sql",
+          "org.apache.spark" %% "spark-mllib",
+        ).map(_ % sparkVersion)
+      }
+
       object hive {
         // https://mvnrepository.com/artifact/org.apache.hive/hive-exec
         // libraryDependencies += "org.apache.hive" % "hive-exec" % "2.1.1"
