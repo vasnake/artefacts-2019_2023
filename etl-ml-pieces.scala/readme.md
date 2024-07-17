@@ -196,6 +196,7 @@ org.apache.spark.sql.catalyst.vasnake.udf.GenericMax
 org.apache.spark.sql.catalyst.vasnake.udf.GenericSum
 org.apache.spark.sql.catalyst.vasnake.udf.GenericAvg
 org.apache.spark.sql.catalyst.vasnake.udf.GenericMostFreq
+org.apache.spark.sql.catalyst.vasnake.udf.GenericVectorCooMul
 
     * spark-udf-catalog
 
