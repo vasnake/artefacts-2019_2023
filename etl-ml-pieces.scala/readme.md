@@ -192,6 +192,7 @@ For `build.sbt` tricks see
 
     * spark-catalyst-api udf: grep 'import org.apache.spark.sql.catalyst.expressions'
         - org.apache.spark.sql.catalyst.vasnake.udf.GenericMin
+org.apache.spark.sql.catalyst.vasnake.udf.GenericMax
 
     * spark-udf-catalog
 

@@ -15,4 +15,5 @@ object FastMath {
 
 //  def min[@specialized(Double, Float, Int, Long) T](x: T, y: T): T = fm.min(x, y)
   val min: (Double, Double) => Double = (x, y) => fm.min(x, y)
+  val max: (Double, Double) => Double = (x, y) => fm.max(x, y)
 }
