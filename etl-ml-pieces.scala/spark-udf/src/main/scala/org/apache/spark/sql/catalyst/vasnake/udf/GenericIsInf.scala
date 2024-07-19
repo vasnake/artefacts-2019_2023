@@ -8,7 +8,7 @@ import org.apache.spark.sql.types._
 
 import java.lang.{Float => jFloat, Double => jDouble}
 
-import base.GenericUnaryPredicateBoolNotNull
+import base.GenericUnaryPredicateNotNull
 
 /**
   * Evaluates to `true` iff it's Infinity (or -Infinity).
@@ -21,7 +21,7 @@ import base.GenericUnaryPredicateBoolNotNull
        true
   """,
   since = "0.1.0")
-case class GenericIsInf(child: Expression) extends GenericUnaryPredicateBoolNotNull {
+case class GenericIsInf(child: Expression) extends GenericUnaryPredicateNotNull {
 
   override def inputTypes: Seq[AbstractDataType] = Seq(TypeCollection(DoubleType, FloatType))
 

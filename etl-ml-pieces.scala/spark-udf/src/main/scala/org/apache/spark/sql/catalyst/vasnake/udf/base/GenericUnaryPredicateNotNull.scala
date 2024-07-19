@@ -10,8 +10,7 @@ import org.apache.spark.sql.catalyst.expressions.{
   UnaryExpression, ImplicitCastInputTypes, Predicate
 }
 
-// TODO: rename to GenericUnaryPredicateNotNull
-trait GenericUnaryPredicateBoolNotNull extends UnaryExpression with Predicate with ImplicitCastInputTypes {
+trait GenericUnaryPredicateNotNull extends UnaryExpression with Predicate with ImplicitCastInputTypes {
   // Base implementation
 
   override final def nullable: Boolean = false
@@ -41,7 +40,7 @@ trait GenericUnaryPredicateBoolNotNull extends UnaryExpression with Predicate wi
 
   // w/o codegen
   def onNullInput: Any
-  override def nullSafeEval(input: Any): Any = ???
+  override def nullSafeEval(input: Any): Any = ??? // you have to implement this in child class
 
   // with codegen
   def javaOnNullInput: String

@@ -201,6 +201,7 @@ org.apache.spark.sql.catalyst.vasnake.udf.GenericVectorSemiSum
 org.apache.spark.sql.catalyst.vasnake.udf.GenericVectorSemiDiff
 org.apache.spark.sql.catalyst.vasnake.udf.GenericVectorMatMul
 org.apache.spark.sql.catalyst.vasnake.udf.GenericIsInf
+org.apache.spark.sql.catalyst.vasnake.udf.GenericIsFinite
 
     * spark-udf-catalog
 
