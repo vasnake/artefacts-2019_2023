@@ -12,6 +12,10 @@ import java.text.Normalizer
   */
 object StringToolbox {
 
+  def repr(obj: Any): String =
+    if (obj == null) "null"
+    else s"value `${obj.toString}` of type `${obj.getClass.getSimpleName}`"
+
   /**
    * Normalize unicode to canonical decomposition, filter only word or digit symbols, replace all spaces with underscore (_).
    * @param str input, e.g. "dt -> 2022-04-05, uid_type -> HID . ! ? * < > [ ] () ' ` = + - & @ # $ % ^ / \\  ~ чмяк | ^ ; : "
@@ -150,8 +154,6 @@ object StringToolbox {
         StandardCharsets.UTF_8,
       )
 
-    def repr(obj: Any): String =
-      if (obj == null) "null"
-      else s"value `${obj.toString}` of type `${obj.getClass.getSimpleName}`"
-  }
+  } // RichString
+
 }

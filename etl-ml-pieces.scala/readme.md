@@ -211,14 +211,14 @@ For `build.sbt` tricks see
     * com.github.vasnake.spark.io.CheckpointService
     * com.github.vasnake.spark.io.Logging
 
-    * hive (partition) writer (два: из джойнилки и из трансформеров: DefaultHiveWriter)
+    * hive (partition) writer (два: из джойнилки и из трансформеров)
 com.github.vasnake.hive.SQLPartitionsWriterI
 com.github.vasnake.spark.io.hive.SQLHiveWriter
 com.github.vasnake.spark.io.hive.SQLWriterFactory
 com.github.vasnake.spark.io.hive.SQLWriterFactoryImpl
-
-    * HiveExternalCatalog
-    * MetastoreQueryProcessorWithConnPool
+com.github.vasnake.spark.io.hive.TableSmartWriter#insertIntoHive
+org.apache.spark.sql.hive.vasnake.MetastoreQueryProcessorWithConnPool
+org.apache.spark.sql.hive.vasnake.HiveExternalCatalog
 
 - spark-transformers
     * com.mrg.dm.grinder.features.CollectionColumnDecoder

@@ -12,6 +12,7 @@ object FastMath {
   val exp: Double => Double = x => fm.exp(x)
   val atan: Double => Double = x => fm.atan(x)
   val round: Double => Double = x => fm.round(x)
+  val ceil: Double => Double = x => fm.ceil(x)
 
 //  def min[@specialized(Double, Float, Int, Long) T](x: T, y: T): T = fm.min(x, y)
   val min: (Double, Double) => Double = (x, y) => fm.min(x, y)
