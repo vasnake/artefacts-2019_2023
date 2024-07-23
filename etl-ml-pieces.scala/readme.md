@@ -204,10 +204,12 @@ For `build.sbt` tricks see
         - org.apache.spark.sql.catalyst.vasnake.udf.GenericIsFinite
 
     * spark-udf-catalog
-com.github.vasnake.spark.udf.catalog
+        - com.github.vasnake.spark.udf.catalog
 
 - spark-io
     * HDFSFileToolbox
+com.github.vasnake.spark.io.HDFSFileToolbox
+
     * checkpoint (CheckpointService)
     * hive (partition) writer (два: из джойнилки и из трансформеров: DefaultHiveWriter)
     * HiveExternalCatalog
