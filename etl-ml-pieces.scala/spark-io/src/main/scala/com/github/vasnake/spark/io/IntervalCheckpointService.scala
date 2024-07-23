@@ -4,10 +4,10 @@
 package com.github.vasnake.spark.io
 
 import org.apache.spark.sql.DataFrame
-import com.github.vasnake.spark.io.{Logging => GrinderLogging}
+import com.github.vasnake.spark.io.{Logging => Log}
 import com.github.vasnake.common.file.FileToolbox
 
-class IntervalCheckpointService(interval: Int, baseDir: String) extends CheckpointService with GrinderLogging {
+class IntervalCheckpointService(interval: Int, baseDir: String) extends CheckpointService with Log {
 
   private var currentStep: Int = 0
   logInfo(s"Created checkpoint service, interval: ${interval}, checkpoint basedir: `${baseDir}`")

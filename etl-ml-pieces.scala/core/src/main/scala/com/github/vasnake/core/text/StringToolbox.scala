@@ -6,10 +6,25 @@ import java.nio.charset.StandardCharsets
 import java.util.Base64
 
 import scala.util.Try
+import java.text.Normalizer
 
 /** Useful string operations, pimp-my-library style
   */
 object StringToolbox {
+
+  /**
+   * Normalize unicode to canonical decomposition, filter only word or digit symbols, replace all spaces with underscore (_).
+   * @param str input, e.g. "dt -> 2022-04-05, uid_type -> HID . ! ? * < > [ ] () ' ` = + - & @ # $ % ^ / \\  ~ чмяк | ^ ; : "
+   * @return output, e.g. "dt_2022_04_05_uid_type_hid_"
+   */
+  def slugify(str: String): String = {
+    // TODO: consider using https://github.com/osinka/slugify
+
+    Normalizer.normalize(str, Normalizer.Form.NFD)
+      .replaceAll("[^\\w\\d]", " ") // Replace all non-word, non-digit chars with space
+      .replaceAll("\\s+", "_") // Replace whitespace (including newlines and repetitions) with single underscore
+      .toLowerCase // Lowercase the final results
+  }
 
   /** String separators used in RichString class
     * @param v first level separator

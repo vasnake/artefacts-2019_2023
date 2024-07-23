@@ -141,7 +141,7 @@ lazy val `spark-udf` =
 lazy val `spark-io` =
   project
     .in(file("spark-io"))
-    .dependsOn(Seq(common).map(_ % Cctt): _*)
+    .dependsOn(Seq(core, common).map(_ % Cctt): _*)
     .settings(commonSettings)
     .settings(commonDependencies)
     .settings(sparkSettings)

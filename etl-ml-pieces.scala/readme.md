@@ -208,12 +208,15 @@ For `build.sbt` tricks see
 
 - spark-io
     * com.github.vasnake.spark.io.HDFSFileToolbox
-
-    * checkpoint (CheckpointService)
-com.github.vasnake.spark.io.CheckpointService
-com.github.vasnake.spark.io.Logging
+    * com.github.vasnake.spark.io.CheckpointService
+    * com.github.vasnake.spark.io.Logging
 
     * hive (partition) writer (два: из джойнилки и из трансформеров: DefaultHiveWriter)
+com.github.vasnake.hive.SQLPartitionsWriterI
+com.github.vasnake.spark.io.hive.SQLHiveWriter
+com.github.vasnake.spark.io.hive.SQLWriterFactory
+com.github.vasnake.spark.io.hive.SQLWriterFactoryImpl
+
     * HiveExternalCatalog
     * MetastoreQueryProcessorWithConnPool
 
