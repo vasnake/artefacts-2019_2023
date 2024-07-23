@@ -207,10 +207,12 @@ For `build.sbt` tricks see
         - com.github.vasnake.spark.udf.catalog
 
 - spark-io
-    * HDFSFileToolbox
-com.github.vasnake.spark.io.HDFSFileToolbox
+    * com.github.vasnake.spark.io.HDFSFileToolbox
 
     * checkpoint (CheckpointService)
+com.github.vasnake.spark.io.CheckpointService
+com.github.vasnake.spark.io.Logging
+
     * hive (partition) writer (два: из джойнилки и из трансформеров: DefaultHiveWriter)
     * HiveExternalCatalog
     * MetastoreQueryProcessorWithConnPool
