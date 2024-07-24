@@ -230,11 +230,11 @@ Other sbt related resources
     * org.apache.spark.sql.hive.vasnake.HiveExternalCatalog
 
 - spark-transformers
-* com.mrg.dm.grinder.features.CollectionColumnDecoder
 com.github.vasnake.spark.features.vector.FeaturesRowDecoder
+com.github.vasnake.spark.features.aggregate.ColumnAggregator
+com.github.vasnake.`etl-core`.aggregate.AggregationPipeline
+com.github.vasnake.spark.features.aggregate.DatasetAggregator#aggregateColumns
 
-    * column aggregator (configured)
-    * dataset aggregator (DatasetAggregators)
     * Stratified Sampling
     * joiner: from com.mrg.dm.grinder.jobs.etl_features.config.join.JoinRule
 

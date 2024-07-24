@@ -6,6 +6,9 @@ import org.apache.commons.math3.util.{ FastMath => fm }
 
 object FastMath {
   val PI: Double = fm.PI
+
+  val random: () => Double = fm.random
+
   val log: Double => Double = x => fm.log(x)
   val abs: Double => Double = x => fm.abs(x)
   val sqrt: Double => Double = x => fm.sqrt(x)

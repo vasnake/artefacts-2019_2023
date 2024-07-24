@@ -99,7 +99,7 @@ lazy val json =
 lazy val `etl-core` =
   project
     .in(file("etl-core"))
-    .dependsOn(Seq(core).map(_ % Cctt): _*)
+    .dependsOn(Seq(core, common).map(_ % Cctt): _*)
     .settings(commonSettings)
     .settings(commonDependencies)
 
