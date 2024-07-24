@@ -41,6 +41,16 @@ For `build.sbt` tricks see
 - https://github.com/DevInsideYou/tagless-final/blob/master/expression-problem/build.sbt
 - https://github.com/tofu-tf/tofu/blob/master/build.sbt#L555
 
+Other sbt related resources
+- https://www.scala-sbt.org/1.x/docs/Multi-Project.html
+- https://www.scala-lang.org/download/all.html
+- https://docs.scala-lang.org/overviews/compiler-options/index.html#targeting-a-version-of-the-jvm
+- https://scalacenter.github.io/scalafix/docs/users/installation.html#settings-and-tasks
+- https://www.scalatest.org/user_guide/using_scalatest_with_sbt
+- https://scastie.scala-lang.org/
+- https://mvnrepository.com/artifact/org.unbescape/unbescape/1.1.6.RELEASE
+
+
 ## What do we have here
 
 Надо это как-то распихать по отдельным проектам билда.
@@ -210,19 +220,20 @@ For `build.sbt` tricks see
     * com.github.vasnake.spark.io.HDFSFileToolbox
     * com.github.vasnake.spark.io.CheckpointService
     * com.github.vasnake.spark.io.Logging
-
     * hive (partition) writer (два: из джойнилки и из трансформеров)
-com.github.vasnake.hive.SQLPartitionsWriterI
-com.github.vasnake.spark.io.hive.SQLHiveWriter
-com.github.vasnake.spark.io.hive.SQLWriterFactory
-com.github.vasnake.spark.io.hive.SQLWriterFactoryImpl
-com.github.vasnake.spark.io.hive.TableSmartWriter#insertIntoHive
-org.apache.spark.sql.hive.vasnake.MetastoreQueryProcessorWithConnPool
-org.apache.spark.sql.hive.vasnake.HiveExternalCatalog
+        * com.github.vasnake.hive.SQLPartitionsWriterI
+        * com.github.vasnake.spark.io.hive.SQLHiveWriter
+        * com.github.vasnake.spark.io.hive.SQLWriterFactory
+        * com.github.vasnake.spark.io.hive.SQLWriterFactoryImpl
+        * com.github.vasnake.spark.io.hive.TableSmartWriter#insertIntoHive
+    * org.apache.spark.sql.hive.vasnake.MetastoreQueryProcessorWithConnPool
+    * org.apache.spark.sql.hive.vasnake.HiveExternalCatalog
 
 - spark-transformers
-    * com.mrg.dm.grinder.features.CollectionColumnDecoder
-    * column aggregator (configureg)
+* com.mrg.dm.grinder.features.CollectionColumnDecoder
+com.github.vasnake.spark.features.vector.FeaturesRowDecoder
+
+    * column aggregator (configured)
     * dataset aggregator (DatasetAggregators)
     * Stratified Sampling
     * joiner: from com.mrg.dm.grinder.jobs.etl_features.config.join.JoinRule
@@ -236,3 +247,7 @@ org.apache.spark.sql.hive.vasnake.HiveExternalCatalog
 - spark-apps
     * etl features (EtlFeaturesApp)
     * apply models transformer
+
+## Spark notes
+
+https://spark.apache.org/news/index.html

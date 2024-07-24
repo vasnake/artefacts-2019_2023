@@ -26,6 +26,7 @@ lazy val `etl-ml-pieces-1923` =
         `hive-udaf-java`,
         `spark-udf`,
         `spark-io`,
+        `spark-transformers`,
       ).map(
         _ % Cctt
       ): _*
@@ -43,6 +44,7 @@ lazy val `etl-ml-pieces-1923` =
       `hive-udaf-java`,
       `spark-udf`,
       `spark-io`,
+      `spark-transformers`,
     )
     .settings(name := "etl-ml-pieces-1923")
     .settings(commonSettings)
@@ -142,6 +144,14 @@ lazy val `spark-io` =
   project
     .in(file("spark-io"))
     .dependsOn(Seq(core, common).map(_ % Cctt): _*)
+    .settings(commonSettings)
+    .settings(commonDependencies)
+    .settings(sparkSettings)
+
+lazy val `spark-transformers` =
+  project
+    .in(file("spark-transformers"))
+    .dependsOn(Seq(core, common, text, `etl-core`).map(_ % Cctt): _*)
     .settings(commonSettings)
     .settings(commonDependencies)
     .settings(sparkSettings)
