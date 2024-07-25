@@ -151,7 +151,7 @@ lazy val `spark-io` =
 lazy val `spark-transformers` =
   project
     .in(file("spark-transformers"))
-    .dependsOn(Seq(core, common, text, `etl-core`).map(_ % Cctt): _*)
+    .dependsOn(Seq(core, common, text, `etl-core`, `spark-io`, json).map(_ % Cctt): _*)
     .settings(commonSettings)
     .settings(commonDependencies)
     .settings(sparkSettings)

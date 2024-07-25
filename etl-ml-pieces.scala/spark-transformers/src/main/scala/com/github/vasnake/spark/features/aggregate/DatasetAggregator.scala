@@ -16,7 +16,7 @@ import com.github.vasnake.`etl-core`.aggregate.AggregationPipeline
  * Group of features (dense vector as array, sparse vector as map) represented by 3 types of columns:
  * Map, Array, and set of primitive columns with common prefix where prefix used as group (or 'domain') name.
  */
-object DatasetAggregator {
+object DatasetAggregator { // TODO: move to com.github.vasnake.spark.dataset.transform.ConfiguredAggregate
 
   type ColumnsAggregationConfig = Map[String, AggregationPipelineConfig]
   val GROUPBY_COL_NAME = "uid"
