@@ -238,6 +238,13 @@ Other sbt related resources
     * com.github.vasnake.spark.dataset.transform.Joiner#joinDatasets
 
     * top-N rows
+* com.github.vasnake.spark.dataset.transform.TopNRowsExact
+* com.github.vasnake.spark.dataset.transform.TopNRowsApprox
+
+```python
+
+```
+snippets
 
 - spark-ml
     * transformers
