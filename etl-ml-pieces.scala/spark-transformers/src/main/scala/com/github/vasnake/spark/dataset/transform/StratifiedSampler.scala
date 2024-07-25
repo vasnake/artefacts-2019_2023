@@ -34,7 +34,7 @@ import org.apache.spark.sql.types.DataTypes
  * </pre>
  *
  */
-object StratifiedSampling extends GroupingColumnsServices with CustomLogging {
+object StratifiedSampler extends GroupingColumnsServices with CustomLogging {
 
   case class SelectGroupScoreSampleConfig(
                                            sampleRandomSeed: Double = Double.NaN,

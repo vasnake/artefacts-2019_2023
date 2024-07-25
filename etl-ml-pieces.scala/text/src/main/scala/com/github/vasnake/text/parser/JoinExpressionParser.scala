@@ -15,7 +15,9 @@ import scala.util.parsing.combinator.RegexParsers
 
 object JoinExpressionParser {
   sealed abstract class Expression
+
   case class Node(name: String) extends Expression
+
   case class Tree(
     left: Expression,
     right: Expression,

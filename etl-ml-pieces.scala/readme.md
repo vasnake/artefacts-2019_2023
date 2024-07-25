@@ -234,11 +234,10 @@ Other sbt related resources
     * com.github.vasnake.spark.features.aggregate.ColumnAggregator
     * com.github.vasnake.`etl-core`.aggregate.AggregationPipeline
     * com.github.vasnake.spark.features.aggregate.DatasetAggregator#aggregateColumns
+    * com.github.vasnake.spark.dataset.transform.StratifiedSamplerg#getGroupScoreSample
+    * com.github.vasnake.spark.dataset.transform.Joiner#joinDatasets
 
-    * Stratified Sampling
-com.github.vasnake.spark.dataset.transform.StratifiedSampling#getGroupScoreSample
-
-    * joiner: from com.mrg.dm.grinder.jobs.etl_features.config.join.JoinRule
+    * top-N rows
 
 - spark-ml
     * transformers
