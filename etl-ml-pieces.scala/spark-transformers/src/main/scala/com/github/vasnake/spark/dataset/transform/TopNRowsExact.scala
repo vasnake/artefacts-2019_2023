@@ -5,8 +5,8 @@ package com.github.vasnake.spark.dataset.transform
 
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.{functions => sf}
-
 import com.github.vasnake.spark.dataset.Helpers.getNewTempColumnName
+import org.apache.spark.sql.expressions.Window
 
 object TopNRowsExact {
 
@@ -45,24 +45,70 @@ object TopNRowsExact {
       val orderedDF = df.orderBy(orderColumns :_*)
 
       // add rank
-      val rdd = orderedDF.rdd.zipWithIndex() // (row, index) // index (0 .. count - 1)
+      val rddOfPairs = orderedDF.rdd.zipWithIndex() // tuple (row, index) // index (0 .. count - 1)
 
       // decode from RDD
       val origColumns = df.schema.fieldNames.map {
         name => sf.col("_1").getItem(name).alias(name)
       }
-      val columnsWithRank = origColumns :+ sf.col("_2").alias(rankColName)
+      val origColumnsAndRank = origColumns :+ sf.col("_2").alias(rankColName)
 
       df.sparkSession
-        .createDataset(rdd)
-        .select(columnsWithRank :_*)
+        .createDataset(rddOfPairs)
+        .select(origColumnsAndRank :_*)
     }
   }
 
+  // window functions
   val globalRankSQL: GlobalRank = new GlobalRank {
-    // window functions
-    override def add(df: DataFrame, orderByColumns: Seq[String], ascending: Boolean, rankColName: String): DataFrame = ???
-    val isZeroBasedRank: Boolean = ???
+    val isZeroBasedRank: Boolean = false
+
+    override def add(df: DataFrame, orderByColumns: Seq[String], ascending: Boolean, rankColName: String): DataFrame = {
+      // sort
+      val orderColumns =
+        if (ascending) orderByColumns map (sf.col(_).asc)
+        else orderByColumns map (sf.col(_).desc)
+
+      val orderedDF = df.orderBy(orderColumns: _*)
+
+      // add partition_id
+      val partIdColumn = "partition_id_" + rankColName
+      val withPartitionId = orderedDF.withColumn(partIdColumn, sf.spark_partition_id())
+
+      // rank within each partition (row number for partition?)
+      val localRankColumn = "local_rank_" + rankColName
+      val partW = Window.partitionBy(partIdColumn).orderBy(orderColumns :_*)
+      val withLocalRank = withPartitionId.withColumn(localRankColumn, sf.rank().over(partW))
+
+      // max rank and cum-sum for max rank (partition rows count)
+      val maxLocalRankColumn = "max_local_rank_" + rankColName
+      val maxLocalRankDF = withLocalRank.groupBy(partIdColumn).agg(sf.max(localRankColumn).alias(maxLocalRankColumn))
+      // rows count in partition and all previous partitions
+      val cumSumMaxRankColumn = "cum_sum_max_rank_" + rankColName
+      // DF has rows.count = partitions.count, no need to do `partitionBy` in window definition
+      val prevRowsW = Window.orderBy(partIdColumn).rowsBetween(Window.unboundedPreceding, Window.currentRow)
+      val statsDF = maxLocalRankDF.withColumn(cumSumMaxRankColumn, sf.sum(maxLocalRankColumn).over(prevRowsW))
+
+      // Calc 'sum_factor' (number of rows) that have to be added to local rank (local row number) in each partition.
+      // For first partition 'sum_factor" has to be 0, for second = first-partition-rows.count, ...
+      // So, we have to shift statsDF rows and save partition_id
+      val sumFactorColumn = "sum_factor_" + rankColName
+      val shiftedStatsDF = statsDF.alias("l").join(statsDF.alias("r"),
+        sf.col(s"l.$partIdColumn") === sf.col(s"r.$partIdColumn") + 1,
+        "left"
+      ).select(
+        sf.col(s"l.$partIdColumn").alias(partIdColumn),
+        sf.coalesce(sf.col(s"r.$cumSumMaxRankColumn"), sf.lit(0)).alias(sumFactorColumn)
+      )
+
+      // total_rank = local_rank + sum_factor
+      val withTotalRank = withLocalRank.join(sf.broadcast(shiftedStatsDF), Seq(partIdColumn), "inner")
+        .withColumn(rankColName, sf.col(localRankColumn) + sf.col(sumFactorColumn))
+
+      // drop intermediate columns: part_id, local_rank, sum_factor
+      withTotalRank.drop(partIdColumn, localRankColumn, sumFactorColumn)
+    }
+
   }
 
   /**
