@@ -10,6 +10,10 @@ import org.apache.spark.sql.expressions.Window
 
 object TopNRowsExact {
 
+  private def debug(text: String): Unit = { // TODO: add proper logging
+    println(text)
+  }
+
   /**
    * Add global rank (see `rankFun`) and select rows where `rank <= n`
    * @param df input DF
@@ -71,23 +75,30 @@ object TopNRowsExact {
 
       val orderedDF = df.orderBy(orderColumns: _*)
 
-      // add partition_id
+      // add partition_id, should be in total order
       val partIdColumn = "partition_id_" + rankColName
-      val withPartitionId = orderedDF.withColumn(partIdColumn, sf.spark_partition_id())
+      val withPartitionIdDF = orderedDF.withColumn(partIdColumn, sf.spark_partition_id())
 
       // rank within each partition (row number for partition?)
       val localRankColumn = "local_rank_" + rankColName
-      val partW = Window.partitionBy(partIdColumn).orderBy(orderColumns :_*)
-      val withLocalRank = withPartitionId.withColumn(localRankColumn, sf.rank().over(partW))
+      val partitionW = Window.partitionBy(partIdColumn).orderBy(orderColumns :_*)
+      val withLocalRankDF = withPartitionIdDF.withColumn(localRankColumn, sf.rank().over(partitionW)) // rank or row_number?
 
-      // max rank and cum-sum for max rank (partition rows count)
-      val maxLocalRankColumn = "max_local_rank_" + rankColName
-      val maxLocalRankDF = withLocalRank.groupBy(partIdColumn).agg(sf.max(localRankColumn).alias(maxLocalRankColumn))
-      // rows count in partition and all previous partitions
+      // (groupBy partition_id), tiny statsDF: max rank and cum-sum for max rank (partition rows count)
       val cumSumMaxRankColumn = "cum_sum_max_rank_" + rankColName
-      // DF has rows.count = partitions.count, no need to do `partitionBy` in window definition
-      val prevRowsW = Window.orderBy(partIdColumn).rowsBetween(Window.unboundedPreceding, Window.currentRow)
-      val statsDF = maxLocalRankDF.withColumn(cumSumMaxRankColumn, sf.sum(maxLocalRankColumn).over(prevRowsW))
+      val statsDF = {
+        val maxLocalRankColumn = "max_local_rank_" + rankColName
+        val maxLocalRankDF = withLocalRankDF.groupBy(partIdColumn).agg(sf.max(localRankColumn).alias(maxLocalRankColumn))
+
+        // DF has rows.count = partitions.count, no need to do `partitionBy` in window definition
+        val prevRowsW = Window.orderBy(partIdColumn).rowsBetween(Window.unboundedPreceding, Window.currentRow)
+
+        // rows count in partition and all previous partitions
+        val cachedStatsDF = maxLocalRankDF.withColumn(cumSumMaxRankColumn, sf.sum(maxLocalRankColumn).over(prevRowsW))
+          .cache() // TODO: check if it helps, probably not
+        debug(s"GlobalRank, force cache materialization, stats DF rows count: ${cachedStatsDF.count()}")
+        cachedStatsDF
+      }
 
       // Calc 'sum_factor' (number of rows) that have to be added to local rank (local row number) in each partition.
       // For first partition 'sum_factor" has to be 0, for second = first-partition-rows.count, ...
@@ -102,11 +113,11 @@ object TopNRowsExact {
       )
 
       // total_rank = local_rank + sum_factor
-      val withTotalRank = withLocalRank.join(sf.broadcast(shiftedStatsDF), Seq(partIdColumn), "inner")
+      val withTotalRankDF = withLocalRankDF.join(sf.broadcast(shiftedStatsDF), Seq(partIdColumn), "inner")
         .withColumn(rankColName, sf.col(localRankColumn) + sf.col(sumFactorColumn))
 
       // drop intermediate columns: part_id, local_rank, sum_factor
-      withTotalRank.drop(partIdColumn, localRankColumn, sumFactorColumn)
+      withTotalRankDF.drop(partIdColumn, localRankColumn, sumFactorColumn)
     }
 
   }
