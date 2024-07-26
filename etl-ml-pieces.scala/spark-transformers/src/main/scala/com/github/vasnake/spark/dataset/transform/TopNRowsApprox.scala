@@ -3,30 +3,56 @@
  */
 package com.github.vasnake.spark.dataset.transform
 
-/**
-{{{
-    max_target_rows_per_partition = int(float(max_target_rows) / config["shuffle_partitions"])
-    if self.max_target_rows_per_partition > 0:
-        self.info(
-            "Selecting at most {} top-score rows ...".format(
-                self.max_target_rows_per_partition * self.shuffle_partitions
-            )
-        )
+import org.apache.spark.sql.{functions => sf}
+import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.expressions.Window
 
-        df = (
-            df.repartition("uid")
-            .withColumn(
-                "_rn_",
-                sqlfn.row_number().over(
-                    Window.partitionBy(sqlfn.spark_partition_id()).orderBy(sqlfn.desc("score"))
-                ),
-            )
-            .where("_rn_ <= {}".format(self.max_target_rows_per_partition))
-            .drop("_rn_")
-        )
-}}}
- */
+import com.github.vasnake.spark.dataset.Helpers.getNewTempColumnName
+
 class TopNRowsApprox {
-  def selectTopNRows() = ???
-  def addLocalRank() = ???
+
+  /**
+   * From each (sorted) partition select (n / partitions_count) top rows
+   * @param df input df should be evenly partitioned by some value independent from sort columns
+   * @param n total number of selected rows, approximately
+   * @param orderByColumns list of columns to define rows order
+   * @param ascending sord direction
+   * @return df with top n rows, approximately
+   */
+  def selectTopNRows(df: DataFrame, n: Long, orderByColumns: Seq[String], ascending: Boolean = false): DataFrame = {
+    val rankCol: String = "_rank_" + getNewTempColumnName(df)
+
+    val maxnPerPartition: Long =
+      (n.toDouble / (df.rdd.getNumPartitions).toDouble).toLong // well, df.rdd will cost you some
+
+    val withRank = addLocalRank(df, orderByColumns, ascending, rankCol)
+
+    withRank
+      .where(s"$rankCol <= $maxnPerPartition")
+      .drop(rankCol)
+  }
+
+  /**
+   * Local rank: for each partition compute isolated rank (1 .. num_rows_in_partition) in order of sorted rows
+   * @param df input df should be evenly partitioned by some value independent from sort columns
+   * @param orderByColumns list of columns to define rows order
+   * @param ascending sort direction
+   * @param rankColName add column with this name, values are partition row numbers (1 .. partition_size) for each partition
+   * @return DF sorted w/o shuffle, with a new column containing partitions row numbers
+   */
+  def addLocalRank(df: DataFrame, orderByColumns: Seq[String], ascending: Boolean, rankColName: String): DataFrame = {
+    val oCols =
+      if (ascending) orderByColumns map (sf.col(_).asc)
+      else orderByColumns map (sf.col(_).desc)
+
+    val w = Window
+      .partitionBy(sf.spark_partition_id())
+      .orderBy(oCols :_*)
+
+    df.withColumn(
+      rankColName,
+      sf.row_number().over(w)
+    )
+  }
+
 }
