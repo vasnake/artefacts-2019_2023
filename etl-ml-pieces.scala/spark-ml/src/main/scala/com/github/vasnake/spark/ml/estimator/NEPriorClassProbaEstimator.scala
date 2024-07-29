@@ -12,16 +12,11 @@ import org.apache.spark.ml.linalg.{Vectors, Vector => MLV}
 import org.apache.spark.sql.{DataFrame, Dataset}
 import org.apache.spark.sql.types.StructType
 
-import scala.collection.mutable
-import scala.util.{Failure, Success, Try}
-
 import com.github.vasnake.spark.ml.shared._
 import com.github.vasnake.spark.ml.model.{NEPriorClassProbaModel}
-//import com.github.vasnake.`ml-models`.{complex => models}
 import com.github.vasnake.`ml-core`.models.{NEPriorClassProba}
 import com.github.vasnake.spark.dataset.transform.{StratifiedSampler}
 import com.github.vasnake.spark.io.{Logging => CustomLogging}
-//import com.github.vasnake.common.num.{FastMath => fm}
 
 /**
   * Calculate aligned score probabilities according to given distribution in `prior` parameter.

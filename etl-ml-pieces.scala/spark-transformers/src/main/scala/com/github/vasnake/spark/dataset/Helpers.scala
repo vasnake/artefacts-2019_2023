@@ -3,7 +3,7 @@
  */
 package com.github.vasnake.spark.dataset
 
-import org.apache.spark.sql.{DataFrame, Dataset}
+import org.apache.spark.sql.{Dataset}
 import org.apache.spark.sql.types.StructType
 
 object Helpers { // TODO: rename to 'helpers'

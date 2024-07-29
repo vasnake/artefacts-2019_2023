@@ -244,6 +244,8 @@ Other sbt related resources
     * com.github.vasnake.spark.ml.estimator.ScoreEqualizerEstimator (fit)
     * com.github.vasnake.spark.ml.model.NEPriorClassProbaModel
     * com.github.vasnake.spark.ml.estimator.NEPriorClassProbaEstimator
+    * com.github.vasnake.spark.ml.model.ScoreQuantileThresholdModel
+    * com.github.vasnake.spark.ml.estimator.ScoreQuantileThresholdEstimator
 
 TODO
 
