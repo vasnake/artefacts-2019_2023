@@ -34,7 +34,7 @@ class ScoreEqualizerModel(
   ParamsServices
 {
 
-  override def write: MLWriter = ???  // TODO: implement persistence according to spark.ml examples
+  override def write: MLWriter = ???  // TODO: implement persistence, according to spark.ml examples
 
   override def copy(extra: ParamMap): ScoreEqualizerModel = {
     // can't use defaultCopy(extra) because we have extra param in constructor
@@ -45,39 +45,36 @@ class ScoreEqualizerModel(
   override def transformSchema(schema: StructType): StructType = validateAndTransformSchema(schema)
 
   override def transform(dataset: Dataset[_]): DataFrame = {
-    // map: if group not found, null value will be produced;
+    // if group not found, null value will be produced;
     // null and nan values will be transformed to null.
     import ScoreEqualizerModel.json
     logInfo(s"Transform dataframe, ${groupsConfig.length} equalizers for groups: (${groupsConfig.map(_._1).mkString(", ")}), ...")
     logDebug(s"with params:\n${json(params.map(explain))};\nequalizers:\n${json(groupsConfig)}")
 
-    // validation
     if (groupsConfig.isEmpty) logWarning("equalizers list is empty, null values will be produced")
 
-    val df = addTempGroupingColumn(dataset, getGroupColumns)
+    val tempColumnWithGroupsNames = TEMP_GROUP_COLUMN
+    val df = addTempGroupingColumn(dataset, getGroupColumns, tempColumnWithGroupsNames)
 
     val cfg: Broadcast[ScoreEqualizerModelConfig] = df.sparkSession.sparkContext.broadcast(
       ScoreEqualizerModelConfig(
         equalizers = groupsConfig.map { case (group, cfg) => (group, models.ScoreEqualizer(cfg)) }.toMap,
         inputColIndex = df.schema.fieldIndex(getInputCol),
-        groupColIndex = df.schema.fieldIndex(TEMP_GROUP_COLUMN),
+        groupColIndex = df.schema.fieldIndex(tempColumnWithGroupsNames),
         outSchema = transformSchema(df.schema)
       )
     )
 
-    // TODO: collect errors, warnings, stats and print to log
+    // TODO: collect metrics, errors, warnings, stats, etc. send to metrics service (or/and log)
     val res = ScoreEqualizerModel.transform(df, cfg)
-
     logInfo("transform completed.")
-
-    dropTempGroupingColumn(res)
+    dropTempGroupingColumn(res, tempColumnWithGroupsNames)
   }
 
 }
 
 object ScoreEqualizerModel {
 
-  // TODO: collect metrics and dump them to driver log (and/or metrics service)
   def transform(df: DataFrame, config: Broadcast[ScoreEqualizerModelConfig]): DataFrame = {
     // any invalid data in input => null in output
     df.mapPartitions(rows => {

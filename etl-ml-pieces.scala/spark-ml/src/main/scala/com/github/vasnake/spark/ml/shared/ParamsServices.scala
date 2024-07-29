@@ -85,7 +85,7 @@ trait HasCacheSettings extends Params {
 
   def cacheFunctions: PartialFunction[String, DataFrame => DataFrame] = {
     case a: String if a.trim.toUpperCase == "CACHE" => df => df.cache()
-    // TODO: persist:level, checkpoint:path, parquet:path
+    // TODO: add other options, e.g. persist:level, checkpoint:path, parquet:path
   }
 
   // empty string is valid settings, meaning "no cache"

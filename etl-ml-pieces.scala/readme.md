@@ -242,11 +242,6 @@ Other sbt related resources
 TODO
 
 - spark-ml
-    * transformers
-    * estimators
-    * models
-    * params
-
 com.github.vasnake.spark.ml.model.ScoreEqualizerModel (transform)
 com.github.vasnake.spark.ml.estimator.ScoreEqualizerEstimator (fit)
 

@@ -154,6 +154,7 @@ trait GroupingColumnsServices {
   val TEMP_GROUP_COLUMN = "_temp_concatenated_grouping_columns_" // TODO: name should be calculated dynamically, based on DF schema
   // see com.github.vasnake.spark.dataset.Helpers.getNewTempColumnName
 
+  // add column that contains 'group' name in specific format
   def addTempGroupingColumn(
                              dataset: Dataset[_],
                              groupingColumns: Seq[String],
