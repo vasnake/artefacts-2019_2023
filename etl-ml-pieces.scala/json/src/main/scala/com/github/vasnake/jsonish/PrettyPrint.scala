@@ -6,7 +6,7 @@ package com.github.vasnake.jsonish
 import com.github.vasnake.json.{JsonToolbox => jtb}
 
 /**
- * First attempt to implement some stupid idea about 'pretty print' data structures to log.
+ * First attempt to implement some stupid idea about 'pretty print' for set of data structures.
  * By default printing ML models and configs to log looks ugly and un-readable.
  * I wanted something like a type-class for functionality similar to 'toString', using json format.
  */

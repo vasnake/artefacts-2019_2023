@@ -152,6 +152,7 @@ object StratifiedSampler extends GroupingColumnsServices with CustomLogging {
 trait GroupingColumnsServices {
 
   val TEMP_GROUP_COLUMN = "_temp_concatenated_grouping_columns_" // TODO: name should be calculated dynamically, based on DF schema
+  // see com.github.vasnake.spark.dataset.Helpers.getNewTempColumnName
 
   def addTempGroupingColumn(
                              dataset: Dataset[_],

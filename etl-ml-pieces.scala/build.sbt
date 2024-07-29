@@ -2,7 +2,7 @@ import Dependencies._
 import Dependencies.{ io => dio } // conflict with sbt.io
 import MyUtil._
 
-// Spark 2.4.8; Scala 2.12.19: it was production setup for our team
+// Spark 2.4; Scala 2.12: it was production setup for our team (2019 .. 2023)
 
 ThisBuild / organization := "com.github.vasnake"
 ThisBuild / scalaVersion := "2.12.19"
@@ -27,6 +27,7 @@ lazy val `etl-ml-pieces-1923` =
         `spark-udf`,
         `spark-io`,
         `spark-transformers`,
+        `spark-ml`,
       ).map(
         _ % Cctt
       ): _*
@@ -45,6 +46,7 @@ lazy val `etl-ml-pieces-1923` =
       `spark-udf`,
       `spark-io`,
       `spark-transformers`,
+      `spark-ml`,
     )
     .settings(name := "etl-ml-pieces-1923")
     .settings(commonSettings)
@@ -152,6 +154,14 @@ lazy val `spark-transformers` =
   project
     .in(file("spark-transformers"))
     .dependsOn(Seq(core, common, text, `etl-core`, `spark-io`, json).map(_ % Cctt): _*)
+    .settings(commonSettings)
+    .settings(commonDependencies)
+    .settings(sparkSettings)
+
+lazy val `spark-ml` =
+  project
+    .in(file("spark-ml"))
+    .dependsOn(Seq(`json`, `ml-core`, `ml-models`, `spark-io`, `spark-transformers`).map(_ % Cctt): _*)
     .settings(commonSettings)
     .settings(commonDependencies)
     .settings(sparkSettings)

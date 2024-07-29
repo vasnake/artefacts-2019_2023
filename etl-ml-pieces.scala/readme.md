@@ -236,15 +236,19 @@ Other sbt related resources
     * com.github.vasnake.spark.features.aggregate.DatasetAggregator#aggregateColumns
     * com.github.vasnake.spark.dataset.transform.StratifiedSamplerg#getGroupScoreSample
     * com.github.vasnake.spark.dataset.transform.Joiner#joinDatasets
-TODO
     * com.github.vasnake.spark.dataset.transform.TopNRowsExact
     * com.github.vasnake.spark.dataset.transform.TopNRowsApprox
+
+TODO
 
 - spark-ml
     * transformers
     * estimators
     * models
     * params
+
+com.github.vasnake.spark.ml.model.ScoreEqualizerModel (transform)
+com.github.vasnake.spark.ml.estimator.ScoreEqualizerEstimator (fit)
 
 - spark-apps
     * etl features (EtlFeaturesApp)
