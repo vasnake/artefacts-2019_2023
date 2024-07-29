@@ -13,9 +13,8 @@ import org.apache.spark.sql.types.StructType
 import com.github.vasnake.spark.ml.shared._
 import com.github.vasnake.spark.ml.model.ScoreEqualizerModel
 import com.github.vasnake.`ml-models`.{complex => models}
-import com.github.vasnake.spark.dataset.transform.{GroupingColumnsServices, StratifiedSampler}
+import com.github.vasnake.spark.dataset.transform.{StratifiedSampler}
 import com.github.vasnake.spark.io.{Logging => CustomLogging}
-//import com.github.vasnake.common.num.{FastMath => fm}
 
 /**
   * Stratified equalizer, Spark.ml estimator: implementation of the `fit` method.
@@ -28,7 +27,6 @@ import com.github.vasnake.spark.io.{Logging => CustomLogging}
 class ScoreEqualizerEstimator(override val uid: String) extends Estimator[ScoreEqualizerModel] with
   ScoreEqualizerParams with
   ParamsServices with
-  GroupingColumnsServices with
   CustomLogging with
   DefaultParamsWritable {
 

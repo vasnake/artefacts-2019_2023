@@ -239,11 +239,13 @@ Other sbt related resources
     * com.github.vasnake.spark.dataset.transform.TopNRowsExact
     * com.github.vasnake.spark.dataset.transform.TopNRowsApprox
 
-TODO
-
 - spark-ml
-com.github.vasnake.spark.ml.model.ScoreEqualizerModel (transform)
-com.github.vasnake.spark.ml.estimator.ScoreEqualizerEstimator (fit)
+    * com.github.vasnake.spark.ml.model.ScoreEqualizerModel (transform)
+    * com.github.vasnake.spark.ml.estimator.ScoreEqualizerEstimator (fit)
+    * com.github.vasnake.spark.ml.model.NEPriorClassProbaModel
+    * com.github.vasnake.spark.ml.estimator.NEPriorClassProbaEstimator
+
+TODO
 
 - spark-apps
     * etl features (EtlFeaturesApp)

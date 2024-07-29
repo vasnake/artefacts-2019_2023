@@ -3,13 +3,18 @@
  */
 package com.github.vasnake.spark.dataset
 
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{DataFrame, Dataset}
+import org.apache.spark.sql.types.StructType
 
-object Helpers {
+object Helpers { // TODO: rename to 'helpers'
 
-  def getNewTempColumnName(df: DataFrame): String = {
-    val fnMaxLen = df.schema.fieldNames.map(_.length).max
-    "u" * (fnMaxLen + 1)
+  def getNewTempColumnName(ds: Dataset[_]): String = {
+    getNewTempColumnName(ds.schema)
   }
 
+  def getNewTempColumnName(schema: StructType): String = {
+    val fnMaxLen = schema.fieldNames.map(_.length).max
+
+    "u" * (fnMaxLen + 1)
+  }
 }
