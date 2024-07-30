@@ -28,6 +28,7 @@ lazy val `etl-ml-pieces-1923` =
         `spark-io`,
         `spark-transformers`,
         `spark-ml`,
+        `spark-apps`,
       ).map(
         _ % Cctt
       ): _*
@@ -47,6 +48,7 @@ lazy val `etl-ml-pieces-1923` =
       `spark-io`,
       `spark-transformers`,
       `spark-ml`,
+      `spark-apps`,
     )
     .settings(name := "etl-ml-pieces-1923")
     .settings(commonSettings)
@@ -165,6 +167,15 @@ lazy val `spark-ml` =
     .settings(commonSettings)
     .settings(commonDependencies)
     .settings(sparkSettings)
+
+lazy val `spark-apps` =
+  project
+    .in(file("spark-apps"))
+    .dependsOn(Seq(`spark-io`, `spark-transformers`, `spark-ml`).map(_ % Cctt): _*)
+    .settings(commonSettings)
+    .settings(commonDependencies)
+    .settings(sparkSettings)
+    .settings(libraryDependencies ++= Seq(com.beust.jcommander))
 
 // settings
 

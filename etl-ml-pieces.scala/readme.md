@@ -250,8 +250,8 @@ Other sbt related resources
 TODO
 
 - spark-apps
-    * etl features (EtlFeaturesApp)
-    * apply models transformer
+    * com.github.vasnake.spark.app.datasets.JoinerApp
+    * com.github.vasnake.spark.app.ml-models.Applyer
 
 ## Spark notes
 

@@ -12,6 +12,11 @@ object Dependencies {
   }
 
   object com {
+
+    object beust {
+      val jcommander = "com.beust" % "jcommander" % "1.82"
+    }
+
     object eed3si9n {
       object expecty {
         val expecty =
@@ -33,6 +38,7 @@ object Dependencies {
   }
 
   object org {
+
     object unbescape {
       // https://mvnrepository.com/artifact/org.unbescape/unbescape
       val unbescape = "org.unbescape" % "unbescape" % "1.1.6.RELEASE"

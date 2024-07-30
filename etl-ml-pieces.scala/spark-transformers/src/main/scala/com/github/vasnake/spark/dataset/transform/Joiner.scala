@@ -61,7 +61,7 @@ object Joiner {
               tree: JE,
               catalog: String => DF,
               keys: Seq[String],
-              checkpoint: Option[DF => DF]
+              checkpoint: Option[DF => DF] = None
             ): DF = {
 
       tree.eval[DF] { case (left, right, join) =>

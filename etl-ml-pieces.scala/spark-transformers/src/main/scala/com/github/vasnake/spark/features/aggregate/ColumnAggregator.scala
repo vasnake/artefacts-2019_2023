@@ -3,8 +3,6 @@
  */
 package com.github.vasnake.spark.features.aggregate
 
-//class ColumnAggregator {}
-
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.Row
 import scala.collection.mutable
