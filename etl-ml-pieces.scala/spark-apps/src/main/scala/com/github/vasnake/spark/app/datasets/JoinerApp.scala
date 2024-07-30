@@ -311,7 +311,7 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
     val domains: Seq[String] = JoinRule.enumerateItems(partitionJoinRule)
     logger.info(s"Domains to aggregate: `${domains.mkString(",")}`")
 
-    val aggConfig: Map[String, DomainAggregationConfig] = domains.map(n => (n, aggregationConfig(n))).toMap
+    val aggConfig: Map[String, DomainAggregationConfig] = domains.map(name => (name, aggregationConfig(name))).toMap
     logger.info(s"Domains aggregation pipelines: `${aggConfig}`")
 
     aggregateDomains(df, aggConfig)

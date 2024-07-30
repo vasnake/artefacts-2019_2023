@@ -3,11 +3,7 @@
  */
 package com.github.vasnake.spark.app.datasets.joiner
 
-import org.apache.spark.sql.{DataFrame}
 import org.apache.spark.sql
-
-//import org.apache.spark.sql.types.{DataType, StringType}
-//import scala.util.Try
 
 import com.github.vasnake.core.text.StringToolbox
 
@@ -19,10 +15,11 @@ object implicits {
 
   val keyColumns: Seq[String] = Seq(UID_COL_NAME, DT_COL_NAME, UID_TYPE_COL_NAME)
 
-  implicit class RichDataset(val ds: DataFrame) extends AnyVal {
+  import sql.DataFrame
+  import sql.functions.{col, lit, expr}
+  import sql.types.{LongType, DataType}
 
-    import sql.functions.{col, lit, expr}
-    import sql.types.{LongType, DataType}
+  implicit class RichDataset(val ds: DataFrame) extends AnyVal {
 
     def setColumnsInOrder(withDT: Boolean, withUT: Boolean): DataFrame = {
       val dataCols = ds.columns.filter(n => !keyColumns.contains(n)).toSeq

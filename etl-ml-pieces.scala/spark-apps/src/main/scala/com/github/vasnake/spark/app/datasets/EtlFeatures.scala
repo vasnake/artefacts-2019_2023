@@ -27,6 +27,7 @@ import com.github.vasnake.text.evaluator._
 import com.github.vasnake.spark.dataset.transform.Joiner.JoinRule
 import com.github.vasnake.spark.features.aggregate.DatasetAggregator
 import DatasetAggregator.DatasetAggregators
+import com.github.vasnake.`etl-core`.aggregate
 
 object EtlFeatures {
   import implicits._
@@ -595,8 +596,23 @@ object EtlFeatures {
   }
 
   def compileAggregators(cfg: Map[String, DomainAggregationConfig], df: DataFrame): DatasetAggregators = {
-    val c: Map[String, DatasetAggregator.ColumnsAggregationConfig] = cfg.getColumnsAggregationConfig
-    DatasetAggregator.compileAggregators(c, df)
+    val datasetAggCfg: Map[String, DatasetAggregator.ColumnsAggregationConfig] =
+      cfg.map { case (name, cfg) => (name, convertAggConfig(cfg)) }
+
+    DatasetAggregator.compileAggregators(datasetAggCfg, df)
+  }
+
+  def convertAggConfig(datasetAggConfig: DomainAggregationConfig): DatasetAggregator.ColumnsAggregationConfig = {
+    import aggregate.config.{AggregationPipelineConfig, AggregationStageConfig}
+
+    datasetAggConfig map { case (name, pipelineCfg) => (name, AggregationPipelineConfig(
+      pipeline = pipelineCfg.pipeline,
+      stages = pipelineCfg.stages map { case (name, stageCgf) => (name, AggregationStageConfig(
+        name = stageCgf.name,
+        kind = stageCgf.kind,
+        parameters = stageCgf.parameters
+      ))}
+    ))}
   }
 
 }
