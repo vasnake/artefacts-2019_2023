@@ -3,26 +3,20 @@
  */
 package com.github.vasnake.spark.app.datasets
 
-//import scala.collection.mutable
-//import org.apache.log4j.Logger
-//import org.apache.spark.broadcast.Broadcast
-//import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
-//import org.apache.spark.sql.types.StructType
-
-import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
+import org.apache.spark.sql.{DataFrame, Dataset}
 import org.apache.spark.sql
 
-import scala.util.{Failure, Success, Try}
+import scala.util.Try
+
 import com.beust.jcommander
 
-import com.github.vasnake.common.file.FileToolbox
 import com.github.vasnake.spark.app.SparkSubmitApp
 import com.github.vasnake.spark.app.datasets.joiner._
 import com.github.vasnake.core.text.StringToolbox
-import com.github.vasnake.spark.io.{CheckpointService, IntervalCheckpointService, hive}
-import com.github.vasnake.text.parser.JoinExpressionParser
+import com.github.vasnake.spark.io.{CheckpointService, IntervalCheckpointService}
 import com.github.vasnake.text.evaluator._
 import com.github.vasnake.spark.dataset.transform.Joiner.JoinRule
+import com.github.vasnake.common.file.FileToolbox
 
 /**
  * App stages:

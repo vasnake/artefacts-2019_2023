@@ -4,7 +4,6 @@
 package com.github.vasnake.spark.app.datasets
 
 import org.apache.spark.broadcast.Broadcast
-
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
 import org.apache.spark.sql.types.StructType
@@ -17,12 +16,8 @@ import org.apache.log4j.Logger
 import org.json4s
 
 import com.github.vasnake.spark.app.datasets.joiner._
-import com.github.vasnake.common.file.FileToolbox
-import com.github.vasnake.spark.app.SparkSubmitApp
-import com.github.vasnake.spark.app.datasets.joiner._
 import com.github.vasnake.core.text.StringToolbox
-import com.github.vasnake.spark.io.{CheckpointService, IntervalCheckpointService, hive}
-import com.github.vasnake.text.parser.JoinExpressionParser
+import com.github.vasnake.spark.io.{CheckpointService, hive}
 import com.github.vasnake.text.evaluator._
 import com.github.vasnake.spark.dataset.transform.Joiner.JoinRule
 import com.github.vasnake.spark.features.aggregate.DatasetAggregator
@@ -480,7 +475,7 @@ object EtlFeatures {
     // if complex.length == 1: rename to domain
     // if complex.length > 1: add merged collections
 
-    import sql.types.{ArrayType, MapType, DataType, StructType}
+    import sql.types.{ArrayType, MapType, StructType}
     import sql.{functions => sf}
 
     // collect primitives to collectionColumn
