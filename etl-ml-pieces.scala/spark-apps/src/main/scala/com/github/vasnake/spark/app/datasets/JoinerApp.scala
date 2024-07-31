@@ -7,25 +7,41 @@ import org.apache.spark.sql.{DataFrame, Dataset}
 import org.apache.spark.sql
 
 import scala.util.Try
-
 import com.beust.jcommander
 
 import com.github.vasnake.spark.app.SparkSubmitApp
-import com.github.vasnake.spark.app.datasets.joiner._
 import com.github.vasnake.core.text.StringToolbox
 import com.github.vasnake.spark.io.{CheckpointService, IntervalCheckpointService}
 import com.github.vasnake.text.evaluator._
 import com.github.vasnake.spark.dataset.transform.Joiner.JoinRule
 import com.github.vasnake.common.file.FileToolbox
+import com.github.vasnake.spark.app.datasets.joiner.config.{DomainConfig, EtlConfig, MatchingConfig, MatchingTableRow, SourcesFinder, TableConfig}
+import com.github.vasnake.spark.app.datasets.joiner.{DomainSourceDataFrame, EtlFeatures, implicits}
 
 /**
+ * spark-submit app, read partitions from a set of input tables and write partition with set of output columns.
+ *
+ * A few definitions first:
+ * - feature: a number, float or double;
+ * - domain (features domain): a set of named features;
+ * - uid, uid_type, dt: hive partitioning columns, app require these partitions in each table;
+ * - matching: process of mapping uid from one uid_type to another.
+ * To maintain pair (uid, uid_type) uniqueness in context of one dt partition, matching post-processing requires aggregation stage.
+ *
+ * App purpose is to combine (join) data from source tables to resulting set of domains.
+ *
+ * Domains of three types can be produced:
+ * 1) dense vector domain: single column as array of features, array index used as feature name;
+ * 2) sparce vector domain: single column as map [string, feature], unordered collection of named features;
+ * 3) sparce vector domain: set of columns of numeric type (float, double), domain name encoded as prefix in the name of each column.
+ *
  * App stages:
  * - load and parse job config;
  * - load source DFs;
  * - transform sources to features domains;
  * - join domains, produce output partition;
  * - write if no matching required, or:
- * - do matching stages;
+ * - do matching-aggregation;
  * - write.
  */
 object JoinerApp extends SparkSubmitApp(CmdLineParams) {
@@ -59,10 +75,7 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
   private val allDomainsSources = findSourceTables()
   logger.info(s"Sources enumerated: `${allDomainsSources.mkString(";\n")}`")
 
-  private val needMatching: Boolean = {
-    // check config, do we need matching?
-    etlCfg.matching.nonEmpty
-  }
+  private val needMatching: Boolean = etlCfg.matching.nonEmpty
 
   if (!tableExists(etlCfg.table)) {
     logger.warn(s"Target table `${etlCfg.table}` doesn't exists ...")
@@ -105,7 +118,7 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
       throw new UnsupportedOperationException(msg)
     }
 
-    val target: DataFrame = joinDomainsNoCheckpoints(tableJoinRule)
+    val target: DataFrame = joinDomainsNoCheckpoints(tableJoinRule) // we need only schema, data processing will be done later
     logger.info(s"Joined domains: ${target.schema.mkString(";")}")
 
     createEmptyTable(target)
@@ -205,7 +218,7 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
 
   private def findSourceTables(): Seq[DomainSourceDataFrame] = {
     // TODO: use implicits for applying the Reader pattern to config
-    sourcesFromConfig(new SourcesFinder(etlCfg)) // read sources info using config view facade
+    sourcesFromConfig(new SourcesFinder(etlCfg)) // read sources info from config
   }
 
   private def makeDomainSources(domains: Seq[String], sources: Seq[DomainSourceDataFrame]): Seq[DomainSourceDataFrame] = {
@@ -287,7 +300,7 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
     val matchingTableDF: Dataset[MatchingTableRow] = prepareMatchingTable(mc.table, loadMatchingTable(mc.table))
 
     logger.info(s"Map `${inputUidTypes}` to `${outUidType}` using `${matchingTableDF.schema.mkString(";")}`")
-    // TODO: cache function as option: cache, checkpoint, no-op
+    // TODO: get cache function from optional parameter
     val matchedDF: DataFrame = mapUids(df, matchingTableDF, inputUidTypes, outUidType)(df => df.cache())
     logger.info(s"Matching result: ${matchedDF.schema.mkString(";")}")
 
@@ -312,17 +325,14 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
   }
 
   private def aggregationConfig(domain: String): DomainAggregationConfig = {
-    // extract domain agg config from job config
-    // if no config for domain: alert, use default drop-null-avg config
-    // domain_config: Map[String, AggregationConfig]
-
-    val domainCfg = etlCfg.domains.find(d => d.name == domain)
+    val domainCfg: DomainConfig = etlCfg.domains.find(d => d.name == domain)
       .getOrElse(sys.error(s"Can't find domain `${domain}` in job config"))
 
     val cfg: DomainAggregationConfig = domainCfg.agg.getOrElse({
       logger.warn(s"Domain `${domain}` aggregation config not defined, default config will be used. Domain config: `${domainCfg}`")
       defaultAggregationConfig
     })
+
     logger.info(s"Loaded domain `${domain}` aggregation config `${cfg}`")
 
     if (cfg.contains(DOMAIN_AGG_KEY)) cfg
@@ -339,10 +349,10 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
 object CmdLineParams {
   import jcommander.Parameter
 
-  @Parameter(names = Array("--etl-config"), required = true, description = "Target config json repr")
+  @Parameter(names = Array("--etl-config"), required = true, description = "Job config, json text encoded base64")
   var etl_config: String = _
 
-  @Parameter(names = Array("--log-url"), required = false, description = "Control log endpoint")
+  @Parameter(names = Array("--log-url"), required = false, description = "Log service endpoint")
   var log_url: String = ""
 
   @Parameter(names = Array("--min-target-rows"), required = false, description = "Min. acceptable amount of rows in target")
@@ -355,13 +365,3 @@ object CmdLineParams {
     s"""CmdLineParams(etl_config="$etl_config", log_url="$log_url", min_target_rows=$min_target_rows), checkpoint_interval=${checkpoint_interval}"""
 
 }
-
-case class DomainSourceDataFrame
-(
-  domain: String,
-  source: NameWithAlias,
-  table: NameWithAlias,
-  df: Option[DataFrame]
-)
-
-case class MatchingTableRow(uid1: String, uid2: String, uid1_type: String, uid2_type: String)

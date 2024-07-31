@@ -1,28 +1,26 @@
 /**
  * Created by vasnake@gmail.com on 2024-07-30
  */
-package com.github.vasnake.spark.app.datasets
+package com.github.vasnake.spark.app.datasets.joiner
 
+import org.apache.log4j.Logger
 import org.apache.spark.broadcast.Broadcast
-import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
+import org.apache.spark.sql
 import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
 import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql
-
-import scala.util.{Failure, Success, Try}
-import scala.collection.mutable
-import org.apache.log4j.Logger
-
+import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 import org.json4s
 
-import com.github.vasnake.spark.app.datasets.joiner._
-import com.github.vasnake.core.text.StringToolbox
+import scala.collection.mutable
+import scala.util.{Failure, Success, Try}
+
+import com.github.vasnake.`etl-core`.aggregate
+import com.github.vasnake.spark.dataset.transform.Joiner.{JoinRule, parseJoinRule}
+import com.github.vasnake.spark.features.aggregate.DatasetAggregator
+import com.github.vasnake.spark.features.aggregate.DatasetAggregator.DatasetAggregators
 import com.github.vasnake.spark.io.{CheckpointService, hive}
 import com.github.vasnake.text.evaluator._
-import com.github.vasnake.spark.dataset.transform.Joiner.JoinRule
-import com.github.vasnake.spark.features.aggregate.DatasetAggregator
-import DatasetAggregator.DatasetAggregators
-import com.github.vasnake.`etl-core`.aggregate
+import com.github.vasnake.spark.app.datasets.joiner.config.{AggregationConfig, AggregationStageConfig, DomainConfig, EtlConfig, ISourcesConfigView, MatchingTableRow, NameWithAlias, TableConfig}
 
 object EtlFeatures {
   import implicits._
@@ -125,22 +123,22 @@ object EtlFeatures {
     def collectionDataType: DataType = ArrayType(itemDataType)
 
     def collectPrimitives(df: DataFrame, cols: Seq[String], domainName: String): DataFrame = {
-      // source.withColumn(s"${domainName}_primitives", ...) produces wrong columns order
+      // df.withColumn(s"${domainName}_primitives", ...) produces wrong columns order
       val domainColumn = sf.array(cols.map(cn => sf.col(cn).cast(itemDataType)): _*)
-      df.select(domainColumn.as(s"${domainName}_primitives") +: df.columns.map(sf.col): _*)
+      df.select(domainColumn.as(s"${domainName}_primitives") +: df.columns.map(sf.col): _*) // we need this columns order
     }
 
     def renameToDomain(df: DataFrame, col: String, domainName: String): DataFrame = df.withColumnRenamed(col, domainName)
 
     def mergeCollections(df: DataFrame, domainName: String, cols: Seq[String]): DataFrame = {
-      // what should I do when `$arraycolumn is null`: replace missing features with null values
+      // when `$arraycolumn is null`: replace missing features with null values
       lazy val sizes: Map[String, Int] = {
-        val res = columnsSizes(domainName, cols, df)
+        val name_size = columnsSizes(domainName, cols, df)
         require(
-          res.values.forall(sz => sz >= 0),
-          s"ARRAY_TYPE domain parts must have size >= 0. Domain `${domainName}`, parts sizes `${res}`"
+          name_size.values.forall(sz => sz >= 0),
+          s"ARRAY_TYPE domain parts must have size >= 0. Domain `${domainName}`, parts sizes `${name_size}`"
         )
-        res
+        name_size
       }
 
       df.withColumn(domainName, sf.concat(cols.map(n =>
@@ -156,7 +154,7 @@ object EtlFeatures {
   }
 
   class MapDomainBuilder(itemDataType: sql.types.DataType) extends DomainBuilder {
-    import sql.types.{MapType, DataType, StringType}
+    import sql.types.{DataType, MapType, StringType}
     import sql.{functions => sf}
 
     def collectionClass: Class[_] = classOf[MapType]
@@ -167,11 +165,11 @@ object EtlFeatures {
       val domainColumn = sf.map(
         cols.map(sf.lit).zip( // (name, column)
           cols.map(n => sf.col(n).cast(itemDataType))
-        ).flatMap { // name, column, name, column, ...
+        ).flatMap {
           case (k, v) => Array(k, v)
         } : _*
       )
-
+      // select map(name, column, name, column, ...) as foo_primitives
       df.select(domainColumn.as(s"${domainName}_primitives") +: df.columns.map(sf.col): _*)
     }
 
@@ -188,7 +186,7 @@ object EtlFeatures {
       )
         .withColumn(
           domainName,
-          sf.expr(s"user_dmdesc.combine(${cols.mkString(",")})")
+          sf.expr(s"brickhouse.combine(${cols.mkString(",")})") // TODO: eliminate external dependency
         )
     }
 
@@ -279,7 +277,6 @@ object EtlFeatures {
                                                 ): Try[DataFrame] = Try {
 
     log.info(s"Writing result to staging dir: `${stagingHdfsDir}` ...")
-
     implicit val spark: SparkSession = df.sparkSession
 
     val repartitionedDF = repartitionToOutputParts(df, outputPartitions)
@@ -292,13 +289,14 @@ object EtlFeatures {
 
     setParallelism(outputPartitions)
 
-    val persistedDF = spark.read.parquet(stagingHdfsDir).cache()
+    val persistedDF = spark.read.parquet(stagingHdfsDir)
+      .cache()
 
     val rowsCount = persistedDF.count()
     require(rowsCount >= minTargetRows, s"Result rows count must be not less than $minTargetRows, got $rowsCount")
     log.info(s"Result rows count: $rowsCount")
 
-    repartitionToOutputParts(persistedDF, outputPartitions)
+    repartitionToOutputParts(persistedDF, outputPartitions) // stupid hack
   }
 
   def repartitionToOutputParts(df: DataFrame, outputPartitions: Int)(implicit log: Logger): DataFrame = {
@@ -308,19 +306,6 @@ object EtlFeatures {
     } else df
   }
 
-  def parseJoinRule(rule: String, defaultItem: String): JoinExpressionEvaluator[String] = {
-    // join rule: "topics full_outer (profs left_outer groups)"
-    // or "" or "topics_composed"
-    import StringToolbox._
-
-    rule.splitTrim(Separators(" ")).toSeq match {
-      case Seq() => SingleItemJoin(defaultItem.trim)
-      case Seq(item) => SingleItemJoin(item)
-      case Seq(a, b) => throw new IllegalArgumentException(s"Invalid config: malformed join rule `${rule}`")
-      case _  => JoinRule.parse(rule)
-    }
-  }
-
   def selectDomainsSources(allSources: Seq[DomainSourceDataFrame], domains: Seq[String]): Seq[DomainSourceDataFrame] = {
     allSources.filter(s => domains.contains(s.domain))
   }
@@ -328,7 +313,6 @@ object EtlFeatures {
   def loadTables(sources: Seq[DomainSourceDataFrame])(implicit spark: SparkSession): Seq[DomainSourceDataFrame] = {
     def loadDF(name: String): Option[DataFrame] = Try { spark.read.table(name) }.toOption
 
-    //sources.map(s => s.copy(df = loadDF(s.table.name)))
     for {
       s <- sources
     } yield s.copy(df = loadDF(s.table.name))
@@ -342,11 +326,11 @@ object EtlFeatures {
     // apply `where` expr
     // fake uid
     // prune uid_type partitions
-    // drop invalid OKID, VKID uid records
+    // drop invalid uid records
     // select features
     // drop partitioning columns
     // cast uid to string
-    val res = source.df.map(
+    val preparedDF = source.df.map(
       _.filterDTPartition(config.dt)
         .filterPartitions(config.partitions)
         .optionalWhere(config.where)
@@ -358,7 +342,7 @@ object EtlFeatures {
         .castColumnTo(UID_COL_NAME, sql.types.StringType)
     )
 
-    source.copy(df = res)
+    source.copy(df = preparedDF)
   }
 
   def loadMatchingTable(cfg: TableConfig)(implicit spark: SparkSession): DataFrame = spark.read.table(cfg.name)
@@ -404,9 +388,11 @@ object EtlFeatures {
       for (je <- rule) yield joinWithAliases(tables, je)
     }
 
-    val df = if (cfg.source.names.length > 1 && cfg.source.join_rule.getOrElse("").trim.nonEmpty)
-      joinSources()
-    else srcWrapper.df.map(_.as(srcWrapper.source.alias))
+    val df =
+      if (cfg.source.names.length > 1 && cfg.source.join_rule.getOrElse("").trim.nonEmpty)
+        joinSources()
+      else
+        srcWrapper.df.map(_.as(srcWrapper.source.alias))
 
     srcWrapper.copy(df = df.map(_.selectFeatures(cfg.features)))
   }
@@ -519,11 +505,11 @@ object EtlFeatures {
     import sql.{functions => sf}
 
     // three options available:
-    // 1 - mapping to different types, e.g. OKID, EMAIL => VKID
-    // 2 - mapping to self, e.g. OKID, VKID => VKID, and cross-table doesn't contain self-mapping pairs:
-    //    must retain original VKID records
-    // 3 - mapping to self, e.g. OKID, VKID => VKID, and cross-table contain self-mapping pairs:
-    //    must drop original VKID records duplicates
+    // 1 - mapping to different types, e.g. FOO, BAR => BAZ
+    // 2 - mapping to self, e.g. FOO, BAR => BAR, and cross-table doesn't contain self-mapping pairs:
+    //    must retain original BAR records
+    // 3 - mapping to self, e.g. FOO, BAR => BAR, and cross-table contain self-mapping pairs:
+    //    must drop original BAR records duplicates
 
     // TODO: use constants and MatchingTableRow.names in sql code
 
@@ -540,8 +526,9 @@ object EtlFeatures {
     }
 
     // TODO: remove uid_type from result -- it's a constant given in job parameter
-    def restoreSchema(df: DataFrame): DataFrame = df.withColumn("uid_type", sf.lit(outUidType))
-      .setColumnsInOrder(withDT = false, withUT = true)
+    def restoreSchema(df: DataFrame): DataFrame =
+      df.withColumn("uid_type", sf.lit(outUidType))
+        .setColumnsInOrder(withDT = false, withUT = true)
 
     def withSelfMapping: DataFrame = {
       val cross = mtable.where(
@@ -566,8 +553,8 @@ object EtlFeatures {
 
   def aggregateDomains(df: DataFrame, cfg: Map[String, DomainAggregationConfig])(implicit spark: SparkSession): DataFrame = {
     // compile aggregation functions for each domain (may be for features in domain), perform aggregation
-    import spark.implicits._
     import org.apache.spark.sql.catalyst.encoders.RowEncoder
+    import spark.implicits._
     implicit val outRowEncoder: ExpressionEncoder[Row] = RowEncoder(df.schema)
 
     val aggregators: Broadcast[DatasetAggregators] = spark.sparkContext.broadcast(
@@ -611,3 +598,11 @@ object EtlFeatures {
   }
 
 }
+
+case class DomainSourceDataFrame
+(
+  domain: String,
+  source: NameWithAlias,
+  table: NameWithAlias,
+  df: Option[DataFrame]
+)

@@ -6,7 +6,12 @@ package com.github.vasnake.spark.app.datasets.joiner
 import org.apache.spark.sql
 
 import com.github.vasnake.core.text.StringToolbox
+import com.github.vasnake.spark.app.datasets.joiner.config.UidImitationConfig
 
+/**
+ * Not a universal solution.
+ * A set of predefined constants used for declarations of a set of special columns in datasets.
+ */
 object implicits {
 
   val DT_COL_NAME = "dt"
@@ -19,6 +24,10 @@ object implicits {
   import sql.functions.{col, lit, expr}
   import sql.types.{LongType, DataType}
 
+  /**
+   * DataFrame extensions
+   * @param ds dataset with certain restrictions applied to schema
+   */
   implicit class RichDataset(val ds: DataFrame) extends AnyVal {
 
     def setColumnsInOrder(withDT: Boolean, withUT: Boolean): DataFrame = {
@@ -45,14 +54,14 @@ object implicits {
 
       val defaultFilter = col(DT_COL_NAME).isNotNull
 
-      // and
+      // col1_cond and col2_cond and ...
       def onePartitionFilter(row: Map[String, String]): Column = row.foldLeft(defaultFilter) {
         case (acc, (k, v)) => acc and (col(k) === lit(v))
       }
 
       val filters: List[Column] = partitions map onePartitionFilter
 
-      // or
+      // filter1 or filter2 or ...
       def combinedFilter: Column = filters.tail.foldLeft(filters.head) { // beware, empty filters will throw NoSuchElementException
         case (acc, filter) => acc or filter
       }
@@ -63,7 +72,7 @@ object implicits {
       )
     }
 
-    def optionalWhere(filterExpr: Option[String]): DataFrame = filterExpr.map(f => ds.where(f)).getOrElse(ds)
+    def optionalWhere(filterExpr: Option[String]): DataFrame = filterExpr.map(expr => ds.where(expr)).getOrElse(ds)
 
     def imitateUID(fakeUid: Option[UidImitationConfig]): DataFrame = fakeUid.map(fu =>
       ds.drop(UID_TYPE_COL_NAME, UID_COL_NAME)
@@ -72,7 +81,7 @@ object implicits {
     ).getOrElse(ds)
 
     def dropInvalidUID: DataFrame = {
-      // drop record where: uid_type in (OKID, VKID) and (uid is null or uid <= 0)
+      // drop records where: uid_type in (OKID, VKID) and (uid is null or uid <= 0)
       val condition = col(UID_COL_NAME).isNull or {
         col(UID_TYPE_COL_NAME).isin("OKID", "VKID") and
           col(UID_COL_NAME).cast(LongType) <= 0L
@@ -81,19 +90,20 @@ object implicits {
       ds.where(!condition)
     }
 
-    def selectFeatures(features: Option[List[String]]): DataFrame = {
-      if (features.getOrElse(List.empty[String]).nonEmpty) features else None
-    }.map(fs => ds.select(
+    def selectFeatures(featuresSelectExpressions: Option[List[String]]): DataFrame = {
+      if (featuresSelectExpressions.getOrElse(List.empty[String]).nonEmpty) featuresSelectExpressions else None
+    }.map(expressions => ds.select(
       col(UID_COL_NAME) +:
         col(UID_TYPE_COL_NAME) +:
-        fs.map(f => expr(f))
+        expressions.map(e => expr(e))
         : _*).dropRepeatedCols
     ).getOrElse(ds)
 
     def dropRepeatedCols: DataFrame = {
       import scala.collection.mutable
+
       val names = mutable.LinkedHashSet.empty[String]
-      for (f <- ds.schema) names += f.name
+      for (f <- ds.schema) names += f.name // preserve order
 
       ds.select(names.toList.map(col): _*)
     }

@@ -17,9 +17,9 @@ class SparkSubmitApp(appParams: Object) extends App with Serializable {
   @transient implicit val logger: Logger = LogManager.getLogger(this.getClass.getSimpleName)
 
   logger.info(s"App args: `${args.toSeq}`")
-  new JCommander(appParams, null.asInstanceOf[java.util.ResourceBundle])
-    .parse(args: _*)
-  logger.info(s"App args parsed: `${appParams}`") // params written to appParams object
+  @transient private val jc = new JCommander(appParams, null.asInstanceOf[java.util.ResourceBundle])
+  jc.parse(args: _*) // Write params to appParams object
+  logger.info(s"App args parsed: `${appParams}`")
 
   @transient implicit lazy val spark: SparkSession = SparkSession
     .builder()
