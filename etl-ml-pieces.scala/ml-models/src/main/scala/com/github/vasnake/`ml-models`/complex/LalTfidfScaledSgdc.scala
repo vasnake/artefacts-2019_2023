@@ -20,7 +20,7 @@ case class LalTfidfScaledSgdcModel // TODO: rename to LalTfidfScaledSgdc
   groupedFeatures: GroupedFeatures,
   audienceName: String,
   equalizerSelector: String,
-) extends GrinderMLModel {
+) extends ComplexMLModel {
   private val imputer = Imputer(config.imputerConfig)
   private val tfidf = GroupedFeaturesTfidfTransformer(config.tfidfConfig)
   private val scaler = Scaler(config.scalerConfig)

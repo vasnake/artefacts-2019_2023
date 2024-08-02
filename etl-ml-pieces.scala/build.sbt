@@ -171,7 +171,7 @@ lazy val `spark-ml` =
 lazy val `spark-apps` =
   project
     .in(file("spark-apps"))
-    .dependsOn(Seq(core, `spark-io`, `spark-transformers`, `spark-ml`).map(_ % Cctt): _*)
+    .dependsOn(Seq(core, `spark-io`, `spark-transformers`, `spark-ml`, `ml-models-json`).map(_ % Cctt): _*)
     .settings(commonSettings)
     .settings(commonDependencies)
     .settings(sparkSettings)

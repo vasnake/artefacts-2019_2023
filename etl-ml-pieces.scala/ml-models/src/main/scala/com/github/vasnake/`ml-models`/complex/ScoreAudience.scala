@@ -4,7 +4,7 @@ package com.github.vasnake.`ml-models`.complex
 
 import com.github.vasnake.`etl-core`._
 
-case class ScoreAudienceModel(audienceName: String, predictor: Predictor) extends GrinderMLModel { // TODO: rename to ScoreAudience
+case class ScoreAudienceModel(audienceName: String, predictor: Predictor) extends ComplexMLModel { // TODO: rename to ScoreAudience
   override def isOK: Boolean = true
 
   val groupedFeatures: GroupedFeatures = {

@@ -4,7 +4,7 @@ package com.github.vasnake.`ml-models`.complex
 
 import com.github.vasnake.`etl-core`.GroupedFeatures
 
-trait GrinderMLModel { // TODO: rename to ComplexMLModel
+trait ComplexMLModel {
   def isOK: Boolean = true
   def message: String = "placeholder for message in case if !model.isOK"
   def groupedFeatures: GroupedFeatures // features indices, for features selection from features storage
@@ -12,7 +12,7 @@ trait GrinderMLModel { // TODO: rename to ComplexMLModel
 }
 
 case class InvalidModel(description: Map[String, String], override val message: String)
-    extends GrinderMLModel {
+    extends ComplexMLModel {
   override def isOK: Boolean = false
   override def apply(features: Array[Double]): Seq[Any] = ???
   override def groupedFeatures: GroupedFeatures = ???
@@ -21,7 +21,7 @@ case class InvalidModel(description: Map[String, String], override val message: 
     s"InvalidModel(description = ${description}, message = ${message})"
 }
 
-case class BaseLineModel(description: Map[String, String]) extends GrinderMLModel {
+case class BaseLineModel(description: Map[String, String]) extends ComplexMLModel {
   private val audienceName = description.getOrElse("audience_name", "baseline")
 
   override def apply(features: Array[Double]): Seq[Any] =

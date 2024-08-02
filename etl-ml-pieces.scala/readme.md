@@ -251,7 +251,9 @@ TODO
 
 - spark-apps
     * com.github.vasnake.spark.app.datasets.JoinerApp
-    * com.github.vasnake.spark.app.ml-models.Applyer
+    * com.github.vasnake.spark.app.ml-models.ApplyerApp
+
+* com.github.vasnake.spark.ml.transformer.ApplyModelsTransformer
 
 ## Spark notes
 

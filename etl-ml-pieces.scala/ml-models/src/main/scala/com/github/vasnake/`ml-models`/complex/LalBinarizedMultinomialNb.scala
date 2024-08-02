@@ -19,7 +19,7 @@ case class LalBinarizedMultinomialNbModel // TODO: rename to LalBinarizedMultino
   groupedFeatures: GroupedFeatures,
   audienceName: String,
   equalizerSelector: String,
-) extends GrinderMLModel {
+) extends ComplexMLModel {
   private val imputer = Imputer(config.imputerConfig)
   private val binarizer = Binarizer(config.binarizerConfig)
 
