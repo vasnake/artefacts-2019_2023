@@ -46,7 +46,7 @@ object EtlFeatures {
     val PREFIX_TYPE = "PREFIX_TYPE"
   }
 
-  // if no config for domain: use default drop-null-avg config
+  // if no config for domain: use default `avg` config
   @transient
   val defaultAggregationConfig: DomainAggregationConfig = Map(DOMAIN_AGG_KEY -> AggregationConfig(
     pipeline = List("agg"),
@@ -381,7 +381,7 @@ object EtlFeatures {
     val srcWrapper = sources.head
 
     def joinSources(): Option[DataFrame] = {
-      // TODO: require join-rule.items is a subset of sources
+      // TODO: require: join-rule.items are a subset of sources
       val rule = for (jr <- cfg.source.join_rule) yield parseJoinRule(jr, defaultItem = srcWrapper.source.alias)
       val tables: Map[String, DataFrame] = sources.map(src => (src.source.alias, src.df.get)).toMap
 

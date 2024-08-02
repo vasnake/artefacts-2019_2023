@@ -5,6 +5,7 @@ package com.github.vasnake.spark.app.datasets.joiner.config
 import com.github.vasnake.core.text.StringToolbox
 
 class SourcesFinder(cfg: EtlConfig) extends ISourcesConfigView {
+
   override def domains: Seq[String] = for {
     domain <- cfg.domains
   } yield domain.name
@@ -13,16 +14,17 @@ class SourcesFinder(cfg: EtlConfig) extends ISourcesConfigView {
     import StringToolbox._
     implicit val sep: Separators = Separators(" as ")
 
-    val sourceNames = cfg.domains.filter(d => d.name == domain).flatMap(d => d.source.names)
+    val sourceNames = cfg.domains
+      .filter(_.name == domain)
+      .flatMap(_.source.names)
 
     sourceNames map { nameExpr =>
       nameExpr.splitTrim.toSeq match {
-        case Seq(name, alias) => NameWithAlias(name, alias)
-        case Seq(name) => NameWithAlias(name, name)
-        case _ =>
-          val msg =
-            s"Invalid config: domain `${domain}` have malformed source name `${nameExpr}` in source.names `${sourceNames}`"
-          throw new IllegalArgumentException(msg)
+        case Seq(name, alias) => NameWithAlias(name, alias) // "foo as bar"
+        case Seq(name) => NameWithAlias(name, name) // foo
+        case _ => throw new IllegalArgumentException(
+          s"Invalid config: domain `${domain}` have malformed source name `${nameExpr}` in source.names `${sourceNames}`"
+        )
       }
     }
   }
@@ -40,8 +42,8 @@ class SourcesFinder(cfg: EtlConfig) extends ISourcesConfigView {
 }
 
 trait ISourcesConfigView {
-  def domains: Seq[String]
-  def sources(domain: String): Seq[NameWithAlias]
+  def domains: Seq[String] // domains names
+  def sources(domain: String): Seq[NameWithAlias] // domain sources with aliases
   def table(source: NameWithAlias): NameWithAlias // retrieve table from list of tables using source name as index
 }
 

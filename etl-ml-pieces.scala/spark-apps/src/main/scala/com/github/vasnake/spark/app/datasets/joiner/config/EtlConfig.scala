@@ -5,14 +5,14 @@ package com.github.vasnake.spark.app.datasets.joiner.config
 
 /** Config for ETL job that creates one output (dt, uid_type) partition
   *
-  * @param domains list of feature domains, output columns definitions
+  * @param domains list of feature domains, de-facto it is definition for output columns
   * @param dt output dt partition
-  * @param join_rule domains join rule for partition, may be empty if table rule used
+  * @param join_rule domains join rule for partition, may be empty if table rule is used
   * @param matching optional uid matching stage config
   * @param shuffle_partitions spark option
-  * @param write_partitions number of files in hive partition
+  * @param write_partitions number of files in output hive partition
   * @param table output table name
-  * @param table_join_rule domains join rule for table schema, may be empty if only one domain
+  * @param table_join_rule domains join rule for table schema, may be empty if only one domain present
   * @param uid_type output uid_type
   */
 case class EtlConfig(
@@ -66,7 +66,7 @@ case class MatchingConfig(
 
 /** Domain sources definition
   *
-  * @param names domain sources names, name could be in form of `foo as bar`
+  * @param names domain sources names, each name could be in form of `foo as bar`
   * @param tables sources tables definitions
   * @param join_rule rule for join sources to one domain source
   */
@@ -151,10 +151,10 @@ case class UidImitationConfig(uid: String, uid_type: String) {
 /** Features domain definition
   *
   * @param name domain name, usually used as output field name
-  * @param group_type domain type, MAP_TYPE by default
-  * @param cast_type feature type, float by default
+  * @param group_type domain type, `MAP_TYPE` by default
+  * @param cast_type feature type, `float` by default
   * @param features sql.expr statements for selecting features
-  * @param agg features aggregation definitions for each feature and default definition for domain
+  * @param agg features aggregation definitions for each feature plus default definition for domain
   * @param source input tables definitions
   */
 case class DomainConfig(
@@ -189,7 +189,8 @@ case class DomainConfig(
   }
 }
 
-/** Definition of a transformation stage
+/** Definition of a transformation stage, for list of available values see project documentation.
+ *
   * @param name function name, e.g. `min`, `avg`, `sum`
   * @param kind stage type: `filter`, `agg`, `imputer`, etc
   * @param parameters function parameters, see function spec.
@@ -209,7 +210,7 @@ case class AggregationStageConfig(
 
 /** Aggregation pipeline config
   *
-  * @param pipeline steps enumeration
+  * @param pipeline pipeline steps enumeration
   * @param stages definitions for each step
   */
 case class AggregationConfig(

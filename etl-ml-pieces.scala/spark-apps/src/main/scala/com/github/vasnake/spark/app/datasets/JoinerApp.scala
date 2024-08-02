@@ -13,7 +13,7 @@ import com.github.vasnake.spark.app.SparkSubmitApp
 import com.github.vasnake.core.text.StringToolbox
 import com.github.vasnake.spark.io.{CheckpointService, IntervalCheckpointService}
 import com.github.vasnake.text.evaluator._
-import com.github.vasnake.spark.dataset.transform.Joiner.JoinRule
+import com.github.vasnake.spark.dataset.transform.Joiner.{JoinRule, parseJoinRule}
 import com.github.vasnake.common.file.FileToolbox
 import com.github.vasnake.spark.app.datasets.joiner.config.{DomainConfig, EtlConfig, MatchingConfig, MatchingTableRow, SourcesFinder, TableConfig}
 import com.github.vasnake.spark.app.datasets.joiner.{DomainSourceDataFrame, EtlFeatures, implicits}
@@ -76,6 +76,12 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
   logger.info(s"Sources enumerated: `${allDomainsSources.mkString(";\n")}`")
 
   private val needMatching: Boolean = etlCfg.matching.nonEmpty
+
+  // TODO: set of steps should be a little different:
+  // parse config, check env conditions (e.g. tableExists?);
+  // load sources; if-table-not-exists-stage; transform sources to target; write result.
+  // if-table-not-exists-stage: get a copy of each source DF filtered by condition `0 == 1`, we need only schema here;
+  // transform sources to target; create target table using target DF schema; restore list of sources and resume pipeline.
 
   if (!tableExists(etlCfg.table)) {
     logger.warn(s"Target table `${etlCfg.table}` doesn't exists ...")
