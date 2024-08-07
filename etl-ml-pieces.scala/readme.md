@@ -254,6 +254,7 @@ Other sbt related resources
 TODO
 
 com.github.vasnake.spark.app.interview.transform_array.InvalidValuesToNullApp
+com.github.vasnake.spark.app.external_catalog.Alter_HMS_PartitionsApp
 
 ### unit tests
 ### integration tests
