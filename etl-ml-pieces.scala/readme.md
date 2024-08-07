@@ -246,12 +246,14 @@ Other sbt related resources
     * com.github.vasnake.spark.ml.model.ScoreQuantileThresholdModel
     * com.github.vasnake.spark.ml.estimator.ScoreQuantileThresholdEstimator
 
-TODO
-
 - spark-apps
     * com.github.vasnake.spark.app.datasets.JoinerApp
     * com.github.vasnake.spark.app.ml-models.ApplyerApp
     * com.github.vasnake.spark.ml.transformer.ApplyModelsTransformer
+
+TODO
+
+com.github.vasnake.spark.app.interview.transform_array.InvalidValuesToNullApp
 
 ### unit tests
 ### integration tests
