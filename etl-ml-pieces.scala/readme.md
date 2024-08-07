@@ -50,7 +50,6 @@ Other sbt related resources
 - https://scastie.scala-lang.org/
 - https://mvnrepository.com/artifact/org.unbescape/unbescape/1.1.6.RELEASE
 
-
 ## What do we have here
 
 Надо это как-то распихать по отдельным проектам билда.
@@ -252,8 +251,10 @@ TODO
 - spark-apps
     * com.github.vasnake.spark.app.datasets.JoinerApp
     * com.github.vasnake.spark.app.ml-models.ApplyerApp
+    * com.github.vasnake.spark.ml.transformer.ApplyModelsTransformer
 
-* com.github.vasnake.spark.ml.transformer.ApplyModelsTransformer
+### unit tests
+### integration tests
 
 ## Spark notes
 

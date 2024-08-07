@@ -179,7 +179,13 @@ class ApplyModelsTransformer(override val uid: String) extends Transformer with 
 
 object ApplyModelsTransformer extends DefaultParamsReadable[ApplyModelsTransformer] {
 
-  type ModelDescription = Map[String, String]
+  def apply(modelsList: String, keepColumnsList: String): ApplyModelsTransformer = {
+    val trf = new ApplyModelsTransformer()
+
+    trf
+      .setModels(modelsList)
+      .setKeepColumns(keepColumnsList)
+  }
 
   private def applyModels(df: DataFrame, outSchema: StructType, broadcasted: Broadcast[ApplyModelsDistributedConfig]): DataFrame =
     df.mapPartitions(applyModelsToIter(_, broadcasted))(RowEncoder(outSchema))
@@ -204,6 +210,8 @@ object ApplyModelsTransformer extends DefaultParamsReadable[ApplyModelsTransform
     StructField("audience_name", DataTypes.StringType),
     StructField("category", DataTypes.StringType)
   )
+
+  type ModelDescription = Map[String, String]
 
   object DescriptionTools {
     import StringToolbox._

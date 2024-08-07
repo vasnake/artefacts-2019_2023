@@ -5,64 +5,89 @@ package com.github.vasnake.spark.app.`ml-models`
 
 import org.apache.spark.sql.DataFrame
 
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 import com.beust.jcommander
 
 import com.github.vasnake.spark.app.SparkSubmitApp
 import com.github.vasnake.core.text.StringToolbox
+import com.github.vasnake.json.JsonToolbox
 import com.github.vasnake.spark.ml.transformer.ApplyModelsTransformer
 
 object ApplyerApp extends SparkSubmitApp(CmdLineParams) {
-  type AMT = ApplyModelsTransformer
+  logger.info(s"Loading applyer config `${CmdLineParams.transformer_config}` ...")
 
-  logger.info(s"Loading transformation config `${CmdLineParams.transformation_config}` ...")
-  private val trfCfg: TransformationConfig = {
+  private val cfg: ApplyerConfig = {
     import StringToolbox._
     import DefaultB64Mapping.extraCharsMapping
 
-    val jsonText = CmdLineParams.transformation_config.b64Decode
-    logger.info(s"config json: `${jsonText}`")
-    TransformationConfig.parseJson(jsonText)
-  }
-  logger.info(s"Config loaded: `${trfCfg}`")
+    val jsonText = CmdLineParams.transformer_config.b64Decode
+    logger.debug(s"config json: `${jsonText}`")
 
-  // load source; init transformer, call transform, write result
+    ApplyerConfig.parseJson(jsonText)
+  }
+
+  logger.info(s"Config loaded: `${cfg}`")
+
   var res = for {
-    srcDF <- loadSource(trfCfg.sourcePath)
-    trf <- createTransformer(trfCfg.models, trfCfg.keepColumns)
+    srcDF <- loadSource(cfg.sourcePath)
+    trf <- createTransformer(cfg.models, cfg.keepColumns)
     trgDF <- Try(trf.transform(srcDF))
-    written <- writeTarget(trgDF, trfCfg.targetPath)
+    written <- writeTarget(trgDF, cfg.targetPath)
   } yield written
 
   reportResult(res)
 
-  def loadSource(path: String): Try[DataFrame] = ???
-  def createTransformer(modelsList: String, keepColumnsList: String): Try[AMT] = ???
-  def writeTarget(df: DataFrame, path: String): Try[Unit] = ???
-  def reportResult(res: Try[_]): Unit = ???
+  private def loadSource(path: String): Try[DataFrame] = Try {
+    spark.read.parquet(path)
+  }
+
+  private def createTransformer(modelsList: String, keepColumnsList: String): Try[ApplyModelsTransformer] = Try {
+    val trf = ApplyModelsTransformer.apply(modelsList, keepColumnsList)
+    val isOK = trf.initialize()
+    require(isOK, "Initialization failed, probably config is not valid, see logs for details")
+
+    trf
+  }
+
+  private def writeTarget(df: DataFrame, path: String): Try[Unit] = Try {
+    df.write
+      .mode("overwrite")
+      .option("compression", "gzip")
+      .option("mapreduce.fileoutputcommitter.algorithm.version", "2")
+      .parquet(path)
+  }
+
+  private def reportResult(res: Try[_]): Unit = res match {
+    case Failure(exception) => logger.error("Appyer app: fail", exception)
+    case Success(_) => logger.info("Applyer app: success")
+  }
+
 }
 
 object CmdLineParams {
   import jcommander.Parameter
 
-  @Parameter(names = Array("--transformation-config"), required = true, description = "Job config, json text encoded base64")
-  var transformation_config: String = _ // models_list, keep_columns_list, source_load_path, target_write_path
+  @Parameter(names = Array("--transformer-config"), required = true, description = "Job config, base64-encoded json text")
+  var transformer_config: String = _ // models_list, keep_columns_list, source_load_path, target_write_path
 
   override def toString: String =
-    s"""CmdLineParams(transformation_config="$transformation_config""""
+    s"""CmdLineParams(transformer_config="$transformer_config""""
 
 }
 
 /**
- * Models_list, keep_columns_list, load_path, write_path
- * @param sourcePath
- * @param targetPath
- * @param models
- * @param keepColumns
+ * Apply ML models to DF, config: Models_list, keep_columns_list, load_path, write_path
+ * @param sourcePath input DataFrame source
+ * @param targetPath output DataFrame write path
+ * @param models models list, encoded
+ * @param keepColumns list of columns names to keep, encoded
  */
-case class TransformationConfig(sourcePath: String, targetPath: String, models: String, keepColumns: String)
-object TransformationConfig {
-  def parseJson(jsonText: String): TransformationConfig = {
-    ???
+case class ApplyerConfig(sourcePath: String, targetPath: String, models: String, keepColumns: String)
+
+object ApplyerConfig {
+  def parseJson(jsonText: String): ApplyerConfig = {
+    import JsonToolbox.readObject
+
+    readObject[ApplyerConfig](jsonText)
   }
 }
