@@ -267,6 +267,7 @@ lazy val commonDependencies = Seq(
     // main dependencies
   ),
   libraryDependencies ++= Seq(
+    org.scalatest.scalatest,
     com.eed3si9n.expecty.expecty,
     org.scalacheck.scalacheck,
     org.scalameta.`munit-scalacheck`,
@@ -275,3 +276,27 @@ lazy val commonDependencies = Seq(
     tf.tofu.`derevo-scalacheck`,
   ).map(_ % Test),
 )
+/**
+<pre>
+
+val testDeps = Seq(
+  "org.scalatest" %% "scalatest" % "3.0.8",
+  "com.holdenkarau" %% "spark-testing-base" % s"${sparkVersion}_0.12.0",
+  "com.storm-enroute" %% "scalameter" % "0.19"
+)
+.settings(
+    Defaults.itSettings
+      ++ buildSettings
+      ++ (excludeDependencies ++= excludedDeps)
+      ++ (
+      libraryDependencies
+        ++= (sparkDeps ++ hadoopDeps).map(_ % Provided)
+        ++ mlDeps
+        ++ jsonDeps
+        ++ toolsDeps
+        ++ logDeps
+        ++ testDeps.map(_ % "it,test")
+      )
+
+</pre>
+*/

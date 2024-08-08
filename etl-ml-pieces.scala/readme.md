@@ -250,12 +250,16 @@ Other sbt related resources
     * com.github.vasnake.spark.app.datasets.JoinerApp
     * com.github.vasnake.spark.app.ml-models.ApplyerApp
     * com.github.vasnake.spark.ml.transformer.ApplyModelsTransformer
+- spark-apps test
+    * com.github.vasnake.spark.app.interview.transform_array.InvalidValuesToNullApp
+    * com.github.vasnake.spark.app.external_catalog.Alter_HMS_PartitionsApp
+    * com.github.vasnake.spark.app.datasets.CompareDatasetsApp
 
 TODO
 
-com.github.vasnake.spark.app.interview.transform_array.InvalidValuesToNullApp
-com.github.vasnake.spark.app.external_catalog.Alter_HMS_PartitionsApp
-com.github.vasnake.spark.app.datasets.CompareDatasetsApp
+tests
+
+com.github.vasnake.`ml-core`.models.BinarizerTest
 
 ### unit tests
 ### integration tests

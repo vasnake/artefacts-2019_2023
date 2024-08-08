@@ -38,6 +38,9 @@ object Dependencies {
   }
 
   object org {
+    object scalatest {
+      val scalatest = "org.scalatest" %% "scalatest" % "3.2.19"
+    }
 
     object unbescape {
       // https://mvnrepository.com/artifact/org.unbescape/unbescape
