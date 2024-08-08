@@ -2,7 +2,7 @@
 
 WIP
 
-Collection of some interesting pieces from my projects.
+Collection of some interesting bits and pieces from my projects.
 
 Spark 2.4.8; Scala 2.12.19; sbt 1.10.0 (migration to Spark 3 is WIP)
 
@@ -26,16 +26,16 @@ alias psbt='export JAVA_OPTS="-XX:MaxMetaspaceSize=1G -Xmx4G -XX:+UseParallelGC"
 
 psbt
 ```
-WSL shit
+WSL shit.
 
-Sometimes I want to run sbt in PS
+Sometimes I want to run sbt in PowerShell
 ```s
 pushd ($env:HOMEDRIVE + $env:HOMEPATH + "\.")
 pushd .\data\github\artefacts-2019_2023\etl-ml-pieces.scala\
 $OutputEncoding = [console]::InputEncoding = [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
 sbt -v "-Dfile.encoding=UTF-8"
 ```
-PowerShell shit
+PowerShell shit.
 
 For `build.sbt` tricks see
 - https://github.com/DevInsideYou/tagless-final/blob/master/expression-problem/build.sbt
@@ -50,101 +50,7 @@ Other sbt related resources
 - https://scastie.scala-lang.org/
 - https://mvnrepository.com/artifact/org.unbescape/unbescape/1.1.6.RELEASE
 
-## What do we have here
-
-Надо это как-то распихать по отдельным проектам билда.
-Принцип деления: набор зависимостей, от ядра "нет зависимостей", до доменной логики "зависит от всего".
-
-А еще куда-то как-то надо тесты интеграционные запихать. В виде скриптов и доки по использованию.
-
-### dmscala-grinder_jobs
-~\data\gitlab\dm.dmscala\dmscala-grinder_jobs\
-
-- EtlFeaturesApp
-- JoinExpressionParser
-- DatasetAggregators
-- DefaultHiveWriter
-- CheckpointService
-- toolboxes
-    * file
-    * string
-
-### grinder_transformers
-~\data\gitlab\dm.dmscala\dmscala\grinder_transformers\
-
-- toolboxes
-    * file
-    * json
-    * string
-    * vector
-
-- numpy-scipy
-    * percentile
-    * digitize
-    * histogram
-    * array_transpose
-    * array_cumulativeSum
-    * array_slice
-    * pchip_coefficients
-
-- catalog for all udf, udaf
-- hive udf, udaf
-- java udf aka spark.sql.api.java.UDF
-    * MapValuesOrderedUDF
-    * AggregateSumUDF
-    * CosineSimilarityUDF
-    * DotProductUDF
-    * HtmlUnescapeUDF
-    * DailyStatMapToArrayUDF
-    * DailyStatActivityTypesUDF
-- catalyst udf, udaf (spark.sql.catalyst.expressions)
-    * GenericAvg
-    * GenericIsFinite
-    * GenericIsInf
-    * GenericMax
-    * GenericMin
-    * GenericMostFreq
-    * GenericSum
-    * GenericVectorCooMul
-    * GenericVectorMatMul
-    * GenericVectorSemiDiff
-    * GenericVectorSemiSum
-
-- IO
-    * hive.Writer
-    * HiveExternalCatalog
-    * MetastoreQueryProcessorWithConnPool
-
-- ML models (model in this case is a pipeline of transformations and predictions):
-    * LalBinarizedMultinomialNbModel
-    * LalTfidfScaledSgdcModel
-    * ScoreAudienceModel
-- ML estimators and transformers
-    * ScoreQuantileThreshold
-    * Binarizer
-    * TfIdf
-    * Imputer
-    * StandardScaler
-    * SBGroupedTransformer
-    * ScoreEqualizer
-    * Slicer
-    * MultinomialNB
-    * PredictorWrapper
-    * SGDClassifier
-
-- spark.ml transformers and estimators (model, estimator); stratification, sampling
-    * ArgMaxClassScore...
-    * InverseVariability...
-    * NEPriorClassProba...
-    * ScoreEqualize...
-    * ScoreQuantileThreshold...
-    * ApplyModelsTransformer
-
-- etl helpers (data adapters):
-    * GroupedFeatures
-    * (Grouped)FeaturesRowDecoder (convert grouped features to vector)
-
-### proposed projects schema
+## project modules
 
 - core (com.github.vasnake.core)
     * StringToolbox com.github.vasnake.core.text.StringToolbox
@@ -250,19 +156,21 @@ Other sbt related resources
     * com.github.vasnake.spark.app.datasets.JoinerApp
     * com.github.vasnake.spark.app.ml-models.ApplyerApp
     * com.github.vasnake.spark.ml.transformer.ApplyModelsTransformer
+
 - spark-apps test
     * com.github.vasnake.spark.app.interview.transform_array.InvalidValuesToNullApp
     * com.github.vasnake.spark.app.external_catalog.Alter_HMS_PartitionsApp
     * com.github.vasnake.spark.app.datasets.CompareDatasetsApp
 
+## unit tests
+
 TODO
 
 tests
+    * com.github.vasnake.`ml-core`.models.BinarizerTest
+    * com.github.vasnake.`etl-core`.GroupedFeaturesTest
 
-com.github.vasnake.`ml-core`.models.BinarizerTest
-
-### unit tests
-### integration tests
+## integration tests
 
 ## Spark notes
 
