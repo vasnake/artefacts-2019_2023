@@ -169,6 +169,7 @@ TODO
 tests
     * com.github.vasnake.`ml-core`.models.BinarizerTest
     * com.github.vasnake.`etl-core`.GroupedFeaturesTest
+com.github.vasnake.`ml-core`.models.GroupedFeaturesTfidfTest
 
 ## integration tests
 
