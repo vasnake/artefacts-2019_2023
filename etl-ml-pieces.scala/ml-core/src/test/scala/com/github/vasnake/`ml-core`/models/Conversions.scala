@@ -29,13 +29,13 @@ object Conversions {
     implicit def transformer2ExtendedTransformer(tr: GroupedFeaturesTransformer): ExtendedTransformer = new ExtendedTransformer(tr)
     implicit def seq2array[T: ClassTag](lst: Seq[T]): Array[T] = lst.toArray
 
-    implicit class SeqOfDouble(ds: Iterable[Double]) {
-      def toFloat: Seq[Float] = ds.toSeq.map(_.toFloat)
-      def toString(accuracy: Int): Seq[String] = ds.toSeq.map(x => x.formatted(s"%1.${accuracy}f"))
+    implicit class SeqOfDouble(xs: Iterable[Double]) {
+      def toFloat: Seq[Float] = xs.toSeq.map(_.toFloat)
+      def toString(accuracy: Int): Seq[String] = xs.toSeq.map(x => s"%1.${accuracy}f".format(x))
     }
 
-    implicit class SeqOfFloats(ds: Seq[Float]) {
-      def toDouble: Seq[Double] = ds.map(_.toDouble)
+    implicit class SeqOfFloats(xs: Seq[Float]) {
+      def toDouble: Seq[Double] = xs.map(_.toDouble)
     }
 
     implicit def arrayD2arrayF(ds: Array[Double]): Array[Float] = ds.map(_.toFloat)
