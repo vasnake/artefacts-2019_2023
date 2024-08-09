@@ -53,23 +53,24 @@ object Dependencies {
     }
 
     object json4s {
-      // > Spark depends on old version json4s. You should use old json4s or another json library (3.5.3)
-      // https://github.com/apache/spark/blob/v2.4.8/dev/deps/spark-deps-hadoop-2.7
-      // Or, you could shadow unwanted versions
+      // > Spark depends on old version json4s. You should use old json4s or another json library
+      // https://github.com/apache/spark/blob/v2.4.8/dev/deps/spark-deps-hadoop-2.7 => 3.5.3
 
       // https://mvnrepository.com/artifact/org.json4s/json4s-jackson
       // libraryDependencies += "org.json4s" %% "json4s-jackson" % "4.0.7"
-      val `json4s-jackson` = "org.json4s" %% "json4s-jackson" % "3.5.3"
+      val `json4s-jackson` = "org.json4s" %% "json4s-jackson" % "4.0.7"
 
       // https://mvnrepository.com/artifact/org.json4s/json4s-ast
       //libraryDependencies += "org.json4s" %% "json4s-ast" % "4.0.7"
-      val `json4s-ast` = "org.json4s" %% "json4s-ast" % "3.5.3"
+      val `json4s-ast` = "org.json4s" %% "json4s-ast" % "4.0.7"
 
-      // other versions lead to errors like:
+      // other (than 3.5.3 for spark 2.4.8) versions lead to errors like this:
       //24/08/09 11:46:23 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
       //[info] com.github.vasnake.spark.features.vector.FeaturesRowDecoderTest *** ABORTED ***
       //[info]   java.lang.NoClassDefFoundError: org/json4s/JsonAST$JValue
-
+      // Solution: one old version for all modules; or
+      // you could shadow unwanted versions; or
+      // you could use 'dependencyOverrides' option (current solution)
     }
 
     object pmml4s {

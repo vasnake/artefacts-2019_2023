@@ -211,6 +211,11 @@ SPARK_TESTING=yes ./build/sbt clean +compile +test -DsparkVersion=$SPARK_VERSION
 //      "org.json4s" %% "json4s-jackson",
 //      "org.json4s" %% "json4s-ast", // but not like this: org.json4s.`json4s-jackson`, // Only supported exclusion rule fields: organization, name
 //    ),
+    dependencyOverrides ++= Seq(
+      // spark 2.4.8 requirements:
+      "org.json4s" %% "json4s-jackson" % "3.5.3",
+      "org.json4s" %% "json4s-ast" % "3.5.3",
+    ).map(_ % Test),
   )
 
   lazy val options = Seq(
@@ -311,32 +316,4 @@ lazy val commonDependencies = Seq(
     tf.tofu.`derevo-scalacheck`,
   ).map(_ % Test),
 )
-/**
-<pre>
-// https://mvnrepository.com/artifact/com.holdenkarau/spark-testing-base
-libraryDependencies += "com.holdenkarau" %% "spark-testing-base" % "2.4.8_1.5.3" % Test
-spark 2.4.8
-stb 1.5.3
-
-val testDeps = Seq(
-  "org.scalatest" %% "scalatest" % "3.0.8",
-  "com.holdenkarau" %% "spark-testing-base" % s"${sparkVersion}_0.12.0",
-  "com.storm-enroute" %% "scalameter" % "0.19"
-)
-.settings(
-    Defaults.itSettings
-      ++ buildSettings
-      ++ (excludeDependencies ++= excludedDeps)
-      ++ (
-      libraryDependencies
-        ++= (sparkDeps ++ hadoopDeps).map(_ % Provided)
-        ++ mlDeps
-        ++ jsonDeps
-        ++ toolsDeps
-        ++ logDeps
-        ++ testDeps.map(_ % "it,test")
-      )
-
-</pre>
-*/
 
