@@ -7,7 +7,6 @@ import com.github.vasnake.core.text.StringToolbox.repr
 import com.github.vasnake.spark.io.{Logging => CustomLogging}
 import com.github.vasnake.common.num.{FastMath => fm}
 
-//import com.mrg.dm.grinder.hive.table.info.DataFrameHivePartitionsInfo
 import com.github.vasnake.spark.io.stats.DataFrameBucketsStats
 
 import org.apache.spark.sql.hive.vasnake.MetastoreQueryProcessorWithConnPool

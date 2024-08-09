@@ -13,6 +13,11 @@ object Dependencies {
 
   object com {
 
+    object holdenkarau {
+      // libraryDependencies += "com.holdenkarau" %% "spark-testing-base" % "2.4.8_1.5.3" % Test
+      val `spark-testing-base` = "com.holdenkarau" %% "spark-testing-base" % s"${org.apache.spark.sparkVersion}_1.5.3" // % Test
+    }
+
     object beust {
       val jcommander = "com.beust" % "jcommander" % "1.82"
     }
@@ -48,9 +53,23 @@ object Dependencies {
     }
 
     object json4s {
+      // > Spark depends on old version json4s. You should use old json4s or another json library (3.5.3)
+      // https://github.com/apache/spark/blob/v2.4.8/dev/deps/spark-deps-hadoop-2.7
+      // Or, you could shadow unwanted versions
+
       // https://mvnrepository.com/artifact/org.json4s/json4s-jackson
       // libraryDependencies += "org.json4s" %% "json4s-jackson" % "4.0.7"
-      val `json4s-jackson` = "org.json4s" %% "json4s-jackson" % "4.0.7"
+      val `json4s-jackson` = "org.json4s" %% "json4s-jackson" % "3.5.3"
+
+      // https://mvnrepository.com/artifact/org.json4s/json4s-ast
+      //libraryDependencies += "org.json4s" %% "json4s-ast" % "4.0.7"
+      val `json4s-ast` = "org.json4s" %% "json4s-ast" % "3.5.3"
+
+      // other versions lead to errors like:
+      //24/08/09 11:46:23 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+      //[info] com.github.vasnake.spark.features.vector.FeaturesRowDecoderTest *** ABORTED ***
+      //[info]   java.lang.NoClassDefFoundError: org/json4s/JsonAST$JValue
+
     }
 
     object pmml4s {

@@ -6,6 +6,7 @@ import MyUtil._
 
 ThisBuild / organization := "com.github.vasnake"
 ThisBuild / scalaVersion := "2.12.19"
+ThisBuild / fork := true // do we really need this in global scope?
 
 // project
 
@@ -97,6 +98,7 @@ lazy val json =
         dio.circe.`circe-generic`,
         dio.circe.`circe-parser`,
         org.json4s.`json4s-jackson`,
+        org.json4s.`json4s-ast`,
       )
     )
 
@@ -155,10 +157,12 @@ lazy val `spark-io` =
 lazy val `spark-transformers` =
   project
     .in(file("spark-transformers"))
-    .dependsOn(Seq(core, common, text, `etl-core`, `spark-io`, json).map(_ % Cctt): _*)
+    .dependsOn(Seq(core, common, text, `etl-core`, `ml-core`, `spark-io`, json).map(_ % Cctt): _*)
     .settings(commonSettings)
     .settings(commonDependencies)
     .settings(sparkSettings)
+//    .settings(Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary)
+//    .settings(Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat)
 
 lazy val `spark-ml` =
   project
@@ -180,12 +184,43 @@ lazy val `spark-apps` =
 // settings
 
 lazy val sparkSettings = {
+/** {{{
+
+> If your testing Spark SQL CodeGen make sure to set SPARK_TESTING=true
+SPARK_TESTING=yes ./build/sbt clean +compile +test -DsparkVersion=$SPARK_VERSION
+
+}}} */
 
   lazy val dependencies = Seq(
-    libraryDependencies ++= org.apache.spark.sparkModules.map(_ % Provided)
+    libraryDependencies ++= (org.apache.spark.sparkModules ++ Seq(
+      org.json4s.`json4s-jackson`,
+      org.json4s.`json4s-ast`,
+    )).map(_ % Provided),
+    libraryDependencies ++= Seq(com.holdenkarau.`spark-testing-base`)
+      .map(_ % Test),
+
+// fighting test error:
+//24/08/09 11:46:23 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+//[info] com.github.vasnake.spark.features.vector.FeaturesRowDecoderTest *** ABORTED ***
+//[info]   java.lang.NoClassDefFoundError: org/json4s/JsonAST$JValue
+//    libraryDependencies ++= Seq(
+//      "org.json4s" %% "json4s-jackson" % "3.5.3",
+//      "org.json4s" %% "json4s-ast" % "3.5.3",
+//    ).map(_ % Test),
+//    excludeDependencies ++= Seq(
+//      "org.json4s" %% "json4s-jackson",
+//      "org.json4s" %% "json4s-ast", // but not like this: org.json4s.`json4s-jackson`, // Only supported exclusion rule fields: organization, name
+//    ),
   )
 
-  dependencies
+  lazy val options = Seq(
+    // https://github.com/holdenk/spark-testing-base
+    javaOptions ++= Seq("-Xms4G", "-Xmx4G", "-XX:+CMSClassUnloadingEnabled"),
+    fork := true, // not working: Test / fork := true, // fork in Test := true, // show test / fork
+    Test / parallelExecution := false, // parallelExecution in Test := false,
+  )
+
+  dependencies ++ options
 }
 
 lazy val hiveSettings = {
@@ -278,6 +313,10 @@ lazy val commonDependencies = Seq(
 )
 /**
 <pre>
+// https://mvnrepository.com/artifact/com.holdenkarau/spark-testing-base
+libraryDependencies += "com.holdenkarau" %% "spark-testing-base" % "2.4.8_1.5.3" % Test
+spark 2.4.8
+stb 1.5.3
 
 val testDeps = Seq(
   "org.scalatest" %% "scalatest" % "3.0.8",
@@ -300,3 +339,4 @@ val testDeps = Seq(
 
 </pre>
 */
+

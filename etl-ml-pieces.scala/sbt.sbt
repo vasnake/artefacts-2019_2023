@@ -15,11 +15,11 @@ Global / excludeLintKeys ++= Set(
 // S - show short stack traces
 Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-oSD")
 Test / parallelExecution := false
-Test / turbo := true
+Test / turbo := false
 
 //ThisBuild / autoStartServer := insideCI.value
 ThisBuild / includePluginResolvers := true
-ThisBuild / turbo := true
+ThisBuild / turbo := false
 
 ThisBuild / watchBeforeCommand := Watch.clearScreen
 ThisBuild / watchTriggeredMessage := Watch.clearScreenOnTrigger

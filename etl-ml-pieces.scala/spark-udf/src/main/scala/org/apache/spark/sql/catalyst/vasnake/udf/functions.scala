@@ -19,7 +19,7 @@ object functions {
   // Functions registry interface
   // Possible usage examples:
   // in scala code: `functions.registerAs("generic_avg", "gavg", spark, overrideIfExists = true)`
-  // in python code: `spark._jvm.org.apache.spark.sql.catalyst.grinder.udf.functions.registerAs("generic_avg", "gavg", spark._jsparkSession, True)`
+  // in python code: `spark._jvm.org.apache.spark.sql.catalyst.vasnake.udf.functions.registerAs("generic_avg", "gavg", spark._jsparkSession, True)`
 
   def registerAs(funcName: String, targetName: String, spark: SparkSession, overrideIfExists: Boolean = false): Unit = {
     val (info, builder, alias) = expressions(funcName) // possible NoSuchElementException

@@ -52,39 +52,37 @@ Other sbt related resources
 
 ## project modules
 
-- core (com.github.vasnake.core)
-    * StringToolbox com.github.vasnake.core.text.StringToolbox
-    * VectorToolbox com.github.vasnake.core.num.VectorToolbox
-    * num-sci-py lib
+- core
+    * com.github.vasnake.core.text.StringToolbox
+    * com.github.vasnake.core.num.VectorToolbox
+    * num-sci-py
         - com.github.vasnake.core.num.NumPy
         - com.github.vasnake.core.num.SciPy.PCHIP
-    * configured aggregators (pipeline + config) from joiner com.github.vasnake.core.aggregation.TransformersPipeline
+    * com.github.vasnake.core.aggregation.TransformersPipeline
 
-- common com.github.vasnake.common (apache commons)
-    * FileToolbox com.github.vasnake.common.file.FileToolbox
-    * numpy com.github.vasnake.common.num.NumPy
+- common
+    * com.github.vasnake.common.file.FileToolbox
+    * com.github.vasnake.common.num.NumPy
 
-- text (parser combinators)
+- text // TODO: integrate with https://github.com/vasnake/join-expression-parser; add stack-based parser (based on python module); add tests
     * com.github.vasnake.text.parser.JoinExpressionParser
     * com.github.vasnake.text.evaluator.JoinExpressionEvaluator
-    * TODO: integrate with https://github.com/vasnake/join-expression-parser; add stack-based parser (based on python module); add tests
 
 - etl-core
-    * grouped features com.github.vasnake.etl-core.GroupedFeatures
+    * com.github.vasnake.etl-core.GroupedFeatures
 
-- ml-core (double, array[double], fit, transform: estimators, transformers)
-    simple (one-stage) models
+- ml-core
     * com.github.vasnake.ml-core.models.ScoreQuantileThreshold
     * com.github.vasnake.ml-core.models.Binarizer
     * com.github.vasnake.ml-core.models.GroupedFeaturesTfidf
     * com.github.vasnake.ml-core.models.Imputer
-    * com.github.vasnake.`ml-core`.models.Scaler
+    * com.github.vasnake.ml-core.models.Scaler
 
-- ml-models (Grinder complex models i.e. pipelines)
-    * com.github.vasnake.`ml-models`.complex.GrinderMLModel
+- ml-models
+    * com.github.vasnake.`ml-models`.complex.ComplexMLModel
     * com.github.vasnake.`ml-models`.complex.LalBinarizedMultinomialNb
-    * com.github.vasnake.`ml-models`.complex.LalTfidfScaledSgdcModel
-    * com.github.vasnake.`ml-models`.complex.ScoreAudienceModel
+    * com.github.vasnake.`ml-models`.complex.LalTfidfScaledSgdc
+    * com.github.vasnake.`ml-models`.complex.ScoreAudience
 
 - json
     * com.github.vasnake.json.JsonToolbox
@@ -125,19 +123,19 @@ Other sbt related resources
     * com.github.vasnake.spark.io.HDFSFileToolbox
     * com.github.vasnake.spark.io.CheckpointService
     * com.github.vasnake.spark.io.Logging
-    * hive (partition) writer (два: из джойнилки и из трансформеров)
+    * hive (partition) writer
+        * com.github.vasnake.spark.io.hive.TableSmartWriter#insertIntoHive
         * com.github.vasnake.hive.SQLPartitionsWriterI
         * com.github.vasnake.spark.io.hive.SQLHiveWriter
         * com.github.vasnake.spark.io.hive.SQLWriterFactory
         * com.github.vasnake.spark.io.hive.SQLWriterFactoryImpl
-        * com.github.vasnake.spark.io.hive.TableSmartWriter#insertIntoHive
-    * org.apache.spark.sql.hive.vasnake.MetastoreQueryProcessorWithConnPool
     * org.apache.spark.sql.hive.vasnake.HiveExternalCatalog
+    * org.apache.spark.sql.hive.vasnake.MetastoreQueryProcessorWithConnPool
 
 - spark-transformers
+    * com.github.vasnake.`etl-core`.aggregate.AggregationPipeline
     * com.github.vasnake.spark.features.vector.FeaturesRowDecoder
     * com.github.vasnake.spark.features.aggregate.ColumnAggregator
-    * com.github.vasnake.`etl-core`.aggregate.AggregationPipeline
     * com.github.vasnake.spark.features.aggregate.DatasetAggregator#aggregateColumns
     * com.github.vasnake.spark.dataset.transform.StratifiedSamplerg#getGroupScoreSample
     * com.github.vasnake.spark.dataset.transform.Joiner#joinDatasets
@@ -145,8 +143,8 @@ Other sbt related resources
     * com.github.vasnake.spark.dataset.transform.TopNRowsApprox
 
 - spark-ml
-    * com.github.vasnake.spark.ml.model.ScoreEqualizerModel (transform)
-    * com.github.vasnake.spark.ml.estimator.ScoreEqualizerEstimator (fit)
+    * com.github.vasnake.spark.ml.model.ScoreEqualizerModel
+    * com.github.vasnake.spark.ml.estimator.ScoreEqualizerEstimator
     * com.github.vasnake.spark.ml.model.NEPriorClassProbaModel
     * com.github.vasnake.spark.ml.estimator.NEPriorClassProbaEstimator
     * com.github.vasnake.spark.ml.model.ScoreQuantileThresholdModel
@@ -157,7 +155,7 @@ Other sbt related resources
     * com.github.vasnake.spark.app.ml-models.ApplyerApp
     * com.github.vasnake.spark.ml.transformer.ApplyModelsTransformer
 
-- spark-apps test
+- spark-apps test (experiments)
     * com.github.vasnake.spark.app.interview.transform_array.InvalidValuesToNullApp
     * com.github.vasnake.spark.app.external_catalog.Alter_HMS_PartitionsApp
     * com.github.vasnake.spark.app.datasets.CompareDatasetsApp
@@ -171,7 +169,12 @@ tests
     * com.github.vasnake.`etl-core`.GroupedFeaturesTest
     * com.github.vasnake.`ml-core`.models.GroupedFeaturesTfidfTest
     * com.github.vasnake.`ml-core`.models.ImputerTest
-com.github.vasnake.`ml-core`.models.ScalerTest
+    * com.github.vasnake.`ml-core`.models.ScalerTest
+
+com.github.vasnake.spark.features.vector.FeaturesRowDecoderTest
+
+[error] set spark-transformers / Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary                                                       
+[error] set spark-transformers / Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat
 
 ## integration tests
 
