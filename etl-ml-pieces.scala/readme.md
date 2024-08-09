@@ -171,11 +171,9 @@ tests
     * com.github.vasnake.`ml-core`.models.GroupedFeaturesTfidfTest
     * com.github.vasnake.`ml-core`.models.ImputerTest
     * com.github.vasnake.`ml-core`.models.ScalerTest
+    * com.github.vasnake.spark.features.vector.FeaturesRowDecoderTest
 
-com.github.vasnake.spark.features.vector.FeaturesRowDecoderTest
-
-[error] set spark-transformers / Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary                                                       
-[error] set spark-transformers / Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat
+com.github.vasnake.spark.io.hive.TableSmartWriterTest
 
 ## integration tests
 

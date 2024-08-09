@@ -7,8 +7,6 @@ import org.scalatest._
 import org.apache.spark.sql.SparkSession
 import com.holdenkarau.spark.testing.SparkSessionProvider
 
-// TODO: move to spark-io
-
 trait SparkProvider {
   protected def loadSpark(): SparkSession
   @transient protected implicit lazy val spark: SparkSession = loadSpark()

@@ -7,14 +7,16 @@ import com.github.vasnake.spark.test.SimpleLocalSpark
 import com.github.vasnake.`ml-core`.models.Conversions
 import com.github.vasnake.`etl-core`.{FeaturesGroup, GroupedFeatures}
 import com.github.vasnake.`ml-core`.models.EqualityCheck.createSeqFloatsEquality
+
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
+import org.apache.spark.sql.catalyst.encoders.RowEncoder
 
 import scala.collection.mutable
+
 import org.scalatest._
 import flatspec._
 import matchers._
-import org.apache.spark.sql.catalyst.encoders.RowEncoder
 import org.scalactic.Equality
 
 // testOnly *RowDecoder*
