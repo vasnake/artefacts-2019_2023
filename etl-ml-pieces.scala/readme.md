@@ -49,6 +49,7 @@ Other sbt related resources
 - https://www.scalatest.org/user_guide/using_scalatest_with_sbt
 - https://scastie.scala-lang.org/
 - https://mvnrepository.com/artifact/org.unbescape/unbescape/1.1.6.RELEASE
+- https://stackoverflow.com/questions/57521738/how-to-solve-sbt-dependency-problem-with-spark-and-whisklabs-docker-it-scala
 
 ## project modules
 
@@ -180,4 +181,4 @@ com.github.vasnake.spark.features.vector.FeaturesRowDecoderTest
 
 ## Spark notes
 
-https://spark.apache.org/news/index.html
+- https://spark.apache.org/news/index.html
