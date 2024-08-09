@@ -172,8 +172,9 @@ tests
     * com.github.vasnake.`ml-core`.models.ImputerTest
     * com.github.vasnake.`ml-core`.models.ScalerTest
     * com.github.vasnake.spark.features.vector.FeaturesRowDecoderTest
+    * com.github.vasnake.spark.io.hive.TableSmartWriterTest
 
-com.github.vasnake.spark.io.hive.TableSmartWriterTest
+com.github.vasnake.`ml-models`.complex.LalBinarizedMultinomialNbTest
 
 ## integration tests
 
