@@ -185,6 +185,8 @@ com.github.vasnake.`ml-models`.complex.MultinomialNBTest
 com.github.vasnake.`ml-models`.complex.PredictorWrapperTest
 com.github.vasnake.`ml-core`.models.SGDClassifierTest
 
+com.github.vasnake.spark.ml.estimator.NEPriorClassProbaTest
+
 ## integration tests
 
 ## Spark notes
