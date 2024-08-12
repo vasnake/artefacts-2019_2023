@@ -175,6 +175,7 @@ tests
     * com.github.vasnake.spark.io.hive.TableSmartWriterTest
 
 com.github.vasnake.`ml-models`.complex.LalBinarizedMultinomialNbTest
+com.github.vasnake.`ml-models`.complex.LalTfidfScaledSgdcTest
 
 ## integration tests
 
