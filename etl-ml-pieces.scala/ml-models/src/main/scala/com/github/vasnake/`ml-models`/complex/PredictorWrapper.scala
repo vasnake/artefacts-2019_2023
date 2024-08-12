@@ -3,9 +3,9 @@
 package com.github.vasnake.`ml-models`.complex
 
 import com.github.vasnake.`ml-core`.models.interface.Estimator
+
 // TODO: move to ml-core
-case class PredictorWrapper(predictor: Estimator, config: PredictorWrapperConfig)
-    extends Estimator {
+case class PredictorWrapper(predictor: Estimator, config: PredictorWrapperConfig) extends Estimator {
   override def predict(features: Array[Double]): Array[Double] = {
     require(features.length > 0, "wrong input vector size")
 
