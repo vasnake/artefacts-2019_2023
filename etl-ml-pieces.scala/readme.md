@@ -179,6 +179,8 @@ com.github.vasnake.`ml-models`.complex.LalTfidfScaledSgdcTest
 com.github.vasnake.spark.ml.transformer.ApplyModelsTransformerTest
 com.github.vasnake.spark.ml.transformer.ScoreAudienceTest
 
+com.github.vasnake.`ml-models`.complex.GroupedTransformerTest
+
 ## integration tests
 
 ## Spark notes
