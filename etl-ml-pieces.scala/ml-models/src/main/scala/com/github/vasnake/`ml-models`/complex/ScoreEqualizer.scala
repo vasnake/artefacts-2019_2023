@@ -112,9 +112,10 @@ case class ScoreEqualizer(config: ScoreEqualizerConfig) extends InplaceTransform
       Double.NaN
 }
 
-object ScoreEqualizer { // TODO: with Estimator trait
-
+object ScoreEqualizer {
+  // TODO: with Estimator trait
   // TODO: use case class(msg, optional model)
+
   /**
     * Return error message (or empty string) and fitted model parameters
     */
@@ -223,4 +224,3 @@ object ScoreEqualizer { // TODO: with Estimator trait
 
   case class CDFCoefficients(intervals: Array[Double], coefficients: Array[Array[Double]])
 }
-
