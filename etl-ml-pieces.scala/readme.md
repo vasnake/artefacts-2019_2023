@@ -181,6 +181,8 @@ com.github.vasnake.spark.ml.transformer.ScoreAudienceTest
 com.github.vasnake.`ml-models`.complex.GroupedTransformerTest
 com.github.vasnake.`ml-models`.complex.ScoreEqualizerTest
 
+com.github.vasnake.`ml-core`.models.SlicerTest
+
 ## integration tests
 
 ## Spark notes
