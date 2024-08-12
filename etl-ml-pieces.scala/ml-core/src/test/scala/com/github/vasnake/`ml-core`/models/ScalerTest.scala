@@ -7,12 +7,15 @@ import org.scalatest._
 import flatspec._
 import matchers._
 
+import com.github.vasnake.test.{Conversions => CoreConversions}
+
 // testOnly *Scaler*
 class ScalerTest extends AnyFlatSpec with should.Matchers {
 
   import ScalerTest._
+  import CoreConversions.implicits._
+  import CoreConversions.equalityImplicits._
   import Conversions.implicits._
-  import Conversions.equalityImplicits._
 
   it should "create new transformer from config" in {
     val config = ScalerConfig(

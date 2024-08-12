@@ -7,9 +7,12 @@ import org.scalatest._
 import flatspec._
 import matchers._
 
+import com.github.vasnake.test.{Conversions => CoreConversions}
+
 // testOnly *Imputer*
 class ImputerTest extends AnyFlatSpec  with should.Matchers {
 
+  import CoreConversions.implicits._
   import Conversions.implicits._
 
   it should "create imputer from array of float" in {

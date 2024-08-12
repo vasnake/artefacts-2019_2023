@@ -2,7 +2,7 @@ import Dependencies._
 import Dependencies.{ io => dio } // conflict with sbt.io
 import MyUtil._
 
-// Spark 2.4; Scala 2.12: it was production setup for our team (2019 .. 2023)
+// Spark 2.4; Scala 2.12: it was production setup for our projects (2019 .. 2023)
 
 ThisBuild / organization := "com.github.vasnake"
 ThisBuild / scalaVersion := "2.12.19"
@@ -25,6 +25,7 @@ lazy val `etl-ml-pieces-1923` =
         json,
         `ml-models-json`,
         `hive-udaf-java`,
+        `spark-core`,
         `spark-udf`,
         `spark-io`,
         `spark-transformers`,
@@ -45,6 +46,7 @@ lazy val `etl-ml-pieces-1923` =
       json,
       `ml-models-json`,
       `hive-udaf-java`,
+      `spark-core`,
       `spark-udf`,
       `spark-io`,
       `spark-transformers`,
@@ -138,10 +140,18 @@ lazy val `hive-udaf-java` =
     .settings(commonDependencies)
     .settings(hiveSettings)
 
+lazy val `spark-core` =
+  project
+    .in(file("spark-core"))
+    .dependsOn(Seq(core, common).map(_ % Cctt): _*)
+    .settings(commonSettings)
+    .settings(commonDependencies)
+    .settings(sparkSettings)
+
 lazy val `spark-udf` =
   project
     .in(file("spark-udf"))
-    .dependsOn(Seq(core, common, text).map(_ % Cctt): _*)
+    .dependsOn(Seq(core, common, text, `spark-core`).map(_ % Cctt): _*)
     .settings(commonSettings)
     .settings(commonDependencies)
     .settings(sparkSettings)
@@ -149,7 +159,7 @@ lazy val `spark-udf` =
 lazy val `spark-io` =
   project
     .in(file("spark-io"))
-    .dependsOn(Seq(core, common).map(_ % Cctt): _*)
+    .dependsOn(Seq(core, common, `spark-core`).map(_ % Cctt): _*)
     .settings(commonSettings)
     .settings(commonDependencies)
     .settings(sparkSettings)
@@ -157,17 +167,15 @@ lazy val `spark-io` =
 lazy val `spark-transformers` =
   project
     .in(file("spark-transformers"))
-    .dependsOn(Seq(core, common, text, `etl-core`, `ml-core`, `spark-io`, json).map(_ % Cctt): _*)
+    .dependsOn(Seq(core, common, text, `etl-core`, `ml-core`, `spark-core`, `spark-io`, json).map(_ % Cctt): _*)
     .settings(commonSettings)
     .settings(commonDependencies)
     .settings(sparkSettings)
-//    .settings(Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary)
-//    .settings(Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat)
 
 lazy val `spark-ml` =
   project
     .in(file("spark-ml"))
-    .dependsOn(Seq(`json`, `ml-core`, `ml-models`, `spark-io`, `spark-transformers`).map(_ % Cctt): _*)
+    .dependsOn(Seq(`json`, `ml-core`, `ml-models`, `spark-core`, `spark-io`, `spark-transformers`).map(_ % Cctt): _*)
     .settings(commonSettings)
     .settings(commonDependencies)
     .settings(sparkSettings)
@@ -175,7 +183,7 @@ lazy val `spark-ml` =
 lazy val `spark-apps` =
   project
     .in(file("spark-apps"))
-    .dependsOn(Seq(core, `spark-io`, `spark-transformers`, `spark-ml`, `ml-models-json`).map(_ % Cctt): _*)
+    .dependsOn(Seq(core, `spark-core`, `spark-io`, `spark-transformers`, `spark-ml`, `ml-models-json`).map(_ % Cctt): _*)
     .settings(commonSettings)
     .settings(commonDependencies)
     .settings(sparkSettings)
@@ -212,7 +220,7 @@ SPARK_TESTING=yes ./build/sbt clean +compile +test -DsparkVersion=$SPARK_VERSION
 //      "org.json4s" %% "json4s-ast", // but not like this: org.json4s.`json4s-jackson`, // Only supported exclusion rule fields: organization, name
 //    ),
     dependencyOverrides ++= Seq(
-      // spark 2.4.8 requirements:
+      // spark 2.4.8 requirements, override deps. from json module:
       "org.json4s" %% "json4s-jackson" % "3.5.3",
       "org.json4s" %% "json4s-ast" % "3.5.3",
     ).map(_ % Test),
@@ -221,7 +229,7 @@ SPARK_TESTING=yes ./build/sbt clean +compile +test -DsparkVersion=$SPARK_VERSION
   lazy val options = Seq(
     // https://github.com/holdenk/spark-testing-base
     javaOptions ++= Seq("-Xms4G", "-Xmx4G", "-XX:+CMSClassUnloadingEnabled"),
-    fork := true, // not working: Test / fork := true, // fork in Test := true, // show test / fork
+    fork := true, // this working, but this not: Test / fork := true, // fork in Test := true, // show test / fork
     Test / parallelExecution := false, // parallelExecution in Test := false,
   )
 

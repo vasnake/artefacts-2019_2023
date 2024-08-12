@@ -7,12 +7,15 @@ import org.scalatest._
 import flatspec._
 import matchers._
 
+import com.github.vasnake.test.{Conversions => CoreConversions}
+
 // testOnly *Tfidf*
 class GroupedFeaturesTfidfTest extends AnyFlatSpec  with should.Matchers {
 
   import GroupedFeaturesTfidfTransformerTest._
   import Conversions.implicits._
-  import Conversions.equalityImplicits._
+  import CoreConversions.implicits._
+  import CoreConversions.equalityImplicits._
 
   it should "create transformer from parameters" in {
     val config = GroupedFeaturesTfidfTransformerConfig(

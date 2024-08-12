@@ -9,10 +9,11 @@ import matchers._
 
 import com.github.vasnake.`ml-core`.models._
 import com.github.vasnake.`etl-core`.{GroupedFeatures, FeaturesGroup}
+import com.github.vasnake.test.{Conversions => CoreConversions}
 
 class LalBinarizedMultinomialNbTest extends AnyFlatSpec with should.Matchers {
 
-  import Conversions.implicits._
+  import CoreConversions.implicits._
 
   it should "create new model from config" in {
     val config = {

@@ -1,7 +1,7 @@
 /**
- * Created by vasnake@gmail.com on 2024-08-08
+ * Created by vasnake@gmail.com on 2024-08-12
  */
-package com.github.vasnake.`ml-core`.models
+package com.github.vasnake.test
 
 import org.scalactic.Equality
 import java.lang.{Double => jDouble}

@@ -4,9 +4,9 @@
 package com.github.vasnake.spark.features.vector
 
 import com.github.vasnake.spark.test.SimpleLocalSpark
-import com.github.vasnake.`ml-core`.models.Conversions
 import com.github.vasnake.`etl-core`.{FeaturesGroup, GroupedFeatures}
-import com.github.vasnake.`ml-core`.models.EqualityCheck.createSeqFloatsEquality
+import com.github.vasnake.test.{Conversions => CoreConversions}
+import com.github.vasnake.test.EqualityCheck.createSeqFloatsEquality
 
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
@@ -24,7 +24,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec  with should.Matchers with Simp
 
 //  import VectorizationTest._
   import FeaturesRowDecoderTest._
-  import Conversions.implicits._
+  import CoreConversions.implicits._
 
   it should "throw exception on empty DataFrame" in {
     import spark.implicits._
@@ -439,7 +439,6 @@ class FeaturesRowDecoderTest extends AnyFlatSpec  with should.Matchers with Simp
   }
 
   def check(vector: Array[Double], expected: Seq[Float]): Assertion = {
-    import Conversions.implicits._
     implicit val eq = implicits.seqFloatEqualsWithNaNZeroTolerance
     assert(vector.toSeq.toFloat === expected)
   }
