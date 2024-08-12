@@ -186,6 +186,7 @@ com.github.vasnake.`ml-models`.complex.PredictorWrapperTest
 com.github.vasnake.`ml-core`.models.SGDClassifierTest
 
 com.github.vasnake.spark.ml.estimator.NEPriorClassProbaTest
+com.github.vasnake.spark.ml.estimator.ScoreEqualizerTest
 
 ## integration tests
 
