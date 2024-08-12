@@ -223,6 +223,20 @@ SPARK_TESTING=yes ./build/sbt clean +compile +test -DsparkVersion=$SPARK_VERSION
       // spark 2.4.8 requirements, override deps. from json module:
       "org.json4s" %% "json4s-jackson" % "3.5.3",
       "org.json4s" %% "json4s-ast" % "3.5.3",
+
+      // fighting test errors:
+      // Cause: com.fasterxml.jackson.databind.JsonMappingException: Incompatible Jackson version: 2.8.4
+      // https://github.com/apache/spark/blob/v2.4.8/dev/deps/spark-deps-hadoop-3.1#L99
+      // jackson-module-scala_2.11/2.6.7.1//jackson-module-scala_2.11-2.6.7.1.jar
+      // https://mvnrepository.com/artifact/com.fasterxml.jackson.module/jackson-module-scala
+      "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.6.7.1",
+      // Cause: com.fasterxml.jackson.databind.JsonMappingException: Incompatible Jackson version: 2.8.4
+      // jackson-databind/2.6.7.3//jackson-databind-2.6.7.3.jar
+      // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+      "com.fasterxml.jackson.core" % "jackson-databind" % "2.6.7.3",
+      // jackson-core/2.6.7//jackson-core-2.6.7.jar
+      // "com.fasterxml.jackson.core" % "jackson-core" % "2.6.7",
+
     ).map(_ % Test),
   )
 

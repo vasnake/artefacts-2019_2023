@@ -11,8 +11,8 @@ case class ScoreAudienceModel(audienceName: String, predictor: Predictor) extend
     val topics = (1 to 200).map(cnt => s"topic_$cnt")
     GroupedFeatures(groups =
       Seq(
-        FeaturesGroup("all_profs", Array(0, 1, 2, 2).map(_.toString)),
-        FeaturesGroup("topics_motor200", topics.toArray),
+        FeaturesGroup("all_profiles", Array(0, 1, 2, 2).map(_.toString)),
+        FeaturesGroup("topics_m", topics.toArray),
       )
     )
   }

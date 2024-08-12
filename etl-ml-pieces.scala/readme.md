@@ -176,6 +176,8 @@ tests
 
 com.github.vasnake.`ml-models`.complex.LalBinarizedMultinomialNbTest
 com.github.vasnake.`ml-models`.complex.LalTfidfScaledSgdcTest
+com.github.vasnake.spark.ml.transformer.ApplyModelsTransformerTest
+com.github.vasnake.spark.ml.transformer.ScoreAudienceTest
 
 ## integration tests
 
