@@ -183,6 +183,7 @@ com.github.vasnake.`ml-models`.complex.ScoreEqualizerTest
 com.github.vasnake.`ml-core`.models.SlicerTest
 com.github.vasnake.`ml-models`.complex.MultinomialNBTest
 com.github.vasnake.`ml-models`.complex.PredictorWrapperTest
+com.github.vasnake.`ml-core`.models.SGDClassifierTest
 
 ## integration tests
 
