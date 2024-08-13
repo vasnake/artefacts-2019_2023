@@ -11,18 +11,18 @@ import org.apache.spark.sql.DataFrame
 
 import com.github.vasnake.spark.test.LocalSpark
 
-class ArrayDoubleTest extends AnyFlatSpec with should.Matchers with LocalSpark with Checks {
+class ArrayFloatTest extends AnyFlatSpec with should.Matchers with LocalSpark with Checks {
 
   import Fixtures._
 
   lazy val inputDF: DataFrame = cache(
     createInputDF(spark)
-      .selectExpr("part", "uid", "cast(feature_list as array<double>) as feature")
+      .selectExpr("part", "uid", "cast(feature_list as array<float>) as feature")
       .orderBy("uid")
       .repartition(4)
   )
 
-  val resultColumnType: String = "ArrayType(DoubleType,true)"
+  val resultColumnType: String = "ArrayType(FloatType,true)"
 
   it should "produce null if all collections are null, part E" in {
     val input = inputDF.where("part = 'E'")
