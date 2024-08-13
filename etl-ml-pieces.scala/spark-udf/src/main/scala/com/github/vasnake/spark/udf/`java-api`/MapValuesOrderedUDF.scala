@@ -14,8 +14,7 @@ import org.apache.spark.sql.api.java.UDF2
   *
   * pyspark: sparkSession.udf.registerJavaFunction("map_values_ordered", "com.github.vasnake.spark.udf.java-api.MapValuesOrderedUDF")
   */
-class MapValuesOrderedUDF
-    extends UDF2[Map[jString, jFloat], mutable.WrappedArray[jString], Array[jFloat]] {
+class MapValuesOrderedUDF extends UDF2[Map[jString, jFloat], mutable.WrappedArray[jString], Array[jFloat]] {
   override def call(kvs: Map[jString, jFloat], keys: mutable.WrappedArray[jString])
     : Array[jFloat] = {
     val res = new Array[jFloat](keys.length)
