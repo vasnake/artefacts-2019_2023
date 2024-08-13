@@ -202,8 +202,9 @@ com.github.vasnake.core.num.SciPyTest
 
 com.github.vasnake.core.text.StringToolboxTest
 
-org.apache.spark.sql.catalyst.vasnake.udf.ArrayByteTest
-org.apache.spark.sql.catalyst.vasnake.udf._
+org.apache.spark.sql.catalyst.vasnake.udf.*Test
+
+org.apache.spark.sql.hive.vasnake.MetastoreQueryProcessorWithConnPoolTest
 
 ## integration tests
 
