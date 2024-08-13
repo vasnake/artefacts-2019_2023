@@ -1,6 +1,5 @@
-/**
- * Created by vasnake@gmail.com on 2024-07-17
- */
+/** Created by vasnake@gmail.com on 2024-07-17
+  */
 package org.apache.spark.sql.catalyst.vasnake.udf
 
 // References:
@@ -10,14 +9,12 @@ package org.apache.spark.sql.catalyst.vasnake.udf
 
 // UserDefinedFunction and ScalaUDF won't work in generic form: you can't detect, preserve and maintain actual data types.
 
-import org.apache.spark.sql.catalyst.expressions.{Expression, ExpressionDescription}
+import java.lang.{ Double => jDouble }
 
-import java.lang.{Double => jDouble}
-
+import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.vasnake.udf.base.GenericBinaryArraysElements
 
-/**
-  * Returns an array of the elements produced by multiplication of elements with same index from input arrays.
+/** Returns an array of the elements produced by multiplication of elements with same index from input arrays.
   * Registration: `functions.registerAs("generic_coomul", "coomul", spark, overrideIfExists = true)`
   */
 @ExpressionDescription(
@@ -29,7 +26,9 @@ import org.apache.spark.sql.catalyst.vasnake.udf.base.GenericBinaryArraysElement
       > SELECT _FUNC_(array(1, 2, 3), array(4, 5, 6));
        [4, 10, 18]
   """,
-  since = "0.1.0")
-case class GenericVectorCooMul(left: Expression, right: Expression) extends GenericBinaryArraysElements {
+  since = "0.1.0",
+)
+case class GenericVectorCooMul(left: Expression, right: Expression)
+    extends GenericBinaryArraysElements {
   def binaryOp(x1: jDouble, x2: jDouble): jDouble = x1 * x2
 }

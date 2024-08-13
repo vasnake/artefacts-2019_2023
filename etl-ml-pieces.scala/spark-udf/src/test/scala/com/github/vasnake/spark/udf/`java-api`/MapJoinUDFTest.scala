@@ -1,11 +1,10 @@
-/**
- * Created by vasnake@gmail.com on 2024-08-13
- */
+/** Created by vasnake@gmail.com on 2024-08-13
+  */
 package com.github.vasnake.spark.udf.`java-api`
 
-import org.scalatest._
-import flatspec._
-import matchers._
+//import org.scalatest._
+import org.scalatest.flatspec._
+import org.scalatest.matchers._
 
 class MapJoinUDFTest extends AnyFlatSpec with should.Matchers {
   val udf = new MapJoinUDF()
@@ -16,16 +15,15 @@ class MapJoinUDFTest extends AnyFlatSpec with should.Matchers {
       "b" -> null,
       "c" -> Float.NaN,
       "d" -> Float.NegativeInfinity,
-      "e" -> Float.PositiveInfinity
+      "e" -> Float.PositiveInfinity,
     )
 
     val actual = udf.call(
       feature = inpData,
       itemsSep = ",",
-      kvSep = ":"
+      kvSep = ":",
     )
 
     assert(actual.split(",").sorted.mkString(",") === "a:3.14,b:null,c:null,d:null,e:null")
   }
-
 }

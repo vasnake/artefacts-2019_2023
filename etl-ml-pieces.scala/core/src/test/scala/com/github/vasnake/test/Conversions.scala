@@ -1,16 +1,17 @@
-/**
- * Created by vasnake@gmail.com on 2024-08-12
- */
+/** Created by vasnake@gmail.com on 2024-08-12
+  */
 package com.github.vasnake.test
 
 import com.github.vasnake.test.EqualityCheck.createSeqFloatsEquality
-import org.scalactic.{Equality, TolerantNumerics}
+import org.scalactic._
 
 object Conversions {
-
-  def floatsAreEqual(a: Float, b: Float, tolerance: Float): Boolean = {
+  def floatsAreEqual(
+    a: Float,
+    b: Float,
+    tolerance: Float,
+  ): Boolean =
     (a <= b + tolerance) && (a >= b - tolerance)
-  }
 
   object implicits {
     import scala.reflect.ClassTag
@@ -33,8 +34,8 @@ object Conversions {
 
   object equalityImplicits {
     implicit val tolerance: Float = 0.00001f
-    implicit val seqFloatEquals: Equality[Seq[Float]] = createSeqFloatsEquality((a, b) => floatsAreEqual(a, b, tolerance))
+    implicit val seqFloatEquals: Equality[Seq[Float]] =
+      createSeqFloatsEquality((a, b) => floatsAreEqual(a, b, tolerance))
     implicit val floatEquals: Equality[Float] = TolerantNumerics.tolerantFloatEquality(tolerance)
   }
-
 }

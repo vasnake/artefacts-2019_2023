@@ -1,14 +1,12 @@
-/**
- * Created by vasnake@gmail.com on 2024-07-23
- */
+/** Created by vasnake@gmail.com on 2024-07-23
+  */
 package com.github.vasnake.spark.io
 
-import org.apache.spark.sql.DataFrame
-import com.github.vasnake.spark.io.{Logging => Log}
 import com.github.vasnake.common.file.FileToolbox
+import com.github.vasnake.spark.io.{ Logging => Log }
+import org.apache.spark.sql.DataFrame
 
 class IntervalCheckpointService(interval: Int, baseDir: String) extends CheckpointService with Log {
-
   private var currentStep: Int = 0
   logInfo(s"Created checkpoint service, interval: ${interval}, checkpoint basedir: `${baseDir}`")
 
@@ -43,5 +41,4 @@ class IntervalCheckpointService(interval: Int, baseDir: String) extends Checkpoi
 
     spark.read.parquet(checkpointDir)
   }
-
 }

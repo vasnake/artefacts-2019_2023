@@ -1,31 +1,29 @@
-/**
- * Created by vasnake@gmail.com on 2024-07-19
- */
+/** Created by vasnake@gmail.com on 2024-07-19
+  */
 package com.github.vasnake.spark.udf
 
-import org.apache.spark.sql.SparkSession
+import scala.util._
+
 import org.apache.spark.internal.Logging
-import scala.util.{Try, Success, Failure}
-
-import org.apache.spark.sql.catalyst.vasnake.udf.{functions => _catalystFuncs}
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.catalyst.vasnake.udf.functions.{
+  registerAs => _registerCatalyst,
   registerJava => _registerJava,
-  registerAs => _registerCatalyst
 }
+import org.apache.spark.sql.catalyst.vasnake.udf.{ functions => _catalystFuncs }
 
-/**
- * UDF and UDAF catalog.
- * Help clients to register functions before using them.
- * Usage examples:
- * {{{
- *com.github.vasnake.spark.udf.catalog.registerAll(spark, overrideIfExists = true)
- *com.github.vasnake.spark.udf.catalog.registerAs(name = "generic_avg", alias = "gavg", spark, overrideIfExists = true)
- * }}}
- * If catalog doesn't have a function for registration (UDF name not in the defined set, see below)
- * throw an exception of type `UdfRegistrationFailure`.
- *
- * Available functions:
- * {{{
+/** UDF and UDAF catalog.
+  * Help clients to register functions before using them.
+  * Usage examples:
+  * {{{
+  * com.github.vasnake.spark.udf.catalog.registerAll(spark, overrideIfExists = true)
+  * com.github.vasnake.spark.udf.catalog.registerAs(name = "generic_avg", alias = "gavg", spark, overrideIfExists = true)
+  * }}}
+  * If catalog doesn't have a function for registration (UDF name not in the defined set, see below)
+  * throw an exception of type `UdfRegistrationFailure`.
+  *
+  * Available functions:
+  * {{{
   * generic_avg_hive
   * map_values_ordered
   * is_uint32
@@ -46,12 +44,17 @@ import org.apache.spark.sql.catalyst.vasnake.udf.functions.{
   * generic_matmul as matmul
   * generic_isinf as isinf
   * generic_isfinite as isfinite
- * }}}
- */
+  * }}}
+  */
 object catalog extends Logging {
 
   // main catalog interface, possible UdfRegistrationFailure exception
-  def registerAs(name: String, alias: String, spark: SparkSession, overrideIfExists: Boolean = true): Unit = {
+  def registerAs(
+    name: String,
+    alias: String,
+    spark: SparkSession,
+    overrideIfExists: Boolean = true,
+  ): Unit = {
     logDebug(s"Registering UDF `${name}` as `$alias` override=$overrideIfExists")
 
     // 3 kind of udf, 1 reg func
@@ -81,12 +84,12 @@ object catalog extends Logging {
       // Error if found.count != 1
       val regProcs: List[() => Unit] = List(
         // cp: class path
-        hiveFuncs.get(name).map(cp => { () => registerHive(cp) }),
-        javaFuncs.get(name).map(cp => { () => registerJava(cp) }),
-        catalystFuncs.get(name).map(_ => { () => registerCatalyst() })
+        hiveFuncs.get(name).map(cp => () => registerHive(cp)),
+        javaFuncs.get(name).map(cp => () => registerJava(cp)),
+        catalystFuncs.get(name).map(_ => () => registerCatalyst()),
       ).flatten
 
-      Try{
+      Try {
         require(regProcs.nonEmpty, "Can't find function in catalog")
         require(regProcs.length == 1, "Function name is not unique")
 
@@ -100,10 +103,9 @@ object catalog extends Logging {
     // check result
     registerOrFail match {
       case Success(_) => () // Happy path
-      case Failure(err) => {
+      case Failure(err) =>
         logError(s"UDF registration failure, invalid function: `${name}` as `${alias}`", err)
         throw new UdfRegistrationFailure(s"`${name}` as `${alias}`", err)
-      }
     }
 
   }
@@ -112,12 +114,14 @@ object catalog extends Logging {
   def registerAll(spark: SparkSession, overrideIfExists: Boolean = true): Unit = {
     logDebug(s"Registering all UDFs in catalog, override=$overrideIfExists ...")
 
-    catalystFuncs foreach { case (name, alias) =>
-      registerAs(name, alias, spark, overrideIfExists)
+    catalystFuncs foreach {
+      case (name, alias) =>
+        registerAs(name, alias, spark, overrideIfExists)
     }
 
     (javaFuncs.keys ++ hiveFuncs.keys).foreach(name =>
-      registerAs(name, name, spark, overrideIfExists))
+      registerAs(name, name, spark, overrideIfExists)
+    )
 
     logDebug(s"Registered all UDFs in catalog.")
   }
@@ -145,10 +149,9 @@ object catalog extends Logging {
   private val catalystFuncs: Map[String, String] = _catalystFuncs.names.toMap
 
   class UdfRegistrationFailure(name: String) extends Exception(s"Can't register ${name} UDF") {
-    def this(name: String, cause: Throwable) {
+    def this(name: String, cause: Throwable) = {
       this(name)
       initCause(cause)
     }
   }
-
 }

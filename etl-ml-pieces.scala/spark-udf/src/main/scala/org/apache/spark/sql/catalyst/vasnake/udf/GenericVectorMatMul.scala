@@ -1,17 +1,14 @@
-/**
- * Created by vasnake@gmail.com on 2024-07-19
- */
+/** Created by vasnake@gmail.com on 2024-07-19
+  */
 package org.apache.spark.sql.catalyst.vasnake.udf
 
-import org.apache.spark.sql.catalyst.expressions.{Expression, ExpressionDescription}
+import java.lang.{ Double => jDouble }
+
+import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.util._
-
-import java.lang.{Double => jDouble}
-
 import org.apache.spark.sql.catalyst.vasnake.udf.base.GenericBinaryArraysElements
 
-/**
-  * Returns an array of elements produced by multiplication of two matrices or multiplication of matrix to vector,
+/** Returns an array of elements produced by multiplication of two matrices or multiplication of matrix to vector,
   * depending on the shape of arguments.
   * Registration: `functions.registerAs("generic_matmul", "matmul", spark, overrideIfExists = true)`
   */
@@ -30,9 +27,10 @@ import org.apache.spark.sql.catalyst.vasnake.udf.base.GenericBinaryArraysElement
       > SELECT _FUNC_(array(1, 2, 3, 4), array(5, 6));
        [17, 39]
   """,
-  since = "0.1.0")
-case class GenericVectorMatMul(left: Expression, right: Expression) extends GenericBinaryArraysElements {
-
+  since = "0.1.0",
+)
+case class GenericVectorMatMul(left: Expression, right: Expression)
+    extends GenericBinaryArraysElements {
   def binaryOp(x1: jDouble, x2: jDouble): jDouble =
     throw new IllegalAccessError("This method eliminated by optimized class structure")
 
@@ -46,26 +44,32 @@ case class GenericVectorMatMul(left: Expression, right: Expression) extends Gene
 
     // Size checks and function selection could be optimized using `lazy val`,
     // but only if you can guarantee that all rows have vectors with the same shape.
-    if (array1.numElements() == 0 && array2.numElements() == 0) new GenericArrayData(new Array[Any](0))
+    if (array1.numElements() == 0 && array2.numElements() == 0)
+      new GenericArrayData(new Array[Any](0))
     else if (array1.numElements() == array2.numElements()) { // matrices?
       val size = math.round(math.sqrt(array1.numElements()))
       if (size * size == array1.numElements()) matmat(array1, array2, size.toInt) // yes, matrices
       else null // wrong mat*mat shape
     } // end of matrices branch.
-    else if ((array2.numElements() * array2.numElements()) == array1.numElements()) matvec(array1, array2)
+    else if ((array2.numElements() * array2.numElements()) == array1.numElements())
+      matvec(array1, array2)
     else null // wrong mat*vec shape
   }
 
-  private def matmat(matA: ArrayData, matB: ArrayData, size: Int): ArrayData = {
+  private def matmat(
+    matA: ArrayData,
+    matB: ArrayData,
+    size: Int,
+  ): ArrayData = {
     val res = new Array[Any](matA.numElements())
 
     // Could be optimized, don't use Range object, use simple loops.
     // Doesn't have to be n^3 complexity.
-    (0 until size).foreach(rowIdx => {
+    (0 until size).foreach { rowIdx =>
       (0 until size).foreach(colIdx =>
         res.update((rowIdx * size) + colIdx, dot(matA, matB, rowIdx, colIdx, size))
       )
-    })
+    }
 
     new GenericArrayData(res)
   }
@@ -74,15 +78,19 @@ case class GenericVectorMatMul(left: Expression, right: Expression) extends Gene
     val res = new Array[Any](vec.numElements())
 
     // Could be optimized
-    res.indices.foreach(rowIdx =>
-      res.update(rowIdx, dot(mat, rowIdx, vec))
-    )
+    res.indices.foreach(rowIdx => res.update(rowIdx, dot(mat, rowIdx, vec)))
 
     new GenericArrayData(res)
   }
 
   @inline
-  private def dot(matA: ArrayData, matB: ArrayData, rowIdx: Int, colIdx: Int, size: Int): Any = {
+  private def dot(
+    matA: ArrayData,
+    matB: ArrayData,
+    rowIdx: Int,
+    colIdx: Int,
+    size: Int,
+  ): Any = {
     var res: jDouble = 0
     var i: Int = 0
 
@@ -90,7 +98,7 @@ case class GenericVectorMatMul(left: Expression, right: Expression) extends Gene
       res = safeDotAcc(
         matA.get((rowIdx * size) + i, elementType),
         matB.get(colIdx + (size * i), elementType),
-        res
+        res,
       )
       i += 1
     }
@@ -99,9 +107,13 @@ case class GenericVectorMatMul(left: Expression, right: Expression) extends Gene
   }
 
   @inline
-  private def dot(mat: ArrayData, matRowIdx: Int, vec: ArrayData): Any = {
+  private def dot(
+    mat: ArrayData,
+    matRowIdx: Int,
+    vec: ArrayData,
+  ): Any = {
     val startIdx = matRowIdx * vec.numElements()
-    //def unsafe = vec.indices.map(i => mat(startIdx + i) * vec(i)).sum
+    // def unsafe = vec.indices.map(i => mat(startIdx + i) * vec(i)).sum
 
     var res: jDouble = 0
     var i: Int = 0
@@ -110,7 +122,7 @@ case class GenericVectorMatMul(left: Expression, right: Expression) extends Gene
       res = safeDotAcc(
         mat.get(startIdx + i, elementType),
         vec.get(i, elementType),
-        res
+        res,
       )
       i += 1
     }
@@ -119,18 +131,19 @@ case class GenericVectorMatMul(left: Expression, right: Expression) extends Gene
   }
 
   @inline
-  private def safeDotAcc(_a: Any, _b: Any, acc: jDouble): jDouble = (_a, _b) match { // optimizations needed
+  private def safeDotAcc(
+    _a: Any,
+    _b: Any,
+    acc: jDouble,
+  ): jDouble = (_a, _b) match { // optimizations needed
     case (a, b) if a == null || b == null => null // acc check must be in caller
-    case (a, b) => {
+    case (a, b) =>
       val x1 = toDouble(a)
       val x2 = toDouble(b)
       if (x1.isNaN || x1.isInfinite || x2.isNaN || x2.isInfinite) null // Boxing, could be optimized
       else acc + (x1 * x2)
-    }
   }
-
 }
-
 /*
 
 mat. mul. and dot product cheatsheet

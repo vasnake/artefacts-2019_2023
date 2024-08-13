@@ -1,18 +1,14 @@
-/**
- * Created by vasnake@gmail.com on 2024-08-13
- */
+/** Created by vasnake@gmail.com on 2024-08-13
+  */
 package org.apache.spark.sql.catalyst.vasnake.udf
 
-import org.scalatest._
-import flatspec._
-import matchers._
-
-import org.apache.spark.sql.DataFrame
-
 import com.github.vasnake.spark.test.LocalSpark
+import org.apache.spark.sql.DataFrame
+//import org.scalatest._
+import org.scalatest.flatspec._
+import org.scalatest.matchers._
 
 class MapDecimalTest extends AnyFlatSpec with should.Matchers with LocalSpark with Checks {
-
   import Fixtures._
 
   private val transformExpr =
@@ -71,8 +67,15 @@ class MapDecimalTest extends AnyFlatSpec with should.Matchers with LocalSpark wi
   it should "process time keys, part I" in {
     val input: DataFrame = MapTransformer(inputDF, "part = 'I'").time_decimal
     show(input, message = "input")
-    sumAndCheck2(input, "Map(2021-05-12 12:34:55.0 -> 5.000)", "MapType(TimestampType,DecimalType(4,3),true)")
-    avgAndCheck2(input, "Map(2021-05-12 12:34:55.0 -> 2.500)", "MapType(TimestampType,DecimalType(4,3),true)")
+    sumAndCheck2(
+      input,
+      "Map(2021-05-12 12:34:55.0 -> 5.000)",
+      "MapType(TimestampType,DecimalType(4,3),true)",
+    )
+    avgAndCheck2(
+      input,
+      "Map(2021-05-12 12:34:55.0 -> 2.500)",
+      "MapType(TimestampType,DecimalType(4,3),true)",
+    )
   }
-
 }

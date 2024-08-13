@@ -1,19 +1,16 @@
-/**
- * Created by vasnake@gmail.com on 2024-08-12
- */
+/** Created by vasnake@gmail.com on 2024-08-12
+  */
 package com.github.vasnake.`ml-models`.complex
 
-import org.scalatest._
-import flatspec._
-import matchers._
-import org.scalactic.Equality
-
-import com.github.vasnake.test.{Conversions => CoreConversions}
-import com.github.vasnake.`ml-core`.models.interface.{InplaceTransformer, PostprocessorConfig}
+import com.github.vasnake.`ml-core`.models.interface._
 import com.github.vasnake.test.EqualityCheck.createSeqFloatsEquality
+import com.github.vasnake.test.{ Conversions => CoreConversions }
+import org.scalactic.Equality
+//import org.scalatest._
+import org.scalatest.flatspec._
+import org.scalatest.matchers._
 
 class GroupedTransformerTest extends AnyFlatSpec with should.Matchers {
-
   import GroupedTransformerTest._
   import CoreConversions.implicits._
 
@@ -25,7 +22,7 @@ class GroupedTransformerTest extends AnyFlatSpec with should.Matchers {
     val transformer = SBGroupedTransformer(
       config,
       group = "",
-      transformerFactory = { _ => DummyTransformer(0f) }
+      transformerFactory = { _ => DummyTransformer(0f) },
     )
   }
 
@@ -38,7 +35,7 @@ class GroupedTransformerTest extends AnyFlatSpec with should.Matchers {
       val transformer = SBGroupedTransformer(
         config,
         group = "group1",
-        transformerFactory = transformersFactory
+        transformerFactory = transformersFactory,
       )
     }
     assert(ex.getMessage.contains("can't find transformer 'group1'"))
@@ -48,7 +45,7 @@ class GroupedTransformerTest extends AnyFlatSpec with should.Matchers {
     val transformer = SBGroupedTransformer(
       SBGroupedTransformerConfig(groups = Map.empty),
       group = "",
-      transformersFactory
+      transformersFactory,
     )
 
     val ex = intercept[IllegalArgumentException] {
@@ -61,34 +58,38 @@ class GroupedTransformerTest extends AnyFlatSpec with should.Matchers {
     val input: Array[Float] = Array(42f)
     val transformerGroups = Map(
       "group1" -> DummyTransformerConfig(outputValue = 1f),
-      "group2" -> DummyTransformerConfig(outputValue = 2f)
+      "group2" -> DummyTransformerConfig(outputValue = 2f),
     )
 
     Seq(
       // apply each transformer: transformer1, transformer2, no-transformer
-      ("group1", 1f), ("group2", 2f), ("", 42f)
-    ).foreach { case (group, expected) => {
+      ("group1", 1f),
+      ("group2", 2f),
+      ("", 42f),
+    ).foreach {
+      case (group, expected) =>
+        val transformer = SBGroupedTransformer(
+          SBGroupedTransformerConfig(groups = transformerGroups),
+          group,
+          transformersFactory,
+        )
 
-      val transformer = SBGroupedTransformer(
-        SBGroupedTransformerConfig(groups = transformerGroups),
-        group,
-        transformersFactory
-      )
-
-      assert(output(transformer, input) === Seq(expected))
-    }}
+        assert(output(transformer, input) === Seq(expected))
+    }
   }
 
   it should "produce reference transformation" in {
-    val config = SBGroupedTransformerConfig(Map(
-      "group1" -> DummyTransformerConfig(outputValue = 1f),
-      "group2" -> DummyTransformerConfig(outputValue = 2f)
-    ))
+    val config = SBGroupedTransformerConfig(
+      Map(
+        "group1" -> DummyTransformerConfig(outputValue = 1f),
+        "group2" -> DummyTransformerConfig(outputValue = 2f),
+      )
+    )
 
     val transformer = SBGroupedTransformer(
       config,
       "group1",
-      transformersFactory
+      transformersFactory,
     )
 
     val input = Array(0, 1, 2) map tofloat
@@ -96,23 +97,23 @@ class GroupedTransformerTest extends AnyFlatSpec with should.Matchers {
 
     assert(output(transformer, input) === expected)
   }
-
 }
 
 object GroupedTransformerTest {
-
   import CoreConversions.implicits._
 
   case class DummyTransformerConfig(outputValue: Float) extends PostprocessorConfig
 
   case class DummyTransformer(output_value: Float) extends InplaceTransformer {
-    override def transform(vec: Array[Double]): Unit = vec.indices.foreach(i => vec(i) = output_value)
+    override def transform(vec: Array[Double]): Unit =
+      vec.indices.foreach(i => vec(i) = output_value)
   }
 
   val transformersFactory: PostprocessorConfig => InplaceTransformer =
-    conf => DummyTransformer(
-      output_value = conf.asInstanceOf[DummyTransformerConfig].outputValue
-    )
+    conf =>
+      DummyTransformer(
+        output_value = conf.asInstanceOf[DummyTransformerConfig].outputValue
+      )
 
   val tofloat: Int => Float = x => x.toFloat
 
@@ -122,12 +123,15 @@ object GroupedTransformerTest {
     o.toSeq.toFloat
   }
 
-  implicit val seqFloatEquals: Equality[Seq[Float]] = createSeqFloatsEquality((a, b) => floatsAreEqual(a, b, 0.00001f))
+  implicit val seqFloatEquals: Equality[Seq[Float]] =
+    createSeqFloatsEquality((a, b) => floatsAreEqual(a, b, 0.00001f))
 
-  def floatsAreEqual(a: Float, b: Float, tolerance: Float): Boolean = {
+  def floatsAreEqual(
+    a: Float,
+    b: Float,
+    tolerance: Float,
+  ): Boolean =
     (a.isNaN && b.isNaN) || (
       (a <= b + tolerance) && (a >= b - tolerance)
-      )
-  }
-
+    )
 }

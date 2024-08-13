@@ -1,16 +1,13 @@
-/**
- * Created by vasnake@gmail.com on 2024-07-19
- */
+/** Created by vasnake@gmail.com on 2024-07-19
+  */
 package org.apache.spark.sql.catalyst.vasnake.udf
 
-import org.apache.spark.sql.catalyst.expressions.{Expression, ExpressionDescription}
+import java.lang.{ Double => jDouble }
 
-import java.lang.{Double => jDouble}
-
+import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.vasnake.udf.base.GenericBinaryArraysElements
 
-/**
-  * Returns an array of the elements produced by `diff/2` of elements with the same index from two input arrays.
+/** Returns an array of the elements produced by `diff/2` of elements with the same index from two input arrays.
   * Registration: `functions.registerAs("generic_semidiff", "semidiff", spark, overrideIfExists = true)`
   */
 @ExpressionDescription(
@@ -22,7 +19,9 @@ import org.apache.spark.sql.catalyst.vasnake.udf.base.GenericBinaryArraysElement
       > SELECT _FUNC_(array(1, 2, 3), array(4, 5, 6));
        [-1.5, -1.5, -1.5]
   """,
-  since = "0.1.0")
-case class GenericVectorSemiDiff(left: Expression, right: Expression) extends GenericBinaryArraysElements {
+  since = "0.1.0",
+)
+case class GenericVectorSemiDiff(left: Expression, right: Expression)
+    extends GenericBinaryArraysElements {
   def binaryOp(x1: jDouble, x2: jDouble): jDouble = (x1 - x2) / 2.0
 }

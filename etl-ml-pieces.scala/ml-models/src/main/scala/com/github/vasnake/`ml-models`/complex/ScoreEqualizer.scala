@@ -2,12 +2,12 @@
   */
 package com.github.vasnake.`ml-models`.complex
 
-import com.github.vasnake.`ml-core`.models.interface._
-import com.github.vasnake.core.num.SciPy.PPolyBernsteinCubic
-import com.github.vasnake.common.num.{FastMath => fm}
-
 import scala.collection.mutable
-import scala.util.{Failure, Success, Try}
+import scala.util._
+
+import com.github.vasnake.`ml-core`.models.interface._
+import com.github.vasnake.common.num.{ FastMath => fm }
+import com.github.vasnake.core.num.SciPy.PPolyBernsteinCubic
 
 // TODO: move to ml-core
 case class ScoreEqualizerConfig(
@@ -116,17 +116,16 @@ object ScoreEqualizer {
   // TODO: with Estimator trait
   // TODO: use case class(msg, optional model)
 
-  /**
-    * Return error message (or empty string) and fitted model parameters
+  /** Return error message (or empty string) and fitted model parameters
     */
   def fit(
-                         scoreRaw: Iterator[Double],
-                         minInputSize: Int,
-                         noiseValue: Double,
-                         epsValue: Double,
-                         randomValue: Double,
-                         numBins: Int
-                       ): (String, Option[ScoreEqualizerConfig]) = Try {
+    scoreRaw: Iterator[Double],
+    minInputSize: Int,
+    noiseValue: Double,
+    epsValue: Double,
+    randomValue: Double,
+    numBins: Int,
+  ): (String, Option[ScoreEqualizerConfig]) = Try {
 
     // compute min,max: fail if no data; default minmax = 0..1 if only one unique value
     var minval: Double = Double.MaxValue
@@ -135,23 +134,27 @@ object ScoreEqualizer {
     val arr: Array[Double] = {
       val buf: mutable.ArrayBuffer[Double] = mutable.ArrayBuffer.empty[Double] // n.b. null converted to 0
 
-      scoreRaw.foreach(v => {
+      scoreRaw.foreach { v =>
         minval = fm.min(minval, v)
         maxval = fm.max(maxval, v)
         buf.append(v)
-      })
+      }
 
       buf.toArray
     }
 
-    require(arr.length >= minInputSize, s"Collecting data statistics has failed. No values found to estimate scores CDF, input.size = ${arr.length}")
+    require(
+      arr.length >= minInputSize,
+      s"Collecting data statistics has failed. No values found to estimate scores CDF, input.size = ${arr.length}",
+    )
 
     val msg = if (minval >= maxval) {
       minval = 0.0
       maxval = 1.0
 
       "'X' contains single unique value, equalization cannot be done properly"
-    } else ""
+    }
+    else ""
 
     val config = ScoreEqualizerConfig(
       noise = noiseValue,
@@ -161,7 +164,7 @@ object ScoreEqualizer {
       maxval = maxval,
       // TODO: we don't need cdf right here, ScoreEqualizer should be split on two transformers: normalizer and equalizer
       coefficients = (0 to 3).map(_ => Array(0.0)).toArray,
-      intervals = Array(0.0, 1.0)
+      intervals = Array(0.0, 1.0),
     )
 
     // scale, add noise, stretch
@@ -181,14 +184,13 @@ object ScoreEqualizer {
     case Failure(err) => (err.getMessage, None)
   }
 
-  /**
-    * Cumulative Distribution Function
+  /** Cumulative Distribution Function
     * for
     * Piecewise Cubic Hermite Interpolating Polynomial
     * with uniform distribution in [0, 1] as target
     */
   def fitCDF(xs: Array[Double], numBins: Int): CDFCoefficients = {
-    import com.github.vasnake.core.num.NumPy.{slice, histogram, cumulativeSum}
+    import com.github.vasnake.core.num.NumPy.{ slice, histogram, cumulativeSum }
     import com.github.vasnake.core.num.SciPy.PCHIP
 
     // sort, select unique; find (step(numbins), max, delta);
@@ -208,7 +210,8 @@ object ScoreEqualizer {
 
     val hist: Array[Int] = histogram(xs, bins)
     // TODO: collect stat and metrics
-    if (!hist.indices.forall(idx => idx == 0 || idx == hist.length - 1 || hist(idx) != 0)) println("There is a constant CDF interval")
+    if (!hist.indices.forall(idx => idx == 0 || idx == hist.length - 1 || hist(idx) != 0))
+      println("There is a constant CDF interval")
 
     val ys: Array[Double] = {
       val sum = hist.sum.toDouble
@@ -218,7 +221,7 @@ object ScoreEqualizer {
 
     CDFCoefficients(
       coefficients = PCHIP.coefficients(bins, ys),
-      intervals = bins
+      intervals = bins,
     )
   }
 

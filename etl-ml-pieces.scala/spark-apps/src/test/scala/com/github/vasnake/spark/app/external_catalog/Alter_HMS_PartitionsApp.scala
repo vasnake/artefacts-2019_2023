@@ -1,10 +1,10 @@
 package com.github.vasnake.spark.app.external_catalog
 
+import com.github.vasnake.core.text.{ StringToolbox => stb }
+import com.github.vasnake.spark.app.SparkApp
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.catalyst.catalog.CatalogTablePartition
 import org.apache.spark.sql.catalyst.expressions.Expression
-import com.github.vasnake.spark.app.SparkApp
-import com.github.vasnake.core.text.{StringToolbox => stb}
 
 /*
 Created by vasnake@gmail.com on 2024-08-07
@@ -37,10 +37,11 @@ spark-submit --master yarn --deploy-mode cluster --name "metastore-tests" --verb
 }}}
  */
 object Alter_HMS_PartitionsApp extends SparkApp {
-
-  run { case args => implicit spark =>
-    println(s"HiveMetastoreTestJob arguments: <${args.mkString(";")}>")
-    runTests(spark, new Config(args))
+  run {
+    case args =>
+      implicit spark =>
+        println(s"HiveMetastoreTestJob arguments: <${args.mkString(";")}>")
+        runTests(spark, new Config(args))
   }
 
   def runTests(spark: SparkSession, config: Config): Unit = {
@@ -53,7 +54,8 @@ object Alter_HMS_PartitionsApp extends SparkApp {
     val predicates: Seq[Expression] = Seq.empty
     val tz = "UTC"
 
-    val partitions: Seq[CatalogTablePartition] = extCatalog.listPartitionsByFilter(db, table, predicates, tz)
+    val partitions: Seq[CatalogTablePartition] =
+      extCatalog.listPartitionsByFilter(db, table, predicates, tz)
     if (partitions.isEmpty) sys.error("Empty list of partitions")
 
     val modifiedPartitions = for {
@@ -85,7 +87,5 @@ object Alter_HMS_PartitionsApp extends SparkApp {
         kv <- line.parseMap
       } yield kv
     }.toMap
-
   }
-
 }

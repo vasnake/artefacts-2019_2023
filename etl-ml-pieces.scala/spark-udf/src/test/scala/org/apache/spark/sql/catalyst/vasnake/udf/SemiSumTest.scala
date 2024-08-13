@@ -1,19 +1,14 @@
-/**
- * Created by vasnake@gmail.com on 2024-08-13
- */
+/** Created by vasnake@gmail.com on 2024-08-13
+  */
 package org.apache.spark.sql.catalyst.vasnake.udf
 
-import org.scalatest._
-import flatspec._
-//import matchers._
-
+import com.github.vasnake.spark.test._
 import org.apache.spark.sql
 import org.apache.spark.storage.StorageLevel
-
-import com.github.vasnake.spark.test.{DataFrameHelpers, LocalSpark}
+//import org.scalatest._
+import org.scalatest.flatspec._
 
 class SemiSumTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
-
   import sql.DataFrame
   import sql.types._
   import ArrayFloatFixture._
@@ -22,7 +17,12 @@ class SemiSumTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
   override protected def beforeAll(): Unit = {
     super.beforeAll()
     functions.registerAll(spark, overrideIfExists = true)
-    functions.registerAs(funcName = "generic_semisum", targetName = "generic_semisum", spark, overrideIfExists = true)
+    functions.registerAs(
+      funcName = "generic_semisum",
+      targetName = "generic_semisum",
+      spark,
+      overrideIfExists = true,
+    )
   }
 
   it should "work with different API" in {
@@ -31,18 +31,30 @@ class SemiSumTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
     val colName = "semisum"
     val expectedType = ArrayType(IntegerType, containsNull = true)
     val elementType = "int"
-    val params = s"cast(array(${a1}) as array<$elementType>), cast(array($a2) as array<$elementType>)"
+    val params =
+      s"cast(array(${a1}) as array<$elementType>), cast(array($a2) as array<$elementType>)"
 
     List(
-      ("Dataset API", spark.sql(s"select cast(array(${a1}) as array<$elementType>) as a1, cast(array(${a2}) as array<$elementType>) as a2")
-        .select(generic_semisum("a1", "a2").alias(colName))),
+      (
+        "Dataset API",
+        spark
+          .sql(
+            s"select cast(array(${a1}) as array<$elementType>) as a1, cast(array(${a2}) as array<$elementType>) as a2"
+          )
+          .select(generic_semisum("a1", "a2").alias(colName)),
+      ),
       ("SQL API, aliased function", spark.sql(s"select semisum(${params}) as $colName")),
-      ("SQL API, native func.name", spark.sql(s"select generic_semisum(${params}) as $colName"))
-    ).foreach { case (msg, df) => {
-      show(df, msg)
-      assert(df.schema(colName).dataType.sameType(expectedType))
-      assert(df.select(colName).collect().map(_.toString().toLowerCase).toList === List(s"[WrappedArray(${expectedValue})]".toLowerCase))
-    }}
+      ("SQL API, native func.name", spark.sql(s"select generic_semisum(${params}) as $colName")),
+    ).foreach {
+      case (msg, df) =>
+        show(df, msg)
+        assert(df.schema(colName).dataType.sameType(expectedType))
+        assert(
+          df.select(colName).collect().map(_.toString().toLowerCase).toList === List(
+            s"[WrappedArray(${expectedValue})]".toLowerCase
+          )
+        )
+    }
   }
 
   private def checkType(elementType: String, sparkElementType: DataType) = {
@@ -62,16 +74,23 @@ class SemiSumTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
       case _ => "4, 10, 18"
     }
     val colName = "semisum"
-    val params = s"cast(array(${a1}) as array<$elementType>), cast(array($a2) as array<$elementType>)"
+    val params =
+      s"cast(array(${a1}) as array<$elementType>), cast(array($a2) as array<$elementType>)"
 
     show(spark.sql(s"select ${params}"), "source")
 
-    val actual = spark.sql(s"select generic_semisum(${params}) as ${colName}").persist(StorageLevel.MEMORY_ONLY)
+    val actual = spark
+      .sql(s"select generic_semisum(${params}) as ${colName}")
+      .persist(StorageLevel.MEMORY_ONLY)
 
     show(actual, "target")
 
     assert(actual.schema(colName).dataType.sameType(expectedType))
-    assert(actual.select(colName).collect().map(_.toString().toLowerCase).toList === List(s"[WrappedArray(${expectedValue})]".toLowerCase))
+    assert(
+      actual.select(colName).collect().map(_.toString().toLowerCase).toList === List(
+        s"[WrappedArray(${expectedValue})]".toLowerCase
+      )
+    )
 
     actual.unpersist()
   }
@@ -106,37 +125,43 @@ class SemiSumTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
 
   it should "produce reference values" in {
     // (id, vector1, vector2, expected)
-    val data: DataFrame = df(List(
-      // happy path
-      ("1", af(1, 2, 3), af(1, 1, 1), af(1, 1.5, 2)),
+    val data: DataFrame = df(
+      List(
+        // happy path
+        ("1", af(1, 2, 3), af(1, 1, 1), af(1, 1.5, 2)),
 
-      // item is null
-      ("2", af(None, None, 3, 4), af(None, 2, None, 44), af(None, None, None, 24)),
+        // item is null
+        ("2", af(None, None, 3, 4), af(None, 2, None, 44), af(None, None, None, 24)),
 
-      // item is inf
-      ("3",
-        af(PINF, 2, NINF, 4, PINF, 6),
-        af(1, PINF, 3, NINF, NINF, 66),
-        af(None, None, None, None, None, 36)),
+        // item is inf
+        (
+          "3",
+          af(PINF, 2, NINF, 4, PINF, 6),
+          af(1, PINF, 3, NINF, NINF, 66),
+          af(None, None, None, None, None, 36),
+        ),
 
-      // item is nan
-      ("4",
-        af(NAN,   2,    NAN,  None, NAN,  PINF, NAN, 8),
-        af(1,     NAN,  NAN,  NAN,  None, NAN,  NINF, 88),
-        af(None,  None, None, None, None, None, None, 48)),
+        // item is nan
+        (
+          "4",
+          af(NAN, 2, NAN, None, NAN, PINF, NAN, 8),
+          af(1, NAN, NAN, NAN, None, NAN, NINF, 88),
+          af(None, None, None, None, None, None, None, 48),
+        ),
 
-      // both arguments are empty
-      ("5", af(), af(), af()),
+        // both arguments are empty
+        ("5", af(), af(), af()),
 
-      // argument is null
-      ("6", None, None, None),
-      ("7", None, af(1, 2), None),
-      ("8", af(1, 2), None, None),
+        // argument is null
+        ("6", None, None, None),
+        ("7", None, af(1, 2), None),
+        ("8", af(1, 2), None, None),
 
-      // different size
-      ("9", af(1, 2), af(1, 2, 3), None),
-      ("10", af(1, 2, 3), af(1, 2), None)
-    ))
+        // different size
+        ("9", af(1, 2), af(1, 2, 3), None),
+        ("10", af(1, 2, 3), af(1, 2), None),
+      )
+    )
       .persist(StorageLevel.DISK_ONLY) // N.B. codegen ON switch here
 
     val actual = data
@@ -149,15 +174,16 @@ class SemiSumTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
 
     show(actual, "result")
 
-    assert(actual.schema("semisum").toString() === "StructField(semisum,ArrayType(FloatType,true),true)")
+    assert(
+      actual.schema("semisum").toString() === "StructField(semisum,ArrayType(FloatType,true),true)"
+    )
 
     assert(
       actual.select("semisum").collect().map(_.toString().toLowerCase).toList
         ===
-        actual.select("expected").collect().map(_.toString().toLowerCase).toList
+          actual.select("expected").collect().map(_.toString().toLowerCase).toList
     )
 
     data.unpersist()
   }
-
 }

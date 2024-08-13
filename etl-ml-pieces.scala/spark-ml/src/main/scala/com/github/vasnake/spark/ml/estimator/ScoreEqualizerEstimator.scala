@@ -1,35 +1,31 @@
-/**
- * Created by vasnake@gmail.com on 2024-07-29
- */
+/** Created by vasnake@gmail.com on 2024-07-29
+  */
 package com.github.vasnake.spark.ml.estimator
 
+import com.github.vasnake.`ml-models`.{ complex => models }
+import com.github.vasnake.spark.dataset.transform.StratifiedSampler
+import com.github.vasnake.spark.io.{ Logging => CustomLogging }
+import com.github.vasnake.spark.ml.model.ScoreEqualizerModel
+import com.github.vasnake.spark.ml.shared._
 import org.apache.spark.ml.Estimator
 import org.apache.spark.ml.param.ParamMap
-import org.apache.spark.ml.util.{DefaultParamsWritable, Identifiable}
-
-import org.apache.spark.sql.{DataFrame, Dataset}
+import org.apache.spark.ml.util._
+import org.apache.spark.sql._
 import org.apache.spark.sql.types.StructType
 
-import com.github.vasnake.spark.ml.shared._
-import com.github.vasnake.spark.ml.model.ScoreEqualizerModel
-import com.github.vasnake.`ml-models`.{complex => models}
-import com.github.vasnake.spark.dataset.transform.{StratifiedSampler}
-import com.github.vasnake.spark.io.{Logging => CustomLogging}
-
-/**
-  * Stratified equalizer, Spark.ml estimator: implementation of the `fit` method.
+/** Stratified equalizer, Spark.ml estimator: implementation of the `fit` method.
   *
   * Use `fit` method to produce trained equalizer model (transformer), using sample of input DataFrame.
   * Because fitting involves materialization of input data, you should cache input DataFrame before calling `fit`.
   *
   * Stratification: for different groups of records different equalizers could be fitted using `groupColumns` parameter.
   */
-class ScoreEqualizerEstimator(override val uid: String) extends Estimator[ScoreEqualizerModel] with
-  ScoreEqualizerParams with
-  ParamsServices with
-  CustomLogging with
-  DefaultParamsWritable {
-
+class ScoreEqualizerEstimator(override val uid: String)
+    extends Estimator[ScoreEqualizerModel]
+       with ScoreEqualizerParams
+       with ParamsServices
+       with CustomLogging
+       with DefaultParamsWritable {
   def this() = this(Identifiable.randomUID("equalizer"))
 
   override def copy(extra: ParamMap): Estimator[ScoreEqualizerModel] = defaultCopy(extra)
@@ -60,7 +56,7 @@ class ScoreEqualizerEstimator(override val uid: String) extends Estimator[ScoreE
           inputColName = getInputCol,
           inputCastType = "double",
           validInputExpr = "score is not null and not isnan(score)",
-          cacheFunction = cacheFunction
+          cacheFunction = cacheFunction,
         )
 
         // Dataset[(group, score)], cached
@@ -94,7 +90,6 @@ class ScoreEqualizerEstimator(override val uid: String) extends Estimator[ScoreE
 
     copyValues(new ScoreEqualizerModel(uid, configs)).setParent(this)
   }
-
 }
 
 object ScoreEqualizerEstimator {
@@ -108,37 +103,44 @@ object ScoreEqualizerEstimator {
 
   // invalid data filtered out already. return (name, message, model)
   def distributedFit(
-                      group_score: DataFrame,
-                      minInputSize: Int,
-                      noiseValue: Double,
-                      epsValue: Double,
-                      randomValue: Double,
-                      numBins: Int
-                    ): Dataset[(String, String, Option[models.ScoreEqualizerConfig])] = {
+    group_score: DataFrame,
+    minInputSize: Int,
+    noiseValue: Double,
+    epsValue: Double,
+    randomValue: Double,
+    numBins: Int,
+  ): Dataset[(String, String, Option[models.ScoreEqualizerConfig])] = {
 
     val spark = group_score.sparkSession
     import spark.implicits._
 
-    group_score.as[(String, Double)]
+    group_score
+      .as[(String, Double)]
       .groupByKey { case (group, _) => group }
-      .mapGroups { case (group, rows) => {
-        val (msg, eq) = fitOneEqualizer(rows.map(_._2), minInputSize, noiseValue, epsValue, randomValue, numBins)
-        (group, msg, eq)
-      }}
+      .mapGroups {
+        case (group, rows) =>
+          val (msg, eq) = fitOneEqualizer(
+            rows.map(_._2),
+            minInputSize,
+            noiseValue,
+            epsValue,
+            randomValue,
+            numBins,
+          )
+          (group, msg, eq)
+      }
   }
 
   // TODO: use case class(msg, optional model)
-  /**
-    * Return error message (or empty string) and fitted model parameters
+  /** Return error message (or empty string) and fitted model parameters
     */
   def fitOneEqualizer(
-                         scoreRaw: Iterator[Double],
-                         minInputSize: Int,
-                         noiseValue: Double,
-                         epsValue: Double,
-                         randomValue: Double,
-                         numBins: Int
-                       ): (String, Option[models.ScoreEqualizerConfig]) =
+    scoreRaw: Iterator[Double],
+    minInputSize: Int,
+    noiseValue: Double,
+    epsValue: Double,
+    randomValue: Double,
+    numBins: Int,
+  ): (String, Option[models.ScoreEqualizerConfig]) =
     models.ScoreEqualizer.fit(scoreRaw, minInputSize, noiseValue, epsValue, randomValue, numBins)
-
 }

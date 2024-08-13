@@ -1,11 +1,10 @@
-/**
- * Created by vasnake@gmail.com on 2024-08-13
- */
+/** Created by vasnake@gmail.com on 2024-08-13
+  */
 package com.github.vasnake.spark.udf.`java-api`
 
-import org.scalatest._
-import flatspec._
-import matchers._
+//import org.scalatest._
+import org.scalatest.flatspec._
+import org.scalatest.matchers._
 
 class MurmurHash3_32UDFTest extends AnyFlatSpec with should.Matchers {
   val udf = new MurmurHash3_32UDF()
@@ -15,7 +14,7 @@ class MurmurHash3_32UDFTest extends AnyFlatSpec with should.Matchers {
     assert(udf.call("SOCIAL") === "3625832686")
     assert(udf.call("DATING") === "1545499902")
 
-/*
+    /*
 
 That's why hash values are as you see it above in test:
 
@@ -46,7 +45,7 @@ https://github.com/scikit-learn/scikit-learn/blob/114616d9f6ce9eba7c1aacd3d4a254
 cdef extern from "src/MurmurHash3.h":
     void MurmurHash3_x86_32(void *key, int len, np.uint32_t seed, void *out)
 
-*/
+     */
 
   }
 }

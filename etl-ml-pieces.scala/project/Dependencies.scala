@@ -12,14 +12,14 @@ object Dependencies {
   }
 
   object com {
-
     object `storm-enroute` {
       val scalameter = "com.storm-enroute" %% "scalameter" % "0.19"
     }
 
     object holdenkarau {
       // libraryDependencies += "com.holdenkarau" %% "spark-testing-base" % "2.4.8_1.5.3" % Test
-      val `spark-testing-base` = "com.holdenkarau" %% "spark-testing-base" % s"${org.apache.spark.sparkVersion}_1.5.3" // % Test
+      val `spark-testing-base` =
+        "com.holdenkarau" %% "spark-testing-base" % s"${org.apache.spark.sparkVersion}_1.5.3" // % Test
     }
 
     object beust {
@@ -65,13 +65,12 @@ object Dependencies {
       val `json4s-jackson` = "org.json4s" %% "json4s-jackson" % "4.0.7"
 
       // https://mvnrepository.com/artifact/org.json4s/json4s-ast
-      //libraryDependencies += "org.json4s" %% "json4s-ast" % "4.0.7"
+      // libraryDependencies += "org.json4s" %% "json4s-ast" % "4.0.7"
       val `json4s-ast` = "org.json4s" %% "json4s-ast" % "4.0.7"
-
       // other (than 3.5.3 for spark 2.4.8) versions lead to errors like this:
-      //24/08/09 11:46:23 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-      //[info] com.github.vasnake.spark.features.vector.FeaturesRowDecoderTest *** ABORTED ***
-      //[info]   java.lang.NoClassDefFoundError: org/json4s/JsonAST$JValue
+      // 24/08/09 11:46:23 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+      // [info] com.github.vasnake.spark.features.vector.FeaturesRowDecoderTest *** ABORTED ***
+      // [info]   java.lang.NoClassDefFoundError: org/json4s/JsonAST$JValue
       // Solution: one old version for all modules; or
       // you could shadow unwanted versions; or
       // you could use 'dependencyOverrides' option (current solution)

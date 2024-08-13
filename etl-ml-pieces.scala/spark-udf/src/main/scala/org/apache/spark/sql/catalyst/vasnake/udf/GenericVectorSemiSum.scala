@@ -1,16 +1,13 @@
-/**
- * Created by vasnake@gmail.com on 2024-07-17
- */
+/** Created by vasnake@gmail.com on 2024-07-17
+  */
 package org.apache.spark.sql.catalyst.vasnake.udf
 
-import org.apache.spark.sql.catalyst.expressions.{Expression, ExpressionDescription}
+import java.lang.{ Double => jDouble }
 
-import java.lang.{Double => jDouble}
-
+import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.vasnake.udf.base.GenericBinaryArraysElements
 
-/**
-  * Returns an array of elements produced by `sum/2` of elements with same index from input arrays.
+/** Returns an array of elements produced by `sum/2` of elements with same index from input arrays.
   * Registration: `functions.registerAs("generic_semisum", "semisum", spark, overrideIfExists = true)`
   */
 @ExpressionDescription(
@@ -22,7 +19,9 @@ import org.apache.spark.sql.catalyst.vasnake.udf.base.GenericBinaryArraysElement
       > SELECT _FUNC_(array(1, 2, 3), array(4, 5, 6));
        [2.5, 3.5, 4.5]
   """,
-  since = "0.1.0")
-case class GenericVectorSemiSum(left: Expression, right: Expression) extends GenericBinaryArraysElements {
+  since = "0.1.0",
+)
+case class GenericVectorSemiSum(left: Expression, right: Expression)
+    extends GenericBinaryArraysElements {
   def binaryOp(x1: jDouble, x2: jDouble): jDouble = (x1 + x2) / 2.0
 }

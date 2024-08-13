@@ -1,11 +1,10 @@
 /** Created by vasnake@gmail.com on 2024-07-31
- */
+  */
 package com.github.vasnake.spark.app.datasets.joiner.config
 
 import com.github.vasnake.core.text.StringToolbox
 
 class SourcesFinder(cfg: EtlConfig) extends ISourcesConfigView {
-
   override def domains: Seq[String] = for {
     domain <- cfg.domains
   } yield domain.name
@@ -14,7 +13,8 @@ class SourcesFinder(cfg: EtlConfig) extends ISourcesConfigView {
     import StringToolbox._
     implicit val sep: Separators = Separators(" as ")
 
-    val sourceNames = cfg.domains
+    val sourceNames = cfg
+      .domains
       .filter(_.name == domain)
       .flatMap(_.source.names)
 
@@ -22,9 +22,10 @@ class SourcesFinder(cfg: EtlConfig) extends ISourcesConfigView {
       nameExpr.splitTrim.toSeq match {
         case Seq(name, alias) => NameWithAlias(name, alias) // "foo as bar"
         case Seq(name) => NameWithAlias(name, name) // foo
-        case _ => throw new IllegalArgumentException(
-          s"Invalid config: domain `${domain}` have malformed source name `${nameExpr}` in source.names `${sourceNames}`"
-        )
+        case _ =>
+          throw new IllegalArgumentException(
+            s"Invalid config: domain `${domain}` have malformed source name `${nameExpr}` in source.names `${sourceNames}`"
+          )
       }
     }
   }

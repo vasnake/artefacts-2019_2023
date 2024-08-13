@@ -1,18 +1,14 @@
-/**
- * Created by vasnake@gmail.com on 2024-08-13
- */
+/** Created by vasnake@gmail.com on 2024-08-13
+  */
 package org.apache.spark.sql.catalyst.vasnake.udf
 
-import org.scalatest._
-import flatspec._
-import matchers._
-
-import org.apache.spark.sql.DataFrame
-
 import com.github.vasnake.spark.test.LocalSpark
+import org.apache.spark.sql.DataFrame
+//import org.scalatest._
+import org.scalatest.flatspec._
+import org.scalatest.matchers._
 
 class ArrayLongTest extends AnyFlatSpec with should.Matchers with LocalSpark with Checks {
-
   import Fixtures._
 
   lazy val inputDF: DataFrame = cache(
@@ -20,7 +16,7 @@ class ArrayLongTest extends AnyFlatSpec with should.Matchers with LocalSpark wit
       .selectExpr(
         "part",
         "uid",
-        "transform(feature_list, _x -> if(_x in (null, 'NaN', 'Infinity', '-Infinity'), null, _x)) as feature_list"
+        "transform(feature_list, _x -> if(_x in (null, 'NaN', 'Infinity', '-Infinity'), null, _x)) as feature_list",
       )
       .selectExpr("part", "uid", "cast(feature_list as array<long>) as feature")
       .orderBy("uid")

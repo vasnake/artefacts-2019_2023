@@ -1,41 +1,41 @@
-/**
- * Created by vasnake@gmail.com on 2024-07-29
- */
+/** Created by vasnake@gmail.com on 2024-07-29
+  */
 package com.github.vasnake.spark.ml.shared
 
-import org.apache.spark.ml.param.{Param, Params}
-import org.apache.spark.ml.param.{DoubleArrayParam, DoubleParam, IntParam, ParamValidators, StringArrayParam}
-import org.apache.spark.sql.DataFrame
-
 import scala.util.Try
+
+import org.apache.spark.ml.param._
+import org.apache.spark.sql.DataFrame
 
 trait ParamsServices {
   this: Params =>
 
-  /**
-    * Replacement for params.explainParam
+  /** Replacement for params.explainParam
     */
   def explain(param: Param[_]): ParamExplained =
     ParamExplained(
       name = param.name,
       value = get(param).map(p => param2String(p)).getOrElse("None"),
       doc = param.doc,
-      default = getDefault(param).map(p => param2String(p)).getOrElse("None")
+      default = getDefault(param).map(p => param2String(p)).getOrElse("None"),
     )
 
   def param2String[T](p: T): String = p match {
     case a: Array[_] => a.mkString("Array(", ", ", ")")
     case b => b.toString
   }
-
 }
 
-case class ParamExplained(name: String, value: String, doc: String, default: String)
+case class ParamExplained(
+  name: String,
+  value: String,
+  doc: String,
+  default: String,
+)
 
 trait HasOutputCol extends Params {
 
-  /**
-    * Param for output column name.
+  /** Param for output column name.
     * @group param
     */
   final val outputCol: Param[String] = new Param[String](this, "outputCol", "output column name")
@@ -46,11 +46,11 @@ trait HasOutputCol extends Params {
 
 trait HasNumClasses extends Params {
 
-  /**
-    * Param for number of classes.
+  /** Param for number of classes.
     * @group param
     */
-  final val numClasses: IntParam = new IntParam(this, "numClasses", "number of classes", isValid = ParamValidators.gt(1))
+  final val numClasses: IntParam =
+    new IntParam(this, "numClasses", "number of classes", isValid = ParamValidators.gt(1))
 
   /** @group getParam */
   def getNumClasses: Int = $(numClasses)
@@ -64,11 +64,15 @@ trait HasNumClasses extends Params {
 }
 
 trait HasRandomValue extends Params {
-
   val isValidRandomValue: Double => Boolean =
-    x => { 0.0 <= x && x <= 1.0 }
+    x => 0.0 <= x && x <= 1.0
 
-  final val randomValue: DoubleParam = new DoubleParam(this, "randomValue", "optional `math.random` replacement", isValid = isValidRandomValue)
+  final val randomValue: DoubleParam = new DoubleParam(
+    this,
+    "randomValue",
+    "optional `math.random` replacement",
+    isValid = isValidRandomValue,
+  )
 
   def getRandomValue: Double = $(randomValue)
 
@@ -82,7 +86,6 @@ trait HasRandomValue extends Params {
 
 trait HasCacheSettings extends Params {
   // available cache options: `cache`
-
   def cacheFunctions: PartialFunction[String, DataFrame => DataFrame] = {
     case a: String if a.trim.toUpperCase == "CACHE" => df => df.cache()
     // TODO: add other options, e.g. persist:level, checkpoint:path, parquet:path
@@ -91,7 +94,8 @@ trait HasCacheSettings extends Params {
   // empty string is valid settings, meaning "no cache"
   val isValidCacheSettings: String => Boolean = cs => cs.isEmpty || cacheFunctions.isDefinedAt(cs)
 
-  final val cacheSettings: Param[String] = new Param[String](this, "cacheSettings", "DataFrame cache settings")
+  final val cacheSettings: Param[String] =
+    new Param[String](this, "cacheSettings", "DataFrame cache settings")
 
   def getCacheSettings: String = $(cacheSettings)
 
@@ -106,21 +110,23 @@ trait HasCacheSettings extends Params {
 }
 
 trait HasLabels extends Params {
-
   val isValidLabels: Array[String] => Boolean =
-    labels => { labels.isEmpty || labels.toSet.size == labels.length }
+    labels => labels.isEmpty || labels.toSet.size == labels.length
 
-  /**
-   * Param for set of unique labels.
-   * @group param
-   */
-  final val labels: StringArrayParam = new StringArrayParam(this, "labels", "label values", isValid = isValidLabels)
+  /** Param for set of unique labels.
+    * @group param
+    */
+  final val labels: StringArrayParam =
+    new StringArrayParam(this, "labels", "label values", isValid = isValidLabels)
 
   /** @group getParam */
   final def getLabels: Array[String] = $(labels)
 
   def setLabels(value: Iterable[String]): this.type = {
-    require(isValidLabels(value.toArray), s"Labels list must be empty or contain unique values, got `${value.mkString(", ")}`")
+    require(
+      isValidLabels(value.toArray),
+      s"Labels list must be empty or contain unique values, got `${value.mkString(", ")}`",
+    )
     set(labels, value.toArray)
   }
 
@@ -128,18 +134,23 @@ trait HasLabels extends Params {
 }
 
 trait HasRankCol extends Params {
-  final val rankCol: Param[String] = new Param[String](this, "rankCol", "Column name with rank values")
+  final val rankCol: Param[String] =
+    new Param[String](this, "rankCol", "Column name with rank values")
   def getRankCol: String = $(rankCol)
   def setRankCol(value: String): this.type = set(rankCol, value)
   def isDefinedRankCol: Boolean = Try(getRankCol.nonEmpty).getOrElse(false)
 }
 
 trait HasPriorValues extends Params {
-
   val isValidPriorValues: Array[Double] => Boolean =
-    xs => { xs.length > 1 && xs.min > 0 }
+    xs => xs.length > 1 && xs.min > 0
 
-  final val priorValues: DoubleArrayParam = new DoubleArrayParam(this, "priorValues", "Prior classes distribution ratio", isValid = isValidPriorValues)
+  final val priorValues: DoubleArrayParam = new DoubleArrayParam(
+    this,
+    "priorValues",
+    "Prior classes distribution ratio",
+    isValid = isValidPriorValues,
+  )
 
   def getPriorValues: Array[Double] = $(priorValues)
 
@@ -152,8 +163,8 @@ trait HasPriorValues extends Params {
 }
 
 trait HasWeightValue extends Params {
-
-  final val weightValue: DoubleParam = new DoubleParam(this, "weightValue", "weight coefficient", isValid = ParamValidators.gt(0.0))
+  final val weightValue: DoubleParam =
+    new DoubleParam(this, "weightValue", "weight coefficient", isValid = ParamValidators.gt(0.0))
 
   def getWeightValue: Double = $(weightValue)
 

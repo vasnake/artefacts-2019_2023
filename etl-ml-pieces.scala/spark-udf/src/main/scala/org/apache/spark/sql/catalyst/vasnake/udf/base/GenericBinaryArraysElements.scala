@@ -1,23 +1,18 @@
-/**
- * Created by vasnake@gmail.com on 2024-07-17
- */
+/** Created by vasnake@gmail.com on 2024-07-17
+  */
 package org.apache.spark.sql.catalyst.vasnake.udf.base
 
-import org.apache.spark.sql.AnalysisException
-import org.apache.spark.sql.catalyst.expressions.codegen.{CodegenContext, ExprCode}
-import org.apache.spark.sql.catalyst.expressions.{ArrayBinaryLike, ComplexTypeMergingExpression}
-import org.apache.spark.sql.catalyst.util.{ArrayData, GenericArrayData}
-
-import org.apache.spark.sql.types.{
-  ArrayType, FractionalType, IntegralType,
-  ByteType, DataType, DecimalType, DoubleType, FloatType, IntegerType, LongType, ShortType, Decimal
-}
+import java.lang.{ Double => jDouble, Float => jFloat }
 
 import scala.collection.mutable
-import java.lang.{Float => jFloat, Double => jDouble}
+
+import org.apache.spark.sql.AnalysisException
+import org.apache.spark.sql.catalyst.expressions._
+import org.apache.spark.sql.catalyst.expressions.codegen._
+import org.apache.spark.sql.catalyst.util._
+import org.apache.spark.sql.types._
 
 trait GenericBinaryArraysElements extends ArrayBinaryLike with ComplexTypeMergingExpression {
-
   def binaryOp(x1: jDouble, x2: jDouble): jDouble
 
   override def nullable: Boolean = true // Can't say "it's not null" before looking at actual data
@@ -28,7 +23,7 @@ trait GenericBinaryArraysElements extends ArrayBinaryLike with ComplexTypeMergin
 
     ArrayType(
       elementType, // Lazy value, computed from first argument
-      containsNull = true // null, inf or nan element produces null element.
+      containsNull = true, // null, inf or nan element produces null element.
       // For elements that not FractionalType could be
       // left.dataType.asInstanceOf[ArrayType].containsNull || right.dataType.asInstanceOf[ArrayType].containsNull
     )
@@ -67,7 +62,7 @@ trait GenericBinaryArraysElements extends ArrayBinaryLike with ComplexTypeMergin
     var x1, x2: java.lang.Double = null
 
     // Could be optimized: use while loop, unboxed ops
-    res.indices.foreach(i => {
+    res.indices.foreach { i =>
       elem = null
 
       if (!array1.isNullAt(i) && !array2.isNullAt(i)) {
@@ -75,15 +70,14 @@ trait GenericBinaryArraysElements extends ArrayBinaryLike with ComplexTypeMergin
         x1 = toDouble(array1.get(i, elementType))
         if (!x1.isNaN && !x1.isInfinite) {
           x2 = toDouble(array2.get(i, elementType))
-          if (!x2.isNaN && !x2.isInfinite) {
+          if (!x2.isNaN && !x2.isInfinite)
             elem = toElementType(binaryOp(x1, x2))
-          }
         }
 
       }
 
       res.update(i, elem)
-    })
+    }
 
     new GenericArrayData(res)
   }
@@ -95,16 +89,15 @@ trait GenericBinaryArraysElements extends ArrayBinaryLike with ComplexTypeMergin
   }
 
   @transient protected lazy val toElementType: jDouble => Any = elementType match {
-    case FloatType => (x => x.toFloat)
-    case IntegerType => (x => x.toInt)
-    case DoubleType => (x => x)
-    case LongType => (x => x.toLong)
-    case ByteType => (x => x.toByte)
-    case ShortType => (x => x.toShort)
-    case DecimalType.Fixed(precision, scale) => (x => Decimal(BigDecimal(x), precision, scale))
+    case FloatType => x => x.toFloat
+    case IntegerType => x => x.toInt
+    case DoubleType => x => x
+    case LongType => x => x.toLong
+    case ByteType => x => x.toByte
+    case ShortType => x => x.toShort
+    case DecimalType.Fixed(precision, scale) => x => Decimal(BigDecimal(x), precision, scale)
     case _ => throw new AnalysisException(s"Unsupported element type: ${elementType.sql}")
   }
-
 }
 
 object Types {

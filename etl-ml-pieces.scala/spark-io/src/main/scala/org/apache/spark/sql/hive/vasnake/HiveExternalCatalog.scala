@@ -1,29 +1,24 @@
-/**
- * Created by vasnake@gmail.com on 2024-07-23
- */
+/** Created by vasnake@gmail.com on 2024-07-23
+  */
 package org.apache.spark.sql.hive.vasnake
-
-import com.github.vasnake.spark.io.{Logging => CustomLogging}
-import com.github.vasnake.core.text.{StringToolbox => stb}
 
 import scala.reflect.ClassTag
 import scala.util.control.NonFatal
 
+import com.github.vasnake.core.text.{ StringToolbox => stb }
+import com.github.vasnake.spark.io.{ Logging => CustomLogging }
 import org.apache.hadoop.conf.Configuration
-import org.apache.spark.{SparkConf, SparkContext}
-
+import org.apache.spark._
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.catalyst.catalog._
+import org.apache.spark.sql.hive.client.HiveClient
+import org.apache.spark.sql.hive.{ HiveExternalCatalog => HiveExternalCatalog_Orig }
 import org.apache.spark.sql.internal.StaticSQLConf._
 import org.apache.spark.util.Utils
-
-import org.apache.spark.sql.hive.{HiveExternalCatalog => HiveExternalCatalog_Orig}
-import org.apache.spark.sql.hive.client.HiveClient
 
 object HiveExternalCatalog extends CustomLogging {
 
   // API
-
   def openConnection(spark: SparkSession): ExternalCatalog = externalCatalog(spark.sparkContext)
 
   def closeConnection(conn: ExternalCatalog): Unit = {
@@ -71,16 +66,16 @@ object HiveExternalCatalog extends CustomLogging {
     val externalCatalog = reflect[ExternalCatalog, SparkConf, Configuration](
       externalCatalogClassName(sparkContext.conf),
       sparkContext.conf,
-      sparkContext.hadoopConfiguration)
+      sparkContext.hadoopConfiguration,
+    )
 
     // Wrap to provide catalog events
     val wrapped = new ExternalCatalogWithListener(externalCatalog)
 
     // Make sure we propagate external catalog events to the spark listener bus
     wrapped.addListener(new ExternalCatalogEventListener {
-      override def onEvent(event: ExternalCatalogEvent): Unit = {
+      override def onEvent(event: ExternalCatalogEvent): Unit =
         sparkContext.listenerBus.post(event)
-      }
     })
 
     wrapped
@@ -88,34 +83,31 @@ object HiveExternalCatalog extends CustomLogging {
 
   private val HIVE_EXTERNAL_CATALOG_CLASS_NAME = "org.apache.spark.sql.hive.HiveExternalCatalog"
 
-  private def externalCatalogClassName(conf: SparkConf): String = {
+  private def externalCatalogClassName(conf: SparkConf): String =
     conf.get(CATALOG_IMPLEMENTATION) match {
       case "hive" => HIVE_EXTERNAL_CATALOG_CLASS_NAME
       case "in-memory" => classOf[InMemoryCatalog].getCanonicalName
     }
-  }
 
-  /**
-    * Helper method to create an instance of [[T]] using a single-arg constructor that
+  /** Helper method to create an instance of [[T]] using a single-arg constructor that
     * accepts an [[Arg1]] and an [[Arg2]].
     */
   private def reflect[T, Arg1 <: AnyRef, Arg2 <: AnyRef](
-                                                          className: String,
-                                                          ctorArg1: Arg1,
-                                                          ctorArg2: Arg2)(
-                                                          implicit ctorArgTag1: ClassTag[Arg1],
-                                                          ctorArgTag2: ClassTag[Arg2]): T = {
-
+    className: String,
+    ctorArg1: Arg1,
+    ctorArg2: Arg2,
+  )(implicit
+    ctorArgTag1: ClassTag[Arg1],
+    ctorArgTag2: ClassTag[Arg2],
+  ): T =
     try {
       val clazz = Utils.classForName(className)
       val ctor = clazz.getDeclaredConstructor(ctorArgTag1.runtimeClass, ctorArgTag2.runtimeClass)
       val args = Array[AnyRef](ctorArg1, ctorArg2)
       ctor.newInstance(args: _*).asInstanceOf[T]
-    } catch {
+    }
+    catch {
       case NonFatal(e) =>
         throw new IllegalArgumentException(s"Error while instantiating '$className':", e)
     }
-
-  }
-
 }

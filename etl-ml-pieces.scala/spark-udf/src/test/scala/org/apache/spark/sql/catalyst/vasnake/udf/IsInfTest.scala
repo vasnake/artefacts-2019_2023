@@ -1,25 +1,25 @@
-/**
- * Created by vasnake@gmail.com on 2024-08-13
- */
+/** Created by vasnake@gmail.com on 2024-08-13
+  */
 package org.apache.spark.sql.catalyst.vasnake.udf
 
-import org.scalatest._
-import flatspec._
-//import matchers._
-
+import com.github.vasnake.spark.test._
 import org.apache.spark.sql.types._
 import org.apache.spark.storage.StorageLevel
-
-import com.github.vasnake.spark.test.{DataFrameHelpers, LocalSpark}
+//import org.scalatest._
+import org.scalatest.flatspec._
 
 class IsInfTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
-
   import functions.generic_isinf
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
     functions.registerAll(spark, overrideIfExists = true)
-    functions.registerAs(funcName = "generic_isinf", targetName = "generic_isinf", spark, overrideIfExists = true)
+    functions.registerAs(
+      funcName = "generic_isinf",
+      targetName = "generic_isinf",
+      spark,
+      overrideIfExists = true,
+    )
   }
 
   it should "work with different API" in {
@@ -28,18 +28,34 @@ class IsInfTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
     val expectedType = BooleanType
 
     List(
-      ("Dataset API", spark.sql(s"select float('Infinity') as x")
-        .select(generic_isinf("x").alias(colName))),
+      (
+        "Dataset API",
+        spark
+          .sql(s"select float('Infinity') as x")
+          .select(generic_isinf("x").alias(colName)),
+      ),
       ("SQL API, aliased function", spark.sql(s"select isinf(double('-Infinity')) as $colName")),
-      ("SQL API, native func.name", spark.sql(s"select generic_isinf(float('-Infinity')) as $colName"))
-    ).foreach { case (msg, df) => {
-      show(df, msg)
-      assert(df.schema(colName).dataType.sameType(expectedType))
-      assert(df.select(colName).collect().map(_.toString().toLowerCase).toList === List(s"[${expectedValue}]".toLowerCase))
-    }}
+      (
+        "SQL API, native func.name",
+        spark.sql(s"select generic_isinf(float('-Infinity')) as $colName"),
+      ),
+    ).foreach {
+      case (msg, df) =>
+        show(df, msg)
+        assert(df.schema(colName).dataType.sameType(expectedType))
+        assert(
+          df.select(colName).collect().map(_.toString().toLowerCase).toList === List(
+            s"[${expectedValue}]".toLowerCase
+          )
+        )
+    }
   }
 
-  private def checkType(elementType: String, value: String = "0", expected: String = "false") = {
+  private def checkType(
+    elementType: String,
+    value: String = "0",
+    expected: String = "false",
+  ) = {
     val params = s"cast($value as ${elementType})"
 
     show(spark.sql(s"select $params"), "source")
@@ -49,7 +65,11 @@ class IsInfTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
     show(actual, "target")
 
     assert(actual.schema("x").dataType.sameType(BooleanType))
-    assert(actual.select("x").collect().map(_.toString().toLowerCase).toList === List(s"[$expected]".toLowerCase))
+    assert(
+      actual.select("x").collect().map(_.toString().toLowerCase).toList === List(
+        s"[$expected]".toLowerCase
+      )
+    )
 
     actual.unpersist()
   }
@@ -102,12 +122,13 @@ class IsInfTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
       ("b", None),
       ("c", Some(Double.NaN)),
       ("d", Some(Double.NegativeInfinity)),
-      ("e", Some(Double.PositiveInfinity))
+      ("e", Some(Double.PositiveInfinity)),
     ).toDF("uid", "x")
 
     show(df, "source")
 
-    val actual = df.selectExpr("upper(uid) as uid", "cast(x as float) as x")
+    val actual = df
+      .selectExpr("upper(uid) as uid", "cast(x as float) as x")
       .where("not isnull(x) and not isnan(x) and not isinf(x)")
       .persist(StorageLevel.MEMORY_ONLY)
 
@@ -127,14 +148,21 @@ class IsInfTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
       ("b", None),
       ("c", Some(Float.NaN)),
       ("d", Some(Float.NegativeInfinity)),
-      ("e", Some(Float.PositiveInfinity))
+      ("e", Some(Float.PositiveInfinity)),
     )
       .toDF("uid", "x")
       .persist(StorageLevel.DISK_ONLY) // N.B. codegen ON switch here
 
     val actual = df
       .where("uid != 'f'")
-      .selectExpr("upper(uid) as uid", "cast(x as float) as x", "isinf(x)", "isinf(float(x))", "isinf(double(x))", "isinf(string(x))")
+      .selectExpr(
+        "upper(uid) as uid",
+        "cast(x as float) as x",
+        "isinf(x)",
+        "isinf(float(x))",
+        "isinf(double(x))",
+        "isinf(string(x))",
+      )
       .where("uid != 'g'")
       .where("isinf(x)")
 
@@ -147,7 +175,12 @@ class IsInfTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
     actual.debug()
     show(actual, "target")
     assert(actual.schema("x").dataType.sameType(FloatType))
-    assert(actual.orderBy("uid").select("x").collect().map(_.toString().toLowerCase).toList === List("[-infinity]", "[infinity]"))
+    assert(
+      actual.orderBy("uid").select("x").collect().map(_.toString().toLowerCase).toList === List(
+        "[-infinity]",
+        "[infinity]",
+      )
+    )
 
     df.unpersist()
   }

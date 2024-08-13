@@ -1,6 +1,5 @@
-/**
- * Created by vasnake@gmail.com on 2024-07-31
- */
+/** Created by vasnake@gmail.com on 2024-07-31
+  */
 package com.github.vasnake.spark.app.datasets.joiner.config
 
 /** Config for ETL job that creates one output (dt, uid_type) partition
@@ -190,7 +189,7 @@ case class DomainConfig(
 }
 
 /** Definition of a transformation stage, for list of available values see project documentation.
- *
+  *
   * @param name function name, e.g. `min`, `avg`, `sum`
   * @param kind stage type: `filter`, `agg`, `imputer`, etc
   * @param parameters function parameters, see function spec.

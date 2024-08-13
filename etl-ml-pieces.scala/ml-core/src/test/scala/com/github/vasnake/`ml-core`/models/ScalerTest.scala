@@ -1,17 +1,14 @@
-/**
- * Created by vasnake@gmail.com on 2024-08-08
- */
+/** Created by vasnake@gmail.com on 2024-08-08
+  */
 package com.github.vasnake.`ml-core`.models
 
-import org.scalatest._
-import flatspec._
-import matchers._
-
-import com.github.vasnake.test.{Conversions => CoreConversions}
+import com.github.vasnake.test.{ Conversions => CoreConversions }
+//import org.scalatest._
+import org.scalatest.flatspec._
+import org.scalatest.matchers._
 
 // testOnly *Scaler*
 class ScalerTest extends AnyFlatSpec with should.Matchers {
-
   import ScalerTest._
   import CoreConversions.implicits._
   import CoreConversions.equalityImplicits._
@@ -19,9 +16,10 @@ class ScalerTest extends AnyFlatSpec with should.Matchers {
 
   it should "create new transformer from config" in {
     val config = ScalerConfig(
-      withMean = true, withStd = true,
+      withMean = true,
+      withStd = true,
       means = Array(1f, 2f, 3f),
-      scales = Array(4f, 5f, 6f)
+      scales = Array(4f, 5f, 6f),
     )
     val transformer = Scaler(config)
     assert(transformer.config.withMean === true)
@@ -103,17 +101,15 @@ class ScalerTest extends AnyFlatSpec with should.Matchers {
     val output: Array[Double] = transformer._transform(input)
     assert(output.toSeq.toFloat === expected)
   }
-
 }
 
 object ScalerTest {
-
   def defaultConfig: ScalerConfig = ScalerConfig(
-    withMean = true, withStd = true,
+    withMean = true,
+    withStd = true,
     means = Array(0.0, 0.370, 200.0, 334.366666).map(_.toDouble),
-    scales = Array(1.0, 0.4469899327, 81.64965809, 470.6753327).map(_.toDouble)
+    scales = Array(1.0, 0.4469899327, 81.64965809, 470.6753327).map(_.toDouble),
   )
 
   def defaultInput: Array[Float] = Seq(7, 5, 0.1, 11).map(_.toFloat).toArray
-
 }

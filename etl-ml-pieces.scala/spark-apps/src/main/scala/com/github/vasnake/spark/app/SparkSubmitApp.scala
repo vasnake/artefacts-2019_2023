@@ -1,18 +1,16 @@
-/**
- * Created by vasnake@gmail.com on 2024-07-30
- */
+/** Created by vasnake@gmail.com on 2024-07-30
+  */
 package com.github.vasnake.spark.app
 
-import org.apache.log4j.{LogManager, Logger}
-import org.apache.spark.sql.SparkSession
 import scala.util.Try
 
 import com.beust.jcommander.JCommander
+import org.apache.log4j._
+import org.apache.spark.sql.SparkSession
 
-/**
- * Helps with commandline parameters, logger, spark session, spark config reader
- * @param appParams object with annotated fields, see jcommander API
- */
+/** Helps with commandline parameters, logger, spark session, spark config reader
+  * @param appParams object with annotated fields, see jcommander API
+  */
 class SparkSubmitApp(appParams: Object) extends App with Serializable {
   @transient implicit val logger: Logger = LogManager.getLogger(this.getClass.getSimpleName)
 
@@ -37,5 +35,4 @@ class SparkSubmitApp(appParams: Object) extends App with Serializable {
   def getSparkConfParameterValue(key: String, default: Int): Int = Try(
     spark.conf.get(key, default.toString).toInt
   ).getOrElse(default)
-
 }

@@ -1,20 +1,16 @@
-/**
- * Created by vasnake@gmail.com on 2024-07-17
- */
+/** Created by vasnake@gmail.com on 2024-07-17
+  */
 package org.apache.spark.sql.catalyst.vasnake.udf.codec
-
-import org.apache.spark.unsafe.types.UTF8String
-
-import org.apache.spark.sql
-import org.apache.spark.sql.types._
-import org.apache.spark.sql.vectorized.{ColumnarArray, ColumnarMap}
-
-import org.apache.spark.sql.catalyst.expressions.{UnsafeArrayData, UnsafeMapData}
-import org.apache.spark.sql.catalyst.util.{ArrayBasedMapData, ArrayData, GenericArrayData, MapData}
 
 import scala.reflect.ClassTag
 
+import org.apache.spark.sql
+import org.apache.spark.sql.catalyst.expressions._
+import org.apache.spark.sql.catalyst.util._
 import org.apache.spark.sql.catalyst.vasnake.udf.accum.NumericAccumulator
+import org.apache.spark.sql.types._
+import org.apache.spark.sql.vectorized._
+import org.apache.spark.unsafe.types.UTF8String
 
 trait ColumnCodec {
   def resultType: sql.types.DataType
@@ -38,7 +34,10 @@ trait ColumnCodec {
   // accum => sql
   def encodeValue(value: String): Any = UTF8String.fromString(value)
   def encodeValue(value: NumericAccumulator.V): Any
-  def encodeValue(buffer: NumericAccumulator, key: NumericAccumulator.K = NumericAccumulator.PRIMITIVE_KEY): Any = encodeValue(buffer(key))
+  def encodeValue(
+    buffer: NumericAccumulator,
+    key: NumericAccumulator.K = NumericAccumulator.PRIMITIVE_KEY,
+  ): Any = encodeValue(buffer(key))
 
   def decodeMap(m: Any): MapData = m match {
     case a: UnsafeMapData => a
@@ -55,7 +54,8 @@ trait ColumnCodec {
 
 case class BooleanColumnCodec() extends ColumnCodec {
   val resultType: DataType = sql.types.BooleanType
-  override def decodeValue(value: Any): NumericAccumulator.V = if (!value.asInstanceOf[java.lang.Boolean]) 0.0 else 1.0
+  override def decodeValue(value: Any): NumericAccumulator.V =
+    if (!value.asInstanceOf[java.lang.Boolean]) 0.0 else 1.0
   def encodeValue(value: NumericAccumulator.V): Any = value.byteValue() != 0
   override def encodeValue(value: String): Any = !(value == "0.0" || value == "false")
 }
@@ -117,21 +117,42 @@ case class DoubleColumnCodec() extends ColumnCodec {
 case class DecimalColumnCodec(precision: Int, scale: Int) extends ColumnCodec {
   val resultType: DataType = sql.types.DecimalType.bounded(precision + 10, scale)
   override def decodeValue(value: Any): NumericAccumulator.V = value.asInstanceOf[Decimal].toDouble
-  def encodeValue(value: NumericAccumulator.V): Any = Decimal(BigDecimal(value), precision + 10, scale)
+  def encodeValue(value: NumericAccumulator.V): Any =
+    Decimal(BigDecimal(value), precision + 10, scale)
   override def encodeValue(value: String): Any = Decimal(BigDecimal(value), precision + 10, scale)
 }
 
-case class MapColumnCodec(override val keyType: DataType, override val valueType: DataType) extends ColumnCodec {
+case class MapColumnCodec(override val keyType: DataType, override val valueType: DataType)
+    extends ColumnCodec {
   // value type
-  if (!Seq(
-    FloatType, DoubleType, IntegerType, ByteType, LongType, ShortType, DecimalType
-  ).exists(_.acceptsType(valueType)))
+  if (
+      !Seq(
+        FloatType,
+        DoubleType,
+        IntegerType,
+        ByteType,
+        LongType,
+        ShortType,
+        DecimalType,
+      ).exists(_.acceptsType(valueType))
+  )
     throw new IllegalArgumentException(s"Map codec: unknown value type: `${valueType}`")
 
   // key type
-  if (!Seq(
-    FloatType, DoubleType, IntegerType, ByteType, LongType, ShortType, BooleanType, DateType, TimestampType, StringType
-  ).exists(_.acceptsType(keyType)))
+  if (
+      !Seq(
+        FloatType,
+        DoubleType,
+        IntegerType,
+        ByteType,
+        LongType,
+        ShortType,
+        BooleanType,
+        DateType,
+        TimestampType,
+        StringType,
+      ).exists(_.acceptsType(keyType))
+  )
     throw new IllegalArgumentException(s"Map codec: unknown key type: `${keyType}`")
 
   val resultType: DataType = sql.types.MapType(keyType, valueType, valueContainsNull = true)
@@ -142,7 +163,8 @@ case class MapColumnCodec(override val keyType: DataType, override val valueType
   private val keyConverter: Any => Any = NumericAccumulator.keyConverter(keyType)
   private val valConverter: Any => Any = NumericAccumulator.valConverter(valueType)
   // row to buffer
-  private val row2bufValueConverter: Any => NumericAccumulator.V = NumericAccumulator.rowToBufferValueConverter(valueType)
+  private val row2bufValueConverter: Any => NumericAccumulator.V =
+    NumericAccumulator.rowToBufferValueConverter(valueType)
 
   override def isInvalidValue(value: Any): Boolean = {
     val x = row2bufValueConverter(value)
@@ -151,23 +173,32 @@ case class MapColumnCodec(override val keyType: DataType, override val valueType
 
   override def decodeValue(value: Any): NumericAccumulator.V = row2bufValueConverter(value)
 
-  override def encodeValue(buffer: NumericAccumulator, key: NumericAccumulator.K = NumericAccumulator.PRIMITIVE_KEY): Any = {
+  override def encodeValue(
+    buffer: NumericAccumulator,
+    key: NumericAccumulator.K = NumericAccumulator.PRIMITIVE_KEY,
+  ): Any =
     ArrayBasedMapData(
       buffer.itemsIterator,
       size = buffer.size,
       keyConverter = keyConverter,
-      valueConverter = valConverter
+      valueConverter = valConverter,
     )
-  }
 
   def encodeValue(value: NumericAccumulator.V): Any = ???
-
 }
 
 case class ArrayColumnCodec(override val valueType: DataType) extends ColumnCodec {
-  if (!Seq(
-    FloatType, DoubleType, IntegerType, ByteType, LongType, ShortType, DecimalType
-  ).exists(_.acceptsType(valueType)))
+  if (
+      !Seq(
+        FloatType,
+        DoubleType,
+        IntegerType,
+        ByteType,
+        LongType,
+        ShortType,
+        DecimalType,
+      ).exists(_.acceptsType(valueType))
+  )
     throw new IllegalArgumentException(s"Array codec: unknown value type: `${valueType}`")
 
   val resultType: DataType = sql.types.ArrayType(valueType, containsNull = true)
@@ -175,35 +206,43 @@ case class ArrayColumnCodec(override val valueType: DataType) extends ColumnCode
   override def isMap: Boolean = false
 
   private val codec: ArrayValueCodec = valueType match {
-    case FloatType => new ArrayValueCodec {
-      override def array(size: Int): Array[Any] = _array[java.lang.Float](size)
-      override def encode(v: NumericAccumulator.V): Any = if (v == null) null else v.floatValue()
-    }
-    case DoubleType => new ArrayValueCodec {
-      override def array(size: Int): Array[Any] = _array[java.lang.Double](size)
-      override def encode(v: NumericAccumulator.V): Any = v
-    }
-    case IntegerType => new ArrayValueCodec {
-      override def array(size: Int): Array[Any] = _array[java.lang.Integer](size)
-      override def encode(v: NumericAccumulator.V): Any = if (v == null) null else v.intValue()
-    }
-    case ByteType => new ArrayValueCodec {
-      override def array(size: Int): Array[Any] = _array[java.lang.Byte](size)
-      override def encode(v: NumericAccumulator.V): Any = if (v == null) null else v.byteValue()
-    }
-    case LongType => new ArrayValueCodec {
-      override def array(size: Int): Array[Any] = _array[java.lang.Long](size)
-      override def encode(v: NumericAccumulator.V): Any = if (v == null) null else v.longValue()
-    }
-    case ShortType => new ArrayValueCodec {
-      override def array(size: Int): Array[Any] = _array[java.lang.Short](size)
-      override def encode(v: NumericAccumulator.V): Any = if (v == null) null else v.shortValue()
-    }
-    case DecimalType.Fixed(precision, scale) => new ArrayValueCodec {
-      override def array(size: Int): Array[Any] = _array[Decimal](size)
-      override def encode(v: NumericAccumulator.V): Any = if (v == null) null else Decimal(BigDecimal(v), precision, scale)
-      override def decode(v: Any): NumericAccumulator.V = v.asInstanceOf[Decimal].toDouble
-    }
+    case FloatType =>
+      new ArrayValueCodec {
+        override def array(size: Int): Array[Any] = _array[java.lang.Float](size)
+        override def encode(v: NumericAccumulator.V): Any = if (v == null) null else v.floatValue()
+      }
+    case DoubleType =>
+      new ArrayValueCodec {
+        override def array(size: Int): Array[Any] = _array[java.lang.Double](size)
+        override def encode(v: NumericAccumulator.V): Any = v
+      }
+    case IntegerType =>
+      new ArrayValueCodec {
+        override def array(size: Int): Array[Any] = _array[java.lang.Integer](size)
+        override def encode(v: NumericAccumulator.V): Any = if (v == null) null else v.intValue()
+      }
+    case ByteType =>
+      new ArrayValueCodec {
+        override def array(size: Int): Array[Any] = _array[java.lang.Byte](size)
+        override def encode(v: NumericAccumulator.V): Any = if (v == null) null else v.byteValue()
+      }
+    case LongType =>
+      new ArrayValueCodec {
+        override def array(size: Int): Array[Any] = _array[java.lang.Long](size)
+        override def encode(v: NumericAccumulator.V): Any = if (v == null) null else v.longValue()
+      }
+    case ShortType =>
+      new ArrayValueCodec {
+        override def array(size: Int): Array[Any] = _array[java.lang.Short](size)
+        override def encode(v: NumericAccumulator.V): Any = if (v == null) null else v.shortValue()
+      }
+    case DecimalType.Fixed(precision, scale) =>
+      new ArrayValueCodec {
+        override def array(size: Int): Array[Any] = _array[Decimal](size)
+        override def encode(v: NumericAccumulator.V): Any =
+          if (v == null) null else Decimal(BigDecimal(v), precision, scale)
+        override def decode(v: Any): NumericAccumulator.V = v.asInstanceOf[Decimal].toDouble
+      }
     case _ => throw new IllegalArgumentException(s"Array codec, unknown value type: `${valueType}`")
   }
 
@@ -212,7 +251,7 @@ case class ArrayColumnCodec(override val valueType: DataType) extends ColumnCode
 
   override def encodeValue(buffer: NumericAccumulator, key: NumericAccumulator.K): Any = {
     val arr: Array[Any] = codec.array(buffer.size)
-    arr.indices.foreach { i => arr.update(i, codec.encode(buffer(NumericAccumulator.keyValue(i)))) }
+    arr.indices.foreach(i => arr.update(i, codec.encode(buffer(NumericAccumulator.keyValue(i)))))
 
     ArrayData.toArrayData(arr)
   }
@@ -221,7 +260,6 @@ case class ArrayColumnCodec(override val valueType: DataType) extends ColumnCode
     codec.decode(value)
 
   def encodeValue(value: NumericAccumulator.V): Any = ???
-
 }
 
 trait ArrayValueCodec {
@@ -232,5 +270,6 @@ trait ArrayValueCodec {
     val x = decode(v)
     x.isNaN || x.isInfinite
   }
-  protected def _array[T: ClassTag](size: Int): Array[Any] = new Array[T](size).asInstanceOf[Array[Any]]
+  protected def _array[T: ClassTag](size: Int): Array[Any] =
+    new Array[T](size).asInstanceOf[Array[Any]]
 }

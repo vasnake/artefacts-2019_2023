@@ -1,19 +1,16 @@
-/**
- * Created by vasnake@gmail.com on 2024-08-13
- */
+/** Created by vasnake@gmail.com on 2024-08-13
+  */
 package org.apache.spark.sql.hive.vasnake
-
-import org.scalatest._
-import flatspec._
-import matchers._
-
-import org.apache.spark.sql
-import sql.SparkSession
 
 import scala.math.Integral.Implicits.infixIntegralOps
 
-class MetastoreQueryProcessorWithConnPoolTest extends AnyFlatSpec with should.Matchers {
+import org.apache.spark.sql
+import org.apache.spark.sql.SparkSession
+//import org.scalatest._
+import org.scalatest.flatspec._
+import org.scalatest.matchers._
 
+class MetastoreQueryProcessorWithConnPoolTest extends AnyFlatSpec with should.Matchers {
   import MetastoreQueryProcessorWithConnPool.sliceIndices
 
   it should "maintain invariants" in {
@@ -25,9 +22,8 @@ class MetastoreQueryProcessorWithConnPoolTest extends AnyFlatSpec with should.Ma
       val allIndices: Array[Int] = (0 until totalItems).toArray
       val (numPartItems, reminder) = totalItems /% numParts
 
-      val slicedIndices: Seq[Seq[Int]] = (0 until numParts).map(partIdx =>
-        sliceIndices(numPartItems, reminder, partIdx, totalItems)
-      )
+      val slicedIndices: Seq[Seq[Int]] =
+        (0 until numParts).map(partIdx => sliceIndices(numPartItems, reminder, partIdx, totalItems))
 
       assert(
         slicedIndices.forall(slice =>
@@ -97,11 +93,15 @@ class MetastoreQueryProcessorWithConnPoolTest extends AnyFlatSpec with should.Ma
 
     // scala> 119 /% 12 // res12: (Int, Int) = (9,11)
     sliceIndices(9, 11, 0, 119) should contain theSameElementsAs Seq(0, 1, 2, 3, 4, 5, 6, 7, 8, 118)
-    sliceIndices(9, 11, 1, 119) should contain theSameElementsAs Seq(9, 10, 11, 12, 13, 14, 15, 16, 17, 117)
-    sliceIndices(9, 11, 2, 119) should contain theSameElementsAs Seq(18, 19, 20, 21, 22, 23, 24, 25, 26, 116)
+    sliceIndices(9, 11, 1, 119) should contain theSameElementsAs Seq(9, 10, 11, 12, 13, 14, 15, 16,
+      17, 117)
+    sliceIndices(9, 11, 2, 119) should contain theSameElementsAs Seq(18, 19, 20, 21, 22, 23, 24, 25,
+      26, 116)
     // ...
-    sliceIndices(9, 11, 10, 119) should contain theSameElementsAs Seq(90, 91, 92, 93, 94, 95, 96, 97, 98, 108)
-    sliceIndices(9, 11, 11, 119) should contain theSameElementsAs Seq(99, 100, 101, 102, 103, 104, 105, 106, 107)
+    sliceIndices(9, 11, 10, 119) should contain theSameElementsAs Seq(90, 91, 92, 93, 94, 95, 96,
+      97, 98, 108)
+    sliceIndices(9, 11, 11, 119) should contain theSameElementsAs Seq(99, 100, 101, 102, 103, 104,
+      105, 106, 107)
 
     // scala> 12 /% 12 // res0: (Int, Int) = (1,0)
     sliceIndices(1, 0, 0, 12) should contain theSameElementsAs Seq(0)
@@ -122,16 +122,24 @@ class MetastoreQueryProcessorWithConnPoolTest extends AnyFlatSpec with should.Ma
     private def _spark_shell_closeConnectionsTest(spark: SparkSession): Unit = {
       import sql.DataFrame
       import org.apache.spark.storage.StorageLevel
-      import com.github.vasnake.spark.io.hive.{TableSmartWriter => Writer}
+      import com.github.vasnake.spark.io.hive.{ TableSmartWriter => Writer }
 
       val database = "dbname"
       val table = "one_feature"
       val writer = new Writer()
-      val parts_130 = (1 to 65) flatMap { idx => Seq("HID", "VKID") map { uid_type => (idx.toString, idx.toDouble / 1000.0, s"2022-02-${idx}", uid_type) } }
-      val df: DataFrame = spark.createDataFrame(parts_130).toDF("uid", "feature", "dt", "uid_type").persist(StorageLevel.MEMORY_ONLY)
+      val parts_130 = (1 to 65) flatMap { idx =>
+        Seq("HID", "VKID") map { uid_type =>
+          (idx.toString, idx.toDouble / 1000.0, s"2022-02-${idx}", uid_type)
+        }
+      }
+      val df: DataFrame = spark
+        .createDataFrame(parts_130)
+        .toDF("uid", "feature", "dt", "uid_type")
+        .persist(StorageLevel.MEMORY_ONLY)
       df.count
 
-      def _timedelta(t1: Long): String = f"${(System.currentTimeMillis - t1).toDouble / 1000.0}%2.2f" // https://docs.scala-lang.org/overviews/core/string-interpolation.html
+      def _timedelta(t1: Long): String =
+        f"${(System.currentTimeMillis - t1).toDouble / 1000.0}%2.2f" // https://docs.scala-lang.org/overviews/core/string-interpolation.html
 
       // N.B. set chunk size = 1, pool size parameter = 128, disable pool size limit,
       // than you can use num_partitions to setup parallelism
@@ -143,10 +151,13 @@ class MetastoreQueryProcessorWithConnPoolTest extends AnyFlatSpec with should.Ma
       }
 
       def fun(): Unit = writer.insertIntoHive(
-        df, database, table,
+        df,
+        database,
+        table,
         maxRowsPerBucket = 37,
-        overwrite = true, raiseOnMissingColumns = false,
-        checkParameterOrNull = "test.partition.success"
+        overwrite = true,
+        raiseOnMissingColumns = false,
+        checkParameterOrNull = "test.partition.success",
       )
 
       // 256 iter * 32 pool will consume 8192 connections
@@ -179,20 +190,27 @@ class MetastoreQueryProcessorWithConnPoolTest extends AnyFlatSpec with should.Ma
       val table = "audience_trg75523"
       val params: Map[String, Option[String]] = Map("test.write.success" -> Some("true"))
       // 32101 parts
-      val partitions = spark.sharedState.externalCatalog.listPartitions(database, table, partialSpec = Some(Map("dt" -> "2022-01-17")))
+      val partitions = spark
+        .sharedState
+        .externalCatalog
+        .listPartitions(database, table, partialSpec = Some(Map("dt" -> "2022-01-17")))
       val dfParts: Seq[Map[String, String]] = partitions.map(_.spec)
       // 1001 parts
       val limitedPartitions = partitions.take(10000 + 1)
       val limitedDfParts = dfParts.take(10000 + 1)
 
-      def _updateData(data: Map[String, String], updates: Map[String, Option[String]]): Map[String, String] =
-        updates.foldLeft(data) { case (result, item) => item match {
-          case (key, None) => result - key
-          case (key, Some(value)) => result + ((key, value))
-        }
+      def _updateData(data: Map[String, String], updates: Map[String, Option[String]])
+        : Map[String, String] =
+        updates.foldLeft(data) {
+          case (result, item) =>
+            item match {
+              case (key, None) => result - key
+              case (key, Some(value)) => result + ((key, value))
+            }
         }
 
-      def _timedelta(t1: Long): String = f"${(System.currentTimeMillis - t1).toDouble / 1000.0}%2.2f" // https://docs.scala-lang.org/overviews/core/string-interpolation.html
+      def _timedelta(t1: Long): String =
+        f"${(System.currentTimeMillis - t1).toDouble / 1000.0}%2.2f" // https://docs.scala-lang.org/overviews/core/string-interpolation.html
 
       def timeit(fun: () => Unit, msg: String = "Fun time"): Unit = {
         val t1 = System.currentTimeMillis()
@@ -200,7 +218,10 @@ class MetastoreQueryProcessorWithConnPoolTest extends AnyFlatSpec with should.Ma
         println(s"${msg}: ${_timedelta(t1)} seconds")
       }
 
-      import com.github.vasnake.spark.io.hive.TableSmartWriter.{_alterPartitions => ap, _listPartitions => lp}
+      import com.github.vasnake.spark.io.hive.TableSmartWriter.{
+        _alterPartitions => ap,
+        _listPartitions => lp,
+      }
 
       def _listParts(chunk_size: Int): Unit = {
         val mqp = MetastoreQueryProcessorWithConnPool(spark, 12)
@@ -208,25 +229,32 @@ class MetastoreQueryProcessorWithConnPoolTest extends AnyFlatSpec with should.Ma
         println(s"partitions: ${parts.length}, data:\n${parts.mkString("\n").take(1000)}")
       }
 
-      timeit(() => _listParts(chunk_size = 150), s"Query ${limitedDfParts.length} parts from metastore, time")
+      timeit(
+        () => _listParts(chunk_size = 150),
+        s"Query ${limitedDfParts.length} parts from metastore, time",
+      )
       // pool(12) 14 sec
       // seq: chunk 150, 67 queries, 10K parts = 103 sec
       // par: chunk 150, 67 queries, 10K parts = 43 sec
 
       def _alterParts(chunk_size: Int): Unit = {
         val mqp = MetastoreQueryProcessorWithConnPool(spark, 12)
-        val updatedParts = limitedPartitions.map(p => p.copy(parameters = _updateData(data = p.parameters, updates = params)))
+        val updatedParts = limitedPartitions.map(p =>
+          p.copy(parameters = _updateData(data = p.parameters, updates = params))
+        )
         println("Updating metastore partitions ...")
         ap(database, table, updatedParts, mqp)(_log, spark)
         println(s"Updated total ${updatedParts.length} parts")
       }
 
-      timeit(() => _alterParts(chunk_size = 500), s"Updated ${limitedPartitions.length} parts in metastore, total time")
+      timeit(
+        () => _alterParts(chunk_size = 500),
+        s"Updated ${limitedPartitions.length} parts in metastore, total time",
+      )
       // pool(12) 20 sec
       // seq: chunk 500, 21 queries, 10K parts = 137 sec
       // par: chunk 500, 21 queries, 10K parts = 27 sec
 
     }
   }
-
 }

@@ -1,19 +1,17 @@
-/**
- * Created by vasnake@gmail.com on 2024-07-29
- */
+/** Created by vasnake@gmail.com on 2024-07-29
+  */
 package com.github.vasnake.`ml-core`.models
 
 import scala.collection.mutable
-import scala.util.{Failure, Success, Try}
+import scala.util._
 
-import com.github.vasnake.common.num.{FastMath => fm}
+import com.github.vasnake.common.num.{ FastMath => fm }
 
 case class NEPriorClassProba(aligner: Array[Double]) {
-  /**
-   * Mutate probs array
-   *
-   * @param probs
-   */
+  /** Mutate probs array
+    *
+    * @param probs
+    */
   def transform(probs: Array[Double]): Unit = {
     // TODO: consider using Vectors from ml.linalg
     // all checks performed already?
@@ -22,38 +20,45 @@ case class NEPriorClassProba(aligner: Array[Double]) {
     val sum = probs.sum
     var newSum: Double = 0.0
 
-    probs.indices.foreach(i => {
+    probs.indices.foreach { i =>
       val nx = probs(i) / sum * aligner(i)
       newSum += nx
       probs(i) = nx
-    })
+    }
 
-    probs.indices.foreach(i => { // TODO: use while(i < probs.length) loop
+    probs.indices.foreach { i => // TODO: use while(i < probs.length) loop
       probs(i) = probs(i) / newSum
-    })
+    }
   }
 }
 
 object NEPriorClassProba {
 
   // TODO: use case class (message, option aligners)
-  def fit(probs: Iterator[Array[Double]], numClasses: Int, priorValues: Array[Double]): (String, Option[Array[Double]]) = Try {
+  def fit(
+    probs: Iterator[Array[Double]],
+    numClasses: Int,
+    priorValues: Array[Double],
+  ): (String, Option[Array[Double]]) = Try {
     // normalize prior
     // normalize probs
     // grid search: compute list of aligners and select the best
 
     // prepare input
 
-    require(priorValues.length == numClasses, "Prior values count must be equal to number of classes")
+    require(
+      priorValues.length == numClasses,
+      "Prior values count must be equal to number of classes",
+    )
     require(priorValues.min > 0, "Prior values mast be positive")
 
     val rows: Array[Array[Double]] = {
       val builder = mutable.ArrayBuilder.make[Array[Double]]()
-      //builder.sizeHint(100000) // TODO: pass sample size in parameter
-      probs.foreach(row => {
+      // builder.sizeHint(100000) // TODO: pass sample size in parameter
+      probs.foreach { row =>
         val sum = row.sum
         builder += row.map(_ / sum)
-      })
+      }
 
       builder.result()
     }
@@ -100,12 +105,11 @@ object NEPriorClassProba {
     //    (0.1, 0.9, 0.9)
     //  ]
 
-    def cartesian[A](list: List[List[A]]): List[List[A]] = {
+    def cartesian[A](list: List[List[A]]): List[List[A]] =
       list match {
         case Nil => List(List())
         case h :: t => h.flatMap(i => cartesian(t).map(i :: _))
       }
-    }
 
     cartesian(List(List(0.5, 0.1), List(0.7, 0.9), List(0.3, 0.9))).map {
       case a :: b :: c :: Nil => (a, b, c)
@@ -114,15 +118,15 @@ object NEPriorClassProba {
   }
 
   def getAligner(
-                  rows: Array[Array[Double]],
-                  n_classes: Int,
-                  counts: Array[Double],
-                  lr_start: Double,
-                  lr_decay: Double,
-                  momentum: Double,
-                  max_iter: Int = 1000,
-                  eps: Double = 1e-8
-                ): (Array[Double], Double) = {
+    rows: Array[Array[Double]],
+    n_classes: Int,
+    counts: Array[Double],
+    lr_start: Double,
+    lr_decay: Double,
+    momentum: Double,
+    max_iter: Int = 1000,
+    eps: Double = 1e-8,
+  ): (Array[Double], Double) = {
     val n_rows = rows.length
 
     var dc_n: Double = 0.0
@@ -139,15 +143,15 @@ object NEPriorClassProba {
     var iter = 0
     while (iter < max_iter && lr >= eps && (dc_n != 0 || iter == 0)) {
       // compute dc_v
-      pred.indices.foreach(i => { // pred: Vector(n_rows) = np.argmax(X * aligner, axis=1)
+      pred.indices.foreach { i => // pred: Vector(n_rows) = np.argmax(X * aligner, axis=1)
         mul(rows(i), aligner, buff)
         pred(i) = argmax(buff)
-      })
-      dc_v.indices.foreach(i => {
+      }
+      dc_v.indices.foreach { i =>
         val uy = counts(i)
         val up = pred.count(_ == i) // up = (pred == c).sum()  # num of rows where c == argmax; [0, n_rows)
         dc_v(i) = (uy - up) / (uy + 1.0)
-      })
+      }
 
       // update coefficients
       old_dc_n = dc_n
@@ -184,8 +188,8 @@ object NEPriorClassProba {
   }
 
   @inline def argmax(xs: Array[Double]): Int = {
-    //import breeze.linalg.argmax
-    //Vectors.dense(xs).argmax
+    // import breeze.linalg.argmax
+    // Vectors.dense(xs).argmax
     var res: Int = 0
 
     var max = xs.head
@@ -201,7 +205,11 @@ object NEPriorClassProba {
     res
   }
 
-  @inline def mul(xs: Array[Double], ys: Array[Double], res: Array[Double]): Unit = {
+  @inline def mul(
+    xs: Array[Double],
+    ys: Array[Double],
+    res: Array[Double],
+  ): Unit = {
     assert(xs.length == ys.length && xs.length == res.length)
     var i = 0
     while (i < xs.length) {
@@ -210,7 +218,11 @@ object NEPriorClassProba {
     }
   }
 
-  @inline def mul(xs: Array[Double], y: Double, res: Array[Double]): Unit = {
+  @inline def mul(
+    xs: Array[Double],
+    y: Double,
+    res: Array[Double],
+  ): Unit = {
     assert(xs.length == res.length)
     var i = 0
     while (i < xs.length) {
@@ -219,7 +231,11 @@ object NEPriorClassProba {
     }
   }
 
-  @inline def sum(xs: Array[Double], ys: Array[Double], res: Array[Double]): Unit = {
+  @inline def sum(
+    xs: Array[Double],
+    ys: Array[Double],
+    res: Array[Double],
+  ): Unit = {
     assert(xs.length == ys.length && xs.length == res.length)
     var i = 0
     while (i < xs.length) {
@@ -228,7 +244,11 @@ object NEPriorClassProba {
     }
   }
 
-  @inline def div(xs: Array[Double], y: Double, res: Array[Double]): Unit = {
+  @inline def div(
+    xs: Array[Double],
+    y: Double,
+    res: Array[Double],
+  ): Unit = {
     assert(xs.length == res.length)
     var i = 0
     while (i < xs.length) {
@@ -236,5 +256,4 @@ object NEPriorClassProba {
       i += 1
     }
   }
-
 }

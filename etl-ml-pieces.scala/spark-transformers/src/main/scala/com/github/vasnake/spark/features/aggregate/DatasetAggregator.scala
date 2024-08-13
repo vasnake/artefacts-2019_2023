@@ -1,43 +1,50 @@
-/**
- * Created by vasnake@gmail.com on 2024-07-24
- */
+/** Created by vasnake@gmail.com on 2024-07-24
+  */
 package com.github.vasnake.spark.features.aggregate
 
+import com.github.vasnake.`etl-core`.aggregate.AggregationPipeline
+import com.github.vasnake.`etl-core`.aggregate.config.AggregationPipelineConfig
 import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.sql
+import org.apache.spark.sql._
 import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 
-import com.github.vasnake.`etl-core`.aggregate.config.AggregationPipelineConfig
-import com.github.vasnake.`etl-core`.aggregate.AggregationPipeline
-
-/**
- * Single feature represented by a number, float or double.
- * Group of features (dense vector as array, sparse vector as map) represented by 3 types of columns:
- * Map, Array, and set of primitive columns with common prefix where prefix used as group (or 'domain') name.
- */
+/** Single feature represented by a number, float or double.
+  * Group of features (dense vector as array, sparse vector as map) represented by 3 types of columns:
+  * Map, Array, and set of primitive columns with common prefix where prefix used as group (or 'domain') name.
+  */
 object DatasetAggregator { // TODO: move to com.github.vasnake.spark.dataset.transform.ConfiguredAggregate
-
   type ColumnsAggregationConfig = Map[String, AggregationPipelineConfig]
-  val GROUPBY_COL_NAME = "uid"
-  val DEFAULT_PIPELINE_KEY = "domain"
+  val GROUPBY_COL_NAME: String = "uid"
+  val DEFAULT_PIPELINE_KEY: String = "domain"
 
   case class DatasetAggregators(columnsAgg: Seq[ColumnAggregator])
 
-  def aggregateColumns(df: DataFrame, cfg: Map[String, ColumnsAggregationConfig])(implicit spark: SparkSession): DataFrame = {
+  def aggregateColumns(
+    df: DataFrame,
+    cfg: Map[String, ColumnsAggregationConfig],
+  )(implicit
+    spark: SparkSession
+  ): DataFrame = {
     import spark.implicits._
     import org.apache.spark.sql.catalyst.encoders.RowEncoder
     implicit val outRowEncoder: ExpressionEncoder[Row] = RowEncoder(df.schema)
 
-    val aggregators: Broadcast[DatasetAggregators] = spark.sparkContext.broadcast(
-      compileAggregators(cfg, df)
-    )
+    val aggregators: Broadcast[DatasetAggregators] = spark
+      .sparkContext
+      .broadcast(
+        compileAggregators(cfg, df)
+      )
 
     df.groupByKey(row => row.getAs[String](GROUPBY_COL_NAME))
       .mapGroups { case (key, rows) => reduceRows(key, rows, aggregators) }
   }
 
-  def reduceRows(key: String, iter: Iterator[Row], aggregators: Broadcast[DatasetAggregators]): Row = {
+  def reduceRows(
+    key: String,
+    iter: Iterator[Row],
+    aggregators: Broadcast[DatasetAggregators],
+  ): Row = {
     val aggs = aggregators.value
     val rows: Seq[Row] = iter.toSeq
 
@@ -48,24 +55,29 @@ object DatasetAggregator { // TODO: move to com.github.vasnake.spark.dataset.tra
     Row.fromSeq(aggregatedColumns)
   }
 
-  def compileAggregators(cfg: Map[String, ColumnsAggregationConfig], df: DataFrame): DatasetAggregators = {
+  def compileAggregators(cfg: Map[String, ColumnsAggregationConfig], df: DataFrame)
+    : DatasetAggregators = {
     // analyze schema and build aggregators on driver
     import sql.types._
 
-    def findGroupName(prefixedFieldName: String): String = cfg.keys.find(groupName =>
-        prefixedFieldName.startsWith(s"${groupName}_"))
-        .getOrElse(prefixedFieldName)
+    def findGroupName(prefixedFieldName: String): String = cfg
+      .keys
+      .find(groupName => prefixedFieldName.startsWith(s"${groupName}_"))
+      .getOrElse(prefixedFieldName)
 
     // TODO: KISS, DRY
 
     def aggPipeline(fieldName: String): AggregationPipeline = {
       val cAggCfg: ColumnsAggregationConfig = cfg.getOrElse(
         fieldName,
-        sys.error(s"Can't find `${fieldName}` config in `${cfg}`")
+        sys.error(s"Can't find `${fieldName}` config in `${cfg}`"),
       )
       val apCfg: AggregationPipelineConfig = cAggCfg.getOrElse(
         fieldName,
-        cAggCfg.getOrElse(DEFAULT_PIPELINE_KEY, sys.error(s"Can't find default config in `${cAggCfg}`"))
+        cAggCfg.getOrElse(
+          DEFAULT_PIPELINE_KEY,
+          sys.error(s"Can't find default config in `${cAggCfg}`"),
+        ),
       )
 
       AggregationPipeline(apCfg)
@@ -78,12 +90,13 @@ object DatasetAggregator { // TODO: move to com.github.vasnake.spark.dataset.tra
       val featuresPipelines: Map[String, AggregationPipeline] = {
         val cAggCfg: ColumnsAggregationConfig = cfg.getOrElse(
           groupName,
-          sys.error(s"Can't find `${groupName}` config in `${cfg}`")
+          sys.error(s"Can't find `${groupName}` config in `${cfg}`"),
         )
-        cAggCfg.keys.filter(k => k != DEFAULT_PIPELINE_KEY)
-          .map(featureName =>
-            (featureName, AggregationPipeline(cAggCfg(featureName)))
-          ).toMap
+        cAggCfg
+          .keys
+          .filter(k => k != DEFAULT_PIPELINE_KEY)
+          .map(featureName => (featureName, AggregationPipeline(cAggCfg(featureName))))
+          .toMap
       }
 
       SetOfNamedPipelines(featuresPipelines.getOrElse(fieldName, defaultPipeline), Map.empty)
@@ -95,29 +108,31 @@ object DatasetAggregator { // TODO: move to com.github.vasnake.spark.dataset.tra
       val featuresPipelines: Map[String, AggregationPipeline] = {
         val cAggCfg: ColumnsAggregationConfig = cfg.getOrElse(
           fieldName,
-          sys.error(s"Can't find `${fieldName}` config in `${cfg}`")
+          sys.error(s"Can't find `${fieldName}` config in `${cfg}`"),
         )
-        cAggCfg.keys.filter(k => k != DEFAULT_PIPELINE_KEY)
-          .map(featureName =>
-            (featureName, AggregationPipeline(cAggCfg(featureName)))
-          ).toMap
+        cAggCfg
+          .keys
+          .filter(k => k != DEFAULT_PIPELINE_KEY)
+          .map(featureName => (featureName, AggregationPipeline(cAggCfg(featureName))))
+          .toMap
       }
 
       SetOfNamedPipelines(defaultPipeline, featuresPipelines)
     }
 
-    val aggregators: Seq[ColumnAggregator] = df.schema.map(field => {
+    val aggregators: Seq[ColumnAggregator] = df.schema.map { field =>
       val idx = df.schema.fieldIndex(field.name)
 
       field.dataType match {
         case StringType if field.name == GROUPBY_COL_NAME => UidFieldAggregator(idx)
-        case MapType(_, _, _) =>  MapFieldAggregator(idx, field, buildCollectionFieldAggPipeline(field.name))
-        case ArrayType(_, _) =>   ArrayFieldAggregator(idx, field, buildCollectionFieldAggPipeline(field.name))
-        case _ =>                 ScalarFieldAggregator(idx, field, buildScalarFieldAggPipeline(field.name))
+        case MapType(_, _, _) =>
+          MapFieldAggregator(idx, field, buildCollectionFieldAggPipeline(field.name))
+        case ArrayType(_, _) =>
+          ArrayFieldAggregator(idx, field, buildCollectionFieldAggPipeline(field.name))
+        case _ => ScalarFieldAggregator(idx, field, buildScalarFieldAggPipeline(field.name))
       }
-    })
+    }
 
     DatasetAggregators(aggregators)
   }
-
 }

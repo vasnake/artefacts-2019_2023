@@ -1,11 +1,10 @@
-/**
- * Created by vasnake@gmail.com on 2024-08-13
- */
+/** Created by vasnake@gmail.com on 2024-08-13
+  */
 package com.github.vasnake.core.text
 
-import org.scalatest._
-import flatspec._
-import matchers._
+//import org.scalatest._
+import org.scalatest.flatspec._
+import org.scalatest.matchers._
 //import org.scalactic.Equality
 
 // happy path
@@ -14,7 +13,7 @@ class StringToolboxTest extends AnyFlatSpec with should.Matchers {
   import StringToolbox._
 
   // custom separators
-  implicit val sep = Separators(";", Some(Separators("=")))
+  implicit val sep: Separators = Separators(";", Some(Separators("=")))
 
   it should "split string to array of non-empty trimmed strings" in {
     assert("foo; bar; baz; bara bas".splitTrim === Array("foo", "bar", "baz", "bara bas"))
@@ -27,7 +26,6 @@ class StringToolboxTest extends AnyFlatSpec with should.Matchers {
   it should "parse string to Map[String, String]" in {
     assert("foo = bar; baz = bara bas".parseMap === Map("foo" -> "bar", "baz" -> "bara bas"))
   }
-
 }
 
 // corner cases
@@ -60,7 +58,7 @@ class StringToolboxTestSplitTrim extends AnyFlatSpec with should.Matchers {
       """.stripMargin
 
     for (line <- data.split('\n') if line.trim.length > 0) {
-      //println(s"check line: `$line`")
+      // println(s"check line: `$line`")
       assert(line.splitTrim === expected)
       assert(s" $line ".splitTrim === expected)
       assert(s" , \t \n $line \t , \n ".splitTrim === expected)
@@ -107,7 +105,7 @@ class StringToolboxTestToList extends AnyFlatSpec with should.Matchers {
       """.stripMargin
 
     for (line <- data.split('\n') if line.trim.length > 0) {
-      //println(s"check line: `$line`")
+      // println(s"check line: `$line`")
       assert(line.s2list === expected)
       assert(s" $line ".s2list === expected)
       assert(s" , \t \n $line \t , \n ".s2list === expected)
@@ -144,7 +142,7 @@ class StringToolboxTestToMap extends AnyFlatSpec with should.Matchers {
       """.stripMargin
 
     for (line <- data.split('\n')) {
-      //println(s"check line: `$line`")
+      // println(s"check line: `$line`")
       assert(line.parseMap === expected)
       assert(s" $line ".parseMap === expected)
       assert(s" \t \n $line \t \n ".parseMap === expected)
@@ -163,7 +161,7 @@ class StringToolboxTestToMap extends AnyFlatSpec with should.Matchers {
       """.stripMargin
 
     for (line <- data.split('\n') if line.trim.length > 0) {
-      //println(s"check line: `$line`")
+      // println(s"check line: `$line`")
       assert(line.parseMap === expected)
       assert(s" $line ".parseMap === expected)
       assert(s" \t \n $line \t \n ".parseMap === expected)
@@ -173,12 +171,11 @@ class StringToolboxTestToMap extends AnyFlatSpec with should.Matchers {
   it should "save last version of key value" in {
     assert("foo: bar, foo: baz".parseMap === Map("foo" -> "baz"))
   }
-
 }
 
 class StringToolboxTestExtractNumber extends AnyFlatSpec with should.Matchers {
   import StringToolbox._
-  implicit val sep = Separators(" ")
+  implicit val sep: Separators = Separators(" ")
 
   it should "parse number from a string" in {
     val data =
@@ -191,7 +188,10 @@ class StringToolboxTestExtractNumber extends AnyFlatSpec with should.Matchers {
         |2: foo bar 3.33 baz
       """.stripMargin.split("\n").map(_.trim).filter(_.nonEmpty)
 
-    for (line <- data; Array(pos, inp) = line.splitTrim(Separators(": "))) {
+    for {
+      line <- data
+      Array(pos, inp) = line.splitTrim(Separators(": "))
+    } {
       assert(inp.extractNumber(pos.toInt) === Some(3.33))
       assert(s"  $inp  ".extractNumber(pos.toInt) === Some(3.33))
       assert(s" oops $inp ".extractNumber(pos.toInt) === None)

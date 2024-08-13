@@ -1,18 +1,14 @@
-/**
- * Created by vasnake@gmail.com on 2024-08-13
- */
+/** Created by vasnake@gmail.com on 2024-08-13
+  */
 package org.apache.spark.sql.catalyst.vasnake.udf
 
-import org.scalatest._
-import flatspec._
-import matchers._
-
-import org.apache.spark.sql.DataFrame
-
 import com.github.vasnake.spark.test.LocalSpark
+import org.apache.spark.sql.DataFrame
+//import org.scalatest._
+import org.scalatest.flatspec._
+import org.scalatest.matchers._
 
 class MapIntTest extends AnyFlatSpec with should.Matchers with LocalSpark with Checks {
-
   import Fixtures._
 
   private val transformExpr =
@@ -85,7 +81,7 @@ class MapIntTest extends AnyFlatSpec with should.Matchers with LocalSpark with C
     avgAndCheck2(input, s"Map(1.0 -> ${7 / 2}, 2.0 -> ${5 / 2})", expectedType)
   }
 
-    it should "process float keys, part I" in {
+  it should "process float keys, part I" in {
     val input: DataFrame = MapTransformer(inputDF, "part = 'I'").float_int
     val expectedType = "MapType(FloatType,IntegerType,true)"
     show(input, message = "input")
@@ -132,5 +128,4 @@ class MapIntTest extends AnyFlatSpec with should.Matchers with LocalSpark with C
     sumAndCheck2(input, "Map(2021-05-12 12:34:55.0 -> 5)", expectedType)
     avgAndCheck2(input, s"Map(2021-05-12 12:34:55.0 -> ${5 / 2})", expectedType)
   }
-
 }

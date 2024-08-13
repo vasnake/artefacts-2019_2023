@@ -168,7 +168,11 @@ lazy val `spark-io` =
 lazy val `spark-transformers` =
   project
     .in(file("spark-transformers"))
-    .dependsOn(Seq(core, common, text, `etl-core`, `ml-core`, `spark-core`, `spark-io`, json).map(_ % Cctt): _*)
+    .dependsOn(
+      Seq(core, common, text, `etl-core`, `ml-core`, `spark-core`, `spark-io`, json).map(
+        _ % Cctt
+      ): _*
+    )
     .settings(commonSettings)
     .settings(commonDependencies)
     .settings(sparkSettings)
@@ -176,7 +180,11 @@ lazy val `spark-transformers` =
 lazy val `spark-ml` =
   project
     .in(file("spark-ml"))
-    .dependsOn(Seq(`json`, `ml-core`, `ml-models`, `spark-core`, `spark-io`, `spark-transformers`).map(_ % Cctt): _*)
+    .dependsOn(
+      Seq(`json`, `ml-core`, `ml-models`, `spark-core`, `spark-io`, `spark-transformers`).map(
+        _ % Cctt
+      ): _*
+    )
     .settings(commonSettings)
     .settings(commonDependencies)
     .settings(sparkSettings)
@@ -184,7 +192,11 @@ lazy val `spark-ml` =
 lazy val `spark-apps` =
   project
     .in(file("spark-apps"))
-    .dependsOn(Seq(core, `spark-core`, `spark-io`, `spark-transformers`, `spark-ml`, `ml-models-json`).map(_ % Cctt): _*)
+    .dependsOn(
+      Seq(core, `spark-core`, `spark-io`, `spark-transformers`, `spark-ml`, `ml-models-json`).map(
+        _ % Cctt
+      ): _*
+    )
     .settings(commonSettings)
     .settings(commonDependencies)
     .settings(sparkSettings)
@@ -193,12 +205,13 @@ lazy val `spark-apps` =
 // settings
 
 lazy val sparkSettings = {
-/** {{{
-
-> If your testing Spark SQL CodeGen make sure to set SPARK_TESTING=true
-SPARK_TESTING=yes ./build/sbt clean +compile +test -DsparkVersion=$SPARK_VERSION
-
-}}} */
+  /** {{{
+    *
+    * > If your testing Spark SQL CodeGen make sure to set SPARK_TESTING=true
+    * SPARK_TESTING=yes ./build/sbt clean +compile +test -DsparkVersion=$SPARK_VERSION
+    *
+    * }}}
+    */
 
   lazy val dependencies = Seq(
     libraryDependencies ++= (org.apache.spark.sparkModules ++ Seq(

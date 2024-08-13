@@ -1,27 +1,27 @@
-/**
- * Created by vasnake@gmail.com on 2024-08-13
- */
+/** Created by vasnake@gmail.com on 2024-08-13
+  */
 package org.apache.spark.sql.catalyst.vasnake.udf
 
-import org.scalatest._
-import flatspec._
-//import matchers._
-
+import com.github.vasnake.spark.test._
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types._
 import org.apache.spark.storage.StorageLevel
-
-import com.github.vasnake.spark.test.{DataFrameHelpers, LocalSpark}
+import org.scalatest._
+import org.scalatest.flatspec._
 
 class CooMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
-
   import ArrayFloatFixture._
   import functions.generic_coomul
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
     functions.registerAll(spark, overrideIfExists = true)
-    functions.registerAs(funcName = "generic_coomul", targetName = "generic_coomul", spark, overrideIfExists = true)
+    functions.registerAs(
+      funcName = "generic_coomul",
+      targetName = "generic_coomul",
+      spark,
+      overrideIfExists = true,
+    )
   }
 
   it should "work with different API" in {
@@ -30,18 +30,30 @@ class CooMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
     val colName = "coomul"
     val expectedType = ArrayType(IntegerType, containsNull = true)
     val elementType = "int"
-    val params = s"cast(array(${a1}) as array<$elementType>), cast(array($a2) as array<$elementType>)"
+    val params =
+      s"cast(array(${a1}) as array<$elementType>), cast(array($a2) as array<$elementType>)"
 
     List(
-      ("Dataset API", spark.sql(s"select cast(array(${a1}) as array<$elementType>) as a1, cast(array(${a2}) as array<$elementType>) as a2")
-        .select(generic_coomul("a1", "a2").alias(colName))),
+      (
+        "Dataset API",
+        spark
+          .sql(
+            s"select cast(array(${a1}) as array<$elementType>) as a1, cast(array(${a2}) as array<$elementType>) as a2"
+          )
+          .select(generic_coomul("a1", "a2").alias(colName)),
+      ),
       ("SQL API, aliased function", spark.sql(s"select coomul(${params}) as $colName")),
-      ("SQL API, native func.name", spark.sql(s"select generic_coomul(${params}) as $colName"))
-    ).foreach { case (msg, df) => {
-      show(df, msg)
-      assert(df.schema(colName).dataType.sameType(expectedType))
-      assert(df.select(colName).collect().map(_.toString().toLowerCase).toList === List(s"[WrappedArray(${expectedValue})]".toLowerCase))
-    }}
+      ("SQL API, native func.name", spark.sql(s"select generic_coomul(${params}) as $colName")),
+    ).foreach {
+      case (msg, df) =>
+        show(df, msg)
+        assert(df.schema(colName).dataType.sameType(expectedType))
+        assert(
+          df.select(colName).collect().map(_.toString().toLowerCase).toList === List(
+            s"[WrappedArray(${expectedValue})]".toLowerCase
+          )
+        )
+    }
   }
 
   private def checkType(elementType: String, sparkElementType: DataType) = {
@@ -61,16 +73,22 @@ class CooMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
       case _ => "4, 10, 18"
     }
     val colName = "coomul"
-    val params = s"cast(array(${a1}) as array<$elementType>), cast(array($a2) as array<$elementType>)"
+    val params =
+      s"cast(array(${a1}) as array<$elementType>), cast(array($a2) as array<$elementType>)"
 
     show(spark.sql(s"select ${params}"), "source")
 
-    val actual = spark.sql(s"select generic_coomul(${params}) as ${colName}").persist(StorageLevel.MEMORY_ONLY)
+    val actual =
+      spark.sql(s"select generic_coomul(${params}) as ${colName}").persist(StorageLevel.MEMORY_ONLY)
 
     show(actual, "target")
 
     assert(actual.schema(colName).dataType.sameType(expectedType))
-    assert(actual.select(colName).collect().map(_.toString().toLowerCase).toList === List(s"[WrappedArray(${expectedValue})]".toLowerCase))
+    assert(
+      actual.select(colName).collect().map(_.toString().toLowerCase).toList === List(
+        s"[WrappedArray(${expectedValue})]".toLowerCase
+      )
+    )
 
     actual.unpersist()
   }
@@ -111,9 +129,9 @@ class CooMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
     assertResult(
       coomulEval(
         "null,  null, 3,    4",
-        "null,  2,    null, 4"
+        "null,  2,    null, 4",
       ),
-      "null, null, null, 16.0"
+      "null, null, null, 16.0",
     )
   }
 
@@ -121,9 +139,9 @@ class CooMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
     assertResult(
       coomulEval(
         "+inf,2,    -inf, 4,    +inf, 6",
-        "1,   +inf, 3,    -inf, -inf, 6"
+        "1,   +inf, 3,    -inf, -inf, 6",
       ),
-      "null, null, null, null, null, 36.0"
+      "null, null, null, null, null, 36.0",
     )
   }
 
@@ -131,9 +149,9 @@ class CooMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
     assertResult(
       coomulEval(
         "nan, 2,    nan,  null, nan,  inf,  nan,  8",
-        "1,   nan,  nan,  nan,  null, nan,  -inf, 8"
+        "1,   nan,  nan,  nan,  null, nan,  -inf, 8",
       ),
-      "null, null, null, null, null, null, null, 64.0"
+      "null, null, null, null, null, null, null, 64.0",
     )
   }
 
@@ -147,15 +165,18 @@ class CooMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
     Seq(
       s"select coomul(cast(null as array<float>), cast(null as array<float>)) as coomul",
       s"select coomul(cast(null as array<float>), cast(${array} as array<float>)) as coomul",
-      s"select coomul(cast(${array} as array<float>), cast(null as array<float>)) as coomul"
-    ) foreach { expr => {
-      withCaching { actual => {
-
+      s"select coomul(cast(${array} as array<float>), cast(null as array<float>)) as coomul",
+    ) foreach { expr =>
+      withCaching { actual =>
         checkSchema(actual)
-        assert(actual.select("coomul").collect().map(_.toString().toLowerCase).toList === List(s"[null]".toLowerCase))
+        assert(
+          actual.select("coomul").collect().map(_.toString().toLowerCase).toList === List(
+            s"[null]".toLowerCase
+          )
+        )
 
-      } } (spark.sql(expr))
-    }}
+      }(spark.sql(expr))
+    }
 
   }
 
@@ -166,55 +187,66 @@ class CooMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
       s"select coomul(cast(array() as array<float>), ${array}) as coomul",
       s"select coomul(array(float(1)), ${array}) as coomul",
       s"select coomul(${array}, array(float(1))) as coomul",
-      s"select coomul(${array}, cast(array() as array<float>)) as coomul"
-    ) foreach { expr => {
+      s"select coomul(${array}, cast(array() as array<float>)) as coomul",
+    ) foreach { expr =>
       val actual = spark.sql(expr).persist(StorageLevel.MEMORY_ONLY)
       checkSchema(actual)
-      assert(actual.select("coomul").collect().map(_.toString().toLowerCase).toList === List(s"[null]".toLowerCase))
+      assert(
+        actual.select("coomul").collect().map(_.toString().toLowerCase).toList === List(
+          s"[null]".toLowerCase
+        )
+      )
       actual.unpersist()
-    }}
+    }
   }
 
   it should "produce reference values" in {
     // (id, vector1, vector2, expected)
-    val data: DataFrame = df(List(
-      // happy path
-      ("1", af(1, 2, 3), af(1, 2, 3), af(1, 4, 9)),
+    val data: DataFrame = df(
+      List(
+        // happy path
+        ("1", af(1, 2, 3), af(1, 2, 3), af(1, 4, 9)),
 
-      // item is null
-      ("2",
-        af(None, None,  3, 4),
-        af(None, 2,     None, 4),
-        af(None, None,  None, 16)),
+        // item is null
+        ("2", af(None, None, 3, 4), af(None, 2, None, 4), af(None, None, None, 16)),
 
-      // item is inf
-      ("3",
-        af(PINF,  2,    NINF, 4,    PINF, 6),
-        af(1,     PINF, 3,    NINF, NINF, 6),
-        af(None,  None, None, None, None, 36)),
+        // item is inf
+        (
+          "3",
+          af(PINF, 2, NINF, 4, PINF, 6),
+          af(1, PINF, 3, NINF, NINF, 6),
+          af(None, None, None, None, None, 36),
+        ),
 
-      // item is nan
-      ("4",
-        af(NAN,   2,    NAN,  None,  NAN,  PINF, NAN, 8),
-        af(1,     NAN,  NAN,  NAN,   None, NAN,  NINF, 8),
-        af(None,  None, None, None,  None, None, None, 64)),
+        // item is nan
+        (
+          "4",
+          af(NAN, 2, NAN, None, NAN, PINF, NAN, 8),
+          af(1, NAN, NAN, NAN, None, NAN, NINF, 8),
+          af(None, None, None, None, None, None, None, 64),
+        ),
 
-      // both arguments are empty
-      ("5", af(), af(), af()),
+        // both arguments are empty
+        ("5", af(), af(), af()),
 
-      // argument is null
-      ("6", None, None, None),
-      ("7", None, af(1, 2), None),
-      ("8", af(1, 2), None, None),
+        // argument is null
+        ("6", None, None, None),
+        ("7", None, af(1, 2), None),
+        ("8", af(1, 2), None, None),
 
-      // different size
-      ("9", af(1, 2), af(1, 2, 3), None),
-      ("10", af(1, 2, 3), af(1, 2), None)
-    ))
+        // different size
+        ("9", af(1, 2), af(1, 2, 3), None),
+        ("10", af(1, 2, 3), af(1, 2), None),
+      )
+    )
       .persist(StorageLevel.DISK_ONLY) // N.B. codegen ON switch here
 
     val actual = data
-      .selectExpr("upper(uid) as uid", "coomul(cast(va as array<double>), cast(vb as array<double>)) as coomul", "expected")
+      .selectExpr(
+        "upper(uid) as uid",
+        "coomul(cast(va as array<double>), cast(vb as array<double>)) as coomul",
+        "expected",
+      )
       .selectExpr("uid", "cast(coomul as array<float>) as coomul", "expected")
 
     actual.explain(extended = true)
@@ -227,7 +259,7 @@ class CooMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
     assert(
       actual.select("coomul").collect().map(_.toString().toLowerCase).toList
         ===
-        actual.select("expected").collect().map(_.toString().toLowerCase).toList
+          actual.select("expected").collect().map(_.toString().toLowerCase).toList
     )
 
     actual.unpersist()
@@ -240,37 +272,53 @@ class CooMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
   }
 
   private def checkSchema(actual: DataFrame): Assertion =
-    _assertResult(actual, "", "coomul", ArrayType(FloatType, containsNull = true), checkSchema = true, checkData = false)
+    _assertResult(
+      actual,
+      "",
+      "coomul",
+      ArrayType(FloatType, containsNull = true),
+      checkSchema = true,
+      checkData = false,
+    )
 
   private def assertResult(actual: DataFrame, expected: String): Assertion =
-    _assertResult(actual, expected, "coomul", ArrayType(FloatType, containsNull = true), checkSchema = true, checkData = true)
+    _assertResult(
+      actual,
+      expected,
+      "coomul",
+      ArrayType(FloatType, containsNull = true),
+      checkSchema = true,
+      checkData = true,
+    )
 
   private def _assertResult(
-                            actual: DataFrame,
-                            expected: String,
-                            colName: String,
-                            expectedType: DataType,
-                            checkSchema: Boolean,
-                            checkData: Boolean
-                          ): Assertion = {
-    withCaching { df => {
+    actual: DataFrame,
+    expected: String,
+    colName: String,
+    expectedType: DataType,
+    checkSchema: Boolean,
+    checkData: Boolean,
+  ): Assertion =
+    withCaching { df =>
       show(df, "result")
       if (checkSchema) assert(df.schema(colName).dataType.sameType(expectedType))
-      if (checkData) assert(
-        df.select(colName).collect().map(_.toString().toLowerCase).toList ===
-          List(s"[WrappedArray(${expected})]".toLowerCase)
-      )
+      if (checkData)
+        assert(
+          df.select(colName).collect().map(_.toString().toLowerCase).toList ===
+            List(s"[WrappedArray(${expected})]".toLowerCase)
+        )
       assert(checkSchema || checkData)
-    }}(actual)
-  }
+    }(actual)
 
   private def args(va: String, vb: String): String =
     s"cast(array(${items(va)}) as array<float>), cast(array(${items(vb)}) as array<float>)"
 
-  private def items(vec: String): String = {
+  private def items(vec: String): String =
     if (vec.isEmpty) vec
     else
-      vec.split(",").map(_.trim)
+      vec
+        .split(",")
+        .map(_.trim)
         .map(x =>
           if (x.toLowerCase.contains("-inf")) s"float('-Infinity')"
           else if (x.toLowerCase.contains("inf")) s"float('+Infinity')"
@@ -278,6 +326,4 @@ class CooMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
           else s"float($x)"
         )
         .mkString(",")
-  }
-
 }

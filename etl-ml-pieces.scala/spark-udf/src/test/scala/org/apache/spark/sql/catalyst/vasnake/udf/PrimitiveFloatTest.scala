@@ -1,18 +1,14 @@
-/**
- * Created by vasnake@gmail.com on 2024-08-13
- */
+/** Created by vasnake@gmail.com on 2024-08-13
+  */
 package org.apache.spark.sql.catalyst.vasnake.udf
 
-import org.scalatest._
-import flatspec._
-import matchers._
-
-import org.apache.spark.sql
-
 import com.github.vasnake.spark.test.LocalSpark
+import org.apache.spark.sql
+//import org.scalatest._
+import org.scalatest.flatspec._
+import org.scalatest.matchers._
 
 class PrimitiveFloatTest extends AnyFlatSpec with should.Matchers with LocalSpark with Checks {
-
   import sql.DataFrame
   import Fixtures._
 
@@ -72,5 +68,4 @@ class PrimitiveFloatTest extends AnyFlatSpec with should.Matchers with LocalSpar
     mfqAndCheckFull(input, expected = "1.0", index = "0")
     mfqAndCheckFull(input, expected = "42.0", prefer = "42.0", index = "0", threshold = "1") // prefer exists
   }
-
 }

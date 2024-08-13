@@ -1,49 +1,46 @@
-/**
- * Created by vasnake@gmail.com on 2024-07-30
- */
+/** Created by vasnake@gmail.com on 2024-07-30
+  */
 package com.github.vasnake.spark.app.datasets
 
-import org.apache.spark.sql.{DataFrame, Dataset}
-import org.apache.spark.sql
-
 import scala.util.Try
+
 import com.beust.jcommander
-
-import com.github.vasnake.spark.app.SparkSubmitApp
-import com.github.vasnake.core.text.StringToolbox
-import com.github.vasnake.spark.io.{CheckpointService, IntervalCheckpointService}
-import com.github.vasnake.text.evaluator._
-import com.github.vasnake.spark.dataset.transform.Joiner.{JoinRule, parseJoinRule}
 import com.github.vasnake.common.file.FileToolbox
-import com.github.vasnake.spark.app.datasets.joiner.config.{DomainConfig, EtlConfig, MatchingConfig, MatchingTableRow, SourcesFinder, TableConfig}
-import com.github.vasnake.spark.app.datasets.joiner.{DomainSourceDataFrame, EtlFeatures, implicits}
+import com.github.vasnake.core.text.StringToolbox
+import com.github.vasnake.spark.app.SparkSubmitApp
+import com.github.vasnake.spark.app.datasets.joiner._
+import com.github.vasnake.spark.app.datasets.joiner.config._
+import com.github.vasnake.spark.dataset.transform.Joiner._
+import com.github.vasnake.spark.io._
+import com.github.vasnake.text.evaluator._
+import org.apache.spark.sql
+import org.apache.spark.sql._
 
-/**
- * spark-submit app, read partitions from a set of input tables and write partition with set of output columns.
- *
- * A few definitions first:
- * - feature: a number, float or double;
- * - domain (features domain): a set of named features;
- * - uid, uid_type, dt: hive partitioning columns, app require these partitions in each table;
- * - matching: process of mapping uid from one uid_type to another.
- * To maintain pair (uid, uid_type) uniqueness in context of one dt partition, matching post-processing requires aggregation stage.
- *
- * App purpose is to combine (join) data from source tables to resulting set of domains.
- *
- * Domains of three types can be produced:
- * 1) dense vector domain: single column as array of features, array index used as feature name;
- * 2) sparce vector domain: single column as map [string, feature], unordered collection of named features;
- * 3) sparce vector domain: set of columns of numeric type (float, double), domain name encoded as prefix in the name of each column.
- *
- * App stages:
- * - load and parse job config;
- * - load source DFs;
- * - transform sources to features domains;
- * - join domains, produce output partition;
- * - write if no matching required, or:
- * - do matching-aggregation;
- * - write.
- */
+/** spark-submit app, read partitions from a set of input tables and write partition with set of output columns.
+  *
+  * A few definitions first:
+  * - feature: a number, float or double;
+  * - domain (features domain): a set of named features;
+  * - uid, uid_type, dt: hive partitioning columns, app require these partitions in each table;
+  * - matching: process of mapping uid from one uid_type to another.
+  * To maintain pair (uid, uid_type) uniqueness in context of one dt partition, matching post-processing requires aggregation stage.
+  *
+  * App purpose is to combine (join) data from source tables to resulting set of domains.
+  *
+  * Domains of three types can be produced:
+  * 1) dense vector domain: single column as array of features, array index used as feature name;
+  * 2) sparce vector domain: single column as map [string, feature], unordered collection of named features;
+  * 3) sparce vector domain: set of columns of numeric type (float, double), domain name encoded as prefix in the name of each column.
+  *
+  * App stages:
+  * - load and parse job config;
+  * - load source DFs;
+  * - transform sources to features domains;
+  * - join domains, produce output partition;
+  * - write if no matching required, or:
+  * - do matching-aggregation;
+  * - write.
+  */
 object JoinerApp extends SparkSubmitApp(CmdLineParams) {
   import EtlFeatures._
 
@@ -61,7 +58,8 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
   private val minTargetRows: Long = math.max(CmdLineParams.min_target_rows, MIN_TARGET_ROWS_MIN)
   logger.info(s"Parameter min_target_rows, effective: ${minTargetRows}")
 
-  private val checkpointInterval: Int = math.max(CmdLineParams.checkpoint_interval, CHECKPOINT_INTERVAL_MIN)
+  private val checkpointInterval: Int =
+    math.max(CmdLineParams.checkpoint_interval, CHECKPOINT_INTERVAL_MIN)
   logger.info(s"Parameter checkpoint_interval, effective: ${checkpointInterval}")
 
   private val stagingHdfsDir: String = buildTempPath("staging")
@@ -89,7 +87,7 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
     logger.info("empty table created.")
   }
 
-  val targetDF = {
+  val targetDF: DataFrame = {
     val joinedDF = joinDomainsWithCheckpoints(partitionJoinRule)
     logger.info(s"Joined domains: ${joinedDF.schema.mkString(";")}")
 
@@ -98,7 +96,8 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
       val res = doMatching(joinedDF)
       logger.info(s"Matching done, ${res.schema.mkString(";")}")
       res
-    } else joinedDF
+    }
+    else joinedDF
   }
 
   saveResult(targetDF)
@@ -107,7 +106,7 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
   private def buildTempPath(prefix: String): String =
     FileToolbox.joinPath(
       getSparkConfParameterValue(HDFS_TMP_DIR_KEY, HDFS_TMP_DIR_DEFAULT),
-      s"${prefix}__${etlCfg.table}__dt=${etlCfg.dt}__uid_type=${etlCfg.uid_type}"
+      s"${prefix}__${etlCfg.table}__dt=${etlCfg.dt}__uid_type=${etlCfg.uid_type}",
     )
 
   private def createTargetTable(): Unit = {
@@ -119,7 +118,8 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
     // use result schema to create table
 
     if (!SNB_DB_PREFIXES.exists(prefix => etlCfg.table.startsWith(prefix))) {
-      val msg = s"Table creation allowed only for db names with prefixes `${SNB_DB_PREFIXES.mkString(",")}`."
+      val msg =
+        s"Table creation allowed only for db names with prefixes `${SNB_DB_PREFIXES.mkString(",")}`."
       logger.error(msg)
       throw new UnsupportedOperationException(msg)
     }
@@ -137,7 +137,11 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
     val fqTableName = etlCfg.table
 
     logger.info(s"Creating empty table `${fqTableName}` `${df.schema.mkString(";")}` ...")
-    EtlFeatures.createEmptyTable(df, fqTableName, partitionColumnsNames = Seq(DT_COL_NAME, UID_TYPE_COL_NAME))
+    EtlFeatures.createEmptyTable(
+      df,
+      fqTableName,
+      partitionColumnsNames = Seq(DT_COL_NAME, UID_TYPE_COL_NAME),
+    )
   }
 
   private def saveResult(df: DataFrame): Unit = {
@@ -150,41 +154,53 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
     logger.info(s"Saving result: `${df.schema.mkString(";")}` to `$fqTableName/$partition` ...")
 
     val res = for {
-      persistedDF <- writeToStagingCheckRowsCountAndRepartition(df, stagingHdfsDir, minTargetRows, etlCfg.getWritePartitions)
+      persistedDF <- writeToStagingCheckRowsCountAndRepartition(
+        df,
+        stagingHdfsDir,
+        minTargetRows,
+        etlCfg.getWritePartitions,
+      )
       fixedDF <- Try(addMissingColumns(persistedDF, spark.read.table(fqTableName).schema)) // it's fast, shouldn't worry about speed
       _ <- Try(EtlFeatures.writePartitionToTable(fixedDF, fqTableName, partition))
     } yield ()
 
-    escalateError(res, exception => logger.fatal(s"Saving result failed: ${exception.getMessage}", exception))
+    escalateError(
+      res,
+      exception => logger.fatal(s"Saving result failed: ${exception.getMessage}", exception),
+    )
   }
 
   // TODO: check for special cases: (join_rule is empty or contains single name) and domains list size == 1
   private def tableJoinRule = parseJoinRule(
     etlCfg.table_join_rule.getOrElse("").trim,
-    etlCfg.domains.head.name
+    etlCfg.domains.head.name,
   )
 
   private def partitionJoinRule = parseJoinRule(
-    etlCfg.join_rule.getOrElse(
-      etlCfg.table_join_rule.getOrElse("")
-    ).trim,
-    etlCfg.domains.head.name
+    etlCfg
+      .join_rule
+      .getOrElse(
+        etlCfg.table_join_rule.getOrElse("")
+      )
+      .trim,
+    etlCfg.domains.head.name,
   )
 
-  private def joinDomainsNoCheckpoints(joinRule: JoinExpressionEvaluator[String]): DataFrame = {
+  private def joinDomainsNoCheckpoints(joinRule: JoinExpressionEvaluator[String]): DataFrame =
     // use table join rule; see `createTargetTable`
     joinDomains(joinRule, checkpointService = None)
-  }
 
-  private def joinDomainsWithCheckpoints(joinRule: JoinExpressionEvaluator[String]): DataFrame = {
+  private def joinDomainsWithCheckpoints(joinRule: JoinExpressionEvaluator[String]): DataFrame =
     // use partition join rule to join domains; see `targetDF`
     joinDomains(
       joinRule,
-      checkpointService = Some(new IntervalCheckpointService(checkpointInterval, checkpointHdfsDir))
+      checkpointService = Some(new IntervalCheckpointService(checkpointInterval, checkpointHdfsDir)),
     )
-  }
 
-  private def joinDomains(joinRule: JoinExpressionEvaluator[String], checkpointService: Option[CheckpointService]): DataFrame = {
+  private def joinDomains(
+    joinRule: JoinExpressionEvaluator[String],
+    checkpointService: Option[CheckpointService],
+  ): DataFrame = {
     // select domains and their order
     // load domain sources
     // transform sources: for complex domains: build one domain source DF using domain join rule
@@ -197,37 +213,43 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
 
     val sourcesWithDF: Seq[DomainSourceDataFrame] = loadTables(sources)
     require(sourcesWithDF.forall(s => s.df.nonEmpty), "All required tables should be accessible")
-    sourcesWithDF.foreach(s => logger.info(s"Source `${s.source}` table: ${s.df.get.schema.mkString(";")}"))
+    sourcesWithDF.foreach(s =>
+      logger.info(s"Source `${s.source}` table: ${s.df.get.schema.mkString(";")}")
+    )
 
     val domainsSources: Seq[DomainSourceDataFrame] = makeDomainSources(domainsNames, sourcesWithDF)
-    domainsSources.foreach(source => logger.info(s"Domain `${source.domain}` source: ${source.df.get.schema.mkString(";")}"))
+    domainsSources.foreach(source =>
+      logger.info(s"Domain `${source.domain}` source: ${source.df.get.schema.mkString(";")}")
+    )
 
     val domains: Map[String, DataFrame] = buildDomains(domainsSources)
-    domains.foreach { case(name, df) => logger.info(s"Domain `${name}`: ${df.schema.mkString(";")}") }
+    domains.foreach {
+      case (name, df) => logger.info(s"Domain `${name}`: ${df.schema.mkString(";")}")
+    }
 
     EtlFeatures.joinDomains(domains, joinRule, checkpointService)
   }
 
   private def addDtColumn(df: DataFrame): DataFrame = {
-    import sql.{functions => sf}
+    import sql.{ functions => sf }
     import implicits._
 
     df.withColumn(DT_COL_NAME, sf.lit(etlCfg.dt))
   }
 
   private def addUidTypeColumn(df: DataFrame): DataFrame = {
-    import sql.{functions => sf}
+    import sql.{ functions => sf }
     import implicits._
 
     df.withColumn(UID_TYPE_COL_NAME, sf.lit(etlCfg.uid_type))
   }
 
-  private def findSourceTables(): Seq[DomainSourceDataFrame] = {
+  private def findSourceTables(): Seq[DomainSourceDataFrame] =
     // TODO: use implicits for applying the Reader pattern to config
     sourcesFromConfig(new SourcesFinder(etlCfg)) // read sources info from config
-  }
 
-  private def makeDomainSources(domains: Seq[String], sources: Seq[DomainSourceDataFrame]): Seq[DomainSourceDataFrame] = {
+  private def makeDomainSources(domains: Seq[String], sources: Seq[DomainSourceDataFrame])
+    : Seq[DomainSourceDataFrame] = {
     // for each domain: use domain config to build source DF, joined-filtered-projected.
     // - for each source apply source filter-projection spec to table
     // - for each domain (optional: join sources) apply domain filter-projection spec to source
@@ -240,36 +262,47 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
     // find source config, filter and project table according to config
     logger.debug(s"Searching source definition for `${source}` ...")
 
-    val sourceConfig: TableConfig = domainConfig(source.domain).source.tables.find(t =>
-      t.name == source.table.name &&
+    val sourceConfig: TableConfig = domainConfig(source.domain)
+      .source
+      .tables
+      .find(t =>
+        t.name == source.table.name &&
         (t.alias.isEmpty || t.alias.contains(source.source.name))
-    ).getOrElse { throw new IllegalArgumentException(s"Malformed config: can't find table definition for `${source}`") }
+      )
+      .getOrElse {
+        throw new IllegalArgumentException(
+          s"Malformed config: can't find table definition for `${source}`"
+        )
+      }
 
     logger.debug(s"Found source definition `${sourceConfig}`.\nPreparing source DF ...")
     resultWithLog(
       EtlFeatures.prepareSource(source, sourceConfig),
-      logger.debug(s"source ready")
+      logger.debug(s"source ready"),
     )
   }
 
   private def domainConfig(name: String): DomainConfig = {
     logger.debug(s"Searching domain definition for `$name` ...")
 
-    val domainCfg = etlCfg.domains.find(d =>
-      d.name == name
-    ).getOrElse { throw new IllegalArgumentException(s"Malformed config: can't find domain definition for `$name`") }
+    val domainCfg = etlCfg.domains.find(d => d.name == name).getOrElse {
+      throw new IllegalArgumentException(
+        s"Malformed config: can't find domain definition for `$name`"
+      )
+    }
 
     logger.debug(s"Found domain definition `${domainCfg}`")
     domainCfg
   }
 
-  private def makeDomainSource(domain: String, sources: Seq[DomainSourceDataFrame]): DomainSourceDataFrame = {
-    //val utypes = sources.map(_.df.get.select(implicits.UID_TYPE_COL_NAME).distinct().collect().mkString(",")).mkString(";")
-    //logger.info(s"Building domain `${domain}` source from sources: `${sources}`, uid_types: `${utypes}`  ...")
+  private def makeDomainSource(domain: String, sources: Seq[DomainSourceDataFrame])
+    : DomainSourceDataFrame = {
+    // val utypes = sources.map(_.df.get.select(implicits.UID_TYPE_COL_NAME).distinct().collect().mkString(",")).mkString(";")
+    // logger.info(s"Building domain `${domain}` source from sources: `${sources}`, uid_types: `${utypes}`  ...")
     logger.debug(s"Building domain `${domain}` source from sources: `${sources}` ...")
     resultWithLog(
       EtlFeatures.makeDomainSource(domainConfig(domain), sources),
-      logger.debug("domain source created.")
+      logger.debug("domain source created."),
     )
   }
 
@@ -282,12 +315,15 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
 
   private def buildDomain(name: String, source: DataFrame): DataFrame = {
     // find domain config, build domain
-    val cfg = etlCfg.domains.find(_.name == name).getOrElse(sys.error(s"Can't find domain `${name}` in config"))
+    val cfg = etlCfg
+      .domains
+      .find(_.name == name)
+      .getOrElse(sys.error(s"Can't find domain `${name}` in config"))
     logger.debug(s"Building domain `${cfg}` ...`")
 
     resultWithLog(
       EtlFeatures.buildDomain(cfg, source),
-      logger.debug(s"domain `${name}` built.")
+      logger.debug(s"domain `${name}` built."),
     )
   }
 
@@ -303,11 +339,15 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
 
     val inputUidTypes: Seq[String] = mc.uid_types_input
     val outUidType: String = etlCfg.uid_type
-    val matchingTableDF: Dataset[MatchingTableRow] = prepareMatchingTable(mc.table, loadMatchingTable(mc.table))
+    val matchingTableDF: Dataset[MatchingTableRow] =
+      prepareMatchingTable(mc.table, loadMatchingTable(mc.table))
 
-    logger.info(s"Map `${inputUidTypes}` to `${outUidType}` using `${matchingTableDF.schema.mkString(";")}`")
+    logger.info(
+      s"Map `${inputUidTypes}` to `${outUidType}` using `${matchingTableDF.schema.mkString(";")}`"
+    )
     // TODO: get cache function from optional parameter
-    val matchedDF: DataFrame = mapUids(df, matchingTableDF, inputUidTypes, outUidType)(df => df.cache())
+    val matchedDF: DataFrame =
+      mapUids(df, matchingTableDF, inputUidTypes, outUidType)(df => df.cache())
     logger.info(s"Matching result: ${matchedDF.schema.mkString(";")}")
 
     logger.info("Aggregating features ...")
@@ -324,50 +364,67 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
     val domains: Seq[String] = JoinRule.enumerateItems(partitionJoinRule)
     logger.info(s"Domains to aggregate: `${domains.mkString(",")}`")
 
-    val aggConfig: Map[String, DomainAggregationConfig] = domains.map(name => (name, aggregationConfig(name))).toMap
+    val aggConfig: Map[String, DomainAggregationConfig] =
+      domains.map(name => (name, aggregationConfig(name))).toMap
     logger.info(s"Domains aggregation pipelines: `${aggConfig}`")
 
     aggregateDomains(df, aggConfig)
   }
 
   private def aggregationConfig(domain: String): DomainAggregationConfig = {
-    val domainCfg: DomainConfig = etlCfg.domains.find(d => d.name == domain)
+    val domainCfg: DomainConfig = etlCfg
+      .domains
+      .find(d => d.name == domain)
       .getOrElse(sys.error(s"Can't find domain `${domain}` in job config"))
 
-    val cfg: DomainAggregationConfig = domainCfg.agg.getOrElse({
-      logger.warn(s"Domain `${domain}` aggregation config not defined, default config will be used. Domain config: `${domainCfg}`")
+    val cfg: DomainAggregationConfig = domainCfg.agg.getOrElse {
+      logger.warn(
+        s"Domain `${domain}` aggregation config not defined, default config will be used. Domain config: `${domainCfg}`"
+      )
       defaultAggregationConfig
-    })
+    }
 
     logger.info(s"Loaded domain `${domain}` aggregation config `${cfg}`")
 
     if (cfg.contains(DOMAIN_AGG_KEY)) cfg
     else {
-      logger.warn(s"Can't find domain default aggregation section, default will be used." +
-        s" Aggregation config for domain must be under `${DOMAIN_AGG_KEY}` key.")
+      logger.warn(
+        s"Can't find domain default aggregation section, default will be used." +
+          s" Aggregation config for domain must be under `${DOMAIN_AGG_KEY}` key."
+      )
 
       cfg + (DOMAIN_AGG_KEY -> defaultAggregationConfig(DOMAIN_AGG_KEY))
     }
   }
-
 }
 
 object CmdLineParams {
   import jcommander.Parameter
 
-  @Parameter(names = Array("--etl-config"), required = true, description = "Job config, json text encoded base64")
+  @Parameter(
+    names = Array("--etl-config"),
+    required = true,
+    description = "Job config, json text encoded base64",
+  )
   var etl_config: String = _
 
   @Parameter(names = Array("--log-url"), required = false, description = "Log service endpoint")
   var log_url: String = ""
 
-  @Parameter(names = Array("--min-target-rows"), required = false, description = "Min. acceptable amount of rows in target")
+  @Parameter(
+    names = Array("--min-target-rows"),
+    required = false,
+    description = "Min. acceptable amount of rows in target",
+  )
   var min_target_rows: Long = EtlFeatures.MIN_TARGET_ROWS_DEFAULT
 
-  @Parameter(names = Array("--checkpoint-interval"), required = false, description = "Number of joins before checkpoint")
+  @Parameter(
+    names = Array("--checkpoint-interval"),
+    required = false,
+    description = "Number of joins before checkpoint",
+  )
   var checkpoint_interval: Int = EtlFeatures.CHECKPOINT_INTERVAL_DEFAULT
 
   override def toString: String =
     s"""CmdLineParams(etl_config="$etl_config", log_url="$log_url", min_target_rows=$min_target_rows), checkpoint_interval=${checkpoint_interval}"""
-
 }

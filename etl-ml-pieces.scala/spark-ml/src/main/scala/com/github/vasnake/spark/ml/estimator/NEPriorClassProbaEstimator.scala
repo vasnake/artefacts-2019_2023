@@ -1,37 +1,33 @@
-/**
- * Created by vasnake@gmail.com on 2024-07-29
- */
+/** Created by vasnake@gmail.com on 2024-07-29
+  */
 package com.github.vasnake.spark.ml.estimator
 
 //class NEPriorClassProbaEstimator {}
 
+import com.github.vasnake.`ml-core`.models.NEPriorClassProba
+import com.github.vasnake.spark.dataset.transform.StratifiedSampler
+import com.github.vasnake.spark.io.{ Logging => CustomLogging }
+import com.github.vasnake.spark.ml.model.NEPriorClassProbaModel
+import com.github.vasnake.spark.ml.shared._
 import org.apache.spark.ml.Estimator
+import org.apache.spark.ml.linalg.{ Vector => MLV, _ }
 import org.apache.spark.ml.param.ParamMap
-import org.apache.spark.ml.util.{DefaultParamsWritable, Identifiable}
-import org.apache.spark.ml.linalg.{Vectors, Vector => MLV}
-import org.apache.spark.sql.{DataFrame, Dataset}
+import org.apache.spark.ml.util._
+import org.apache.spark.sql._
 import org.apache.spark.sql.types.StructType
 
-import com.github.vasnake.spark.ml.shared._
-import com.github.vasnake.spark.ml.model.{NEPriorClassProbaModel}
-import com.github.vasnake.`ml-core`.models.{NEPriorClassProba}
-import com.github.vasnake.spark.dataset.transform.{StratifiedSampler}
-import com.github.vasnake.spark.io.{Logging => CustomLogging}
-
-/**
-  * Calculate aligned score probabilities according to given distribution in `prior` parameter.
+/** Calculate aligned score probabilities according to given distribution in `prior` parameter.
   *
   * Supports stratification: different models could be learn/apply to different groups of rows.
   *
   * Fitting involves materialization of input data, you should cache input DataFrame before calling `fit`.
   */
-class NEPriorClassProbaEstimator(override val uid: String) extends
-  Estimator[NEPriorClassProbaModel] with
-  NEPriorClassProbaParams with
-  ParamsServices with
-  CustomLogging with
-  DefaultParamsWritable
-{
+class NEPriorClassProbaEstimator(override val uid: String)
+    extends Estimator[NEPriorClassProbaModel]
+       with NEPriorClassProbaParams
+       with ParamsServices
+       with CustomLogging
+       with DefaultParamsWritable {
   def this() = this(Identifiable.randomUID("ne_prior_class_proba"))
 
   override def copy(extra: ParamMap): Estimator[NEPriorClassProbaModel] = defaultCopy(extra)
@@ -63,7 +59,7 @@ class NEPriorClassProbaEstimator(override val uid: String) extends
             s"size(score) = ${getNumClasses} and " +
             s"not exists(score, x -> isnull(x) or isnan(x) or x < 0) and " +
             s"exists(score, x -> x > 0)",
-          cacheFunction = cacheFunction
+          cacheFunction = cacheFunction,
         )
 
         // Dataset[(group, score)], cached
@@ -94,17 +90,21 @@ class NEPriorClassProbaEstimator(override val uid: String) extends
 
     copyValues(new NEPriorClassProbaModel(uid, configs)).setParent(this)
   }
-
 }
 
 object NEPriorClassProbaEstimator {
 
   // invalid data filtered out already
-  def distributedFit(group_score: DataFrame, numClasses: Int, priorValues: Array[Double]): Dataset[(String, String, Option[Array[Double]])] = {
+  def distributedFit(
+    group_score: DataFrame,
+    numClasses: Int,
+    priorValues: Array[Double],
+  ): Dataset[(String, String, Option[Array[Double]])] = {
     import group_score.sparkSession.implicits._
     val ds = group_score.as[(String, Array[Double])]
 
-    val fitOnGroup: (String, Iterator[(String, Array[Double])]) => (String, String, Option[Array[Double]]) =
+    val fitOnGroup
+      : (String, Iterator[(String, Array[Double])]) => (String, String, Option[Array[Double]]) =
       (group, rows) => {
         val res = fit(rows.map(_._2), numClasses, priorValues)
         (group, res._1, res._2)
@@ -113,7 +113,10 @@ object NEPriorClassProbaEstimator {
     ds.groupByKey(_._1).mapGroups(fitOnGroup)
   }
 
-  def fit(probs: Iterator[Array[Double]], numClasses: Int, priorValues: Array[Double]): (String, Option[Array[Double]]) =
+  def fit(
+    probs: Iterator[Array[Double]],
+    numClasses: Int,
+    priorValues: Array[Double],
+  ): (String, Option[Array[Double]]) =
     NEPriorClassProba.fit(probs, numClasses, priorValues)
-
 }

@@ -1,11 +1,10 @@
-/**
- * Created by vasnake@gmail.com on 2024-08-13
- */
+/** Created by vasnake@gmail.com on 2024-08-13
+  */
 package com.github.vasnake.spark.udf.`java-api`
 
-import org.scalatest._
-import flatspec._
-import matchers._
+//import org.scalatest._
+import org.scalatest.flatspec._
+import org.scalatest.matchers._
 
 class MapValuesOrderedUDFTest extends AnyFlatSpec with should.Matchers {
   val udf = new MapValuesOrderedUDF()
@@ -16,17 +15,16 @@ class MapValuesOrderedUDFTest extends AnyFlatSpec with should.Matchers {
       "c" -> Float.NaN,
       "a" -> 3.14f,
       "d" -> Float.NegativeInfinity,
-      "e" -> Float.PositiveInfinity
+      "e" -> Float.PositiveInfinity,
     )
 
     val keysOrder = Array("a", "b", "c", "d", "e")
 
     val actual = udf.call(
       kvs = inputData,
-      keys = keysOrder
+      keys = keysOrder,
     )
 
     assert(actual.map(x => s"${x}").toList === List("3.14", "null", "null", "null", "null"))
   }
-
 }

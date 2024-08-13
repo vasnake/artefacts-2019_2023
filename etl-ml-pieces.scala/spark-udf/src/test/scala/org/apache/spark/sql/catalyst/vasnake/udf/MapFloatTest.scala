@@ -1,18 +1,14 @@
-/**
- * Created by vasnake@gmail.com on 2024-08-13
- */
+/** Created by vasnake@gmail.com on 2024-08-13
+  */
 package org.apache.spark.sql.catalyst.vasnake.udf
 
-import org.scalatest._
-import flatspec._
-import matchers._
-
-import org.apache.spark.sql.DataFrame
-
 import com.github.vasnake.spark.test.LocalSpark
+import org.apache.spark.sql.DataFrame
+//import org.scalatest._
+import org.scalatest.flatspec._
+import org.scalatest.matchers._
 
 class MapFloatTest extends AnyFlatSpec with should.Matchers with LocalSpark with Checks {
-
   import Fixtures._
 
   lazy val inputDF: DataFrame = cache(
@@ -90,5 +86,4 @@ class MapFloatTest extends AnyFlatSpec with should.Matchers with LocalSpark with
     sumAndCheck2(input, "Map(2 -> 5.0, 1 -> 7.0)", "MapType(LongType,FloatType,true)")
     avgAndCheck2(input, "Map(2 -> 2.5, 1 -> 3.5)", "MapType(LongType,FloatType,true)")
   }
-
 }

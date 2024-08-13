@@ -1,25 +1,20 @@
-/**
- * Created by vasnake@gmail.com on 2024-07-17
- */
+/** Created by vasnake@gmail.com on 2024-07-17
+  */
 package org.apache.spark.sql.catalyst.vasnake.udf.accum
 
-import java.lang.{Double => jDouble, Long => jLong}
-
-import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.expressions._
-
-import org.apache.spark.sql.types._
-import org.apache.spark.unsafe.types.UTF8String
-
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, DataInputStream, DataOutputStream}
+import java.io._
+import java.lang.{ Double => jDouble, Long => jLong }
 
 import scala.annotation.tailrec
 import scala.collection.mutable
 
-class NumericAccumulatorWithCount[K, V]
-  extends Accumulator with Iterable[(K, V)]
-{
-  import org.apache.spark.sql.catalyst.vasnake.udf.accum.{NumericAccumulatorWithCount => CO}
+import org.apache.spark.sql.catalyst.InternalRow
+import org.apache.spark.sql.catalyst.expressions._
+import org.apache.spark.sql.types._
+import org.apache.spark.unsafe.types.UTF8String
+
+class NumericAccumulatorWithCount[K, V] extends Accumulator with Iterable[(K, V)] {
+  import org.apache.spark.sql.catalyst.vasnake.udf.accum.{ NumericAccumulatorWithCount => CO }
 
   override def toString(): String = s"NumericAccumulatorWithCount{accum = ${accum}"
 
@@ -32,25 +27,30 @@ class NumericAccumulatorWithCount[K, V]
 
   override def deserialize(bytes: Array[Byte]): Accumulator = CO.deserialize(bytes)(CO.kvOps)
 
-  def _serialize(implicit kv: MapKVOps[K, V]): Array[Byte] = {
-    val itemBuff = new Array[Byte](4 << 10)  // 4K item size, TODO: make it a configurable parameter
+  def _serialize(
+    implicit
+    kv: MapKVOps[K, V]
+  ): Array[Byte] = {
+    val itemBuff = new Array[Byte](4 << 10) // 4K item size, TODO: make it a configurable parameter
     val bos = new ByteArrayOutputStream()
     val out = new DataOutputStream(bos)
 
     try {
       val projection = UnsafeProjection.create(kv.sqlTypes)
       // Write kv pairs to byte buffer
-      accum.foreach { case (k, v) =>
-        val row = kv.internalRow(k, v)
-        val unsafeRow = projection.apply(row)
-        out.writeInt(unsafeRow.getSizeInBytes)
-        unsafeRow.writeToStream(out, itemBuff)
+      accum.foreach {
+        case (k, v) =>
+          val row = kv.internalRow(k, v)
+          val unsafeRow = projection.apply(row)
+          out.writeInt(unsafeRow.getSizeInBytes)
+          unsafeRow.writeToStream(out, itemBuff)
       }
       out.writeInt(-1)
       out.flush()
 
       bos.toByteArray
-    } finally {
+    }
+    finally {
       out.close()
       bos.close()
     }
@@ -70,29 +70,31 @@ class NumericAccumulatorWithCount[K, V]
 
       private var nextPair: (K, V) = computeNextPair()
 
-      @tailrec private def computeNextPair(): (K, V) = {
+      @tailrec private def computeNextPair(): (K, V) =
         if (_iter.hasNext) {
           val p = _iter.next()
           if (p._1 == null) computeNextPair() else p
         }
         else null
-      }
     }
   }
 
-  def containerIsNull(isnull: Boolean): Unit = {
+  def containerIsNull(isnull: Boolean): Unit =
     accum.update(
       null.asInstanceOf[K],
-      if (isnull) keyValueOps.positiveValue else keyValueOps.negativeValue
+      if (isnull) keyValueOps.positiveValue else keyValueOps.negativeValue,
     )
-  }
 
-  def containerIsNull: Boolean = {
-    if (accum.contains(null.asInstanceOf[K])) keyValueOps.isValuePositive(accum(null.asInstanceOf[K]))
+  def containerIsNull: Boolean =
+    if (accum.contains(null.asInstanceOf[K]))
+      keyValueOps.isValuePositive(accum(null.asInstanceOf[K]))
     else true
-  }
 
-  def changeValue(k: K, defaultValue: => V, mergeValue: (V) => V): V = {
+  def changeValue(
+    k: K,
+    defaultValue: => V,
+    mergeValue: (V) => V,
+  ): V = {
     // If the key doesn't exist yet in the hash map, set its value to defaultValue;
     // otherwise, set its value to mergeValue(oldValue).
     val v = accum.get(k).map(v => mergeValue(v)).getOrElse(defaultValue)
@@ -101,7 +103,6 @@ class NumericAccumulatorWithCount[K, V]
   }
 
   def get(k: K): Option[V] = accum.get(k)
-
 }
 
 object NumericAccumulatorWithCount {
@@ -110,12 +111,17 @@ object NumericAccumulatorWithCount {
   type VC = jLong
   type VN = jDouble
   type A = NumericAccumulatorWithCount[K, V]
-  val PRIMITIVE_KEY = "1"
+  val PRIMITIVE_KEY: String = "1"
 
   def apply(): NumericAccumulatorWithCount[K, V] = new NumericAccumulatorWithCount[K, V]()
-  def apply(accum: Accumulator): NumericAccumulatorWithCount[K, V] = accum.asInstanceOf[NumericAccumulatorWithCount[K, V]]
+  def apply(accum: Accumulator): NumericAccumulatorWithCount[K, V] =
+    accum.asInstanceOf[NumericAccumulatorWithCount[K, V]]
 
-  def deserialize(bytes: Array[Byte])(implicit kv: MapKVOps[K, V]): A = {
+  def deserialize(
+    bytes: Array[Byte]
+  )(implicit
+    kv: MapKVOps[K, V]
+  ): A = {
     val result = apply()
     val bis = new ByteArrayInputStream(bytes)
     val ins = new DataInputStream(bis)
@@ -131,24 +137,31 @@ object NumericAccumulatorWithCount {
       }
 
       result
-    } finally {
+    }
+    finally {
       ins.close()
       bis.close()
     }
   }
 
-  def changeValue(accum: Accumulator, k: K, defaultValue: => V, mergeValue: (V) => V): V = {
+  def changeValue(
+    accum: Accumulator,
+    k: K,
+    defaultValue: => V,
+    mergeValue: (V) => V,
+  ): V =
     // If the key doesn't exist yet in the hash map, set its value to defaultValue;
     // otherwise, set its value to mergeValue(oldValue).
     accum.asInstanceOf[A].changeValue(k, defaultValue, mergeValue)
-  }
 
-  def get(accum: Accumulator, k: K): V = accum.asInstanceOf[A].accum.getOrElse(k, sys.error(s"Key `${k}` doesn't exists in accumulator"))
+  def get(accum: Accumulator, k: K): V =
+    accum.asInstanceOf[A].accum.getOrElse(k, sys.error(s"Key `${k}` doesn't exists in accumulator"))
 
   def nullValue: V = AccumulatorValue(1, null.asInstanceOf[VN])
 
   val kvOps: MapKVOps[K, V] = new MapKVOps[K, V] {
-    override def makeValue[A, B](a: A, b: B): V = AccumulatorValue(a.asInstanceOf[VC], b.asInstanceOf[VN])
+    override def makeValue[A, B](a: A, b: B): V =
+      AccumulatorValue(a.asInstanceOf[VC], b.asInstanceOf[VN])
     override def positiveValue: V = AccumulatorValue(1, 1.0)
     override def negativeValue: V = AccumulatorValue(1, -1.0)
     override def isValuePositive(v: V): Boolean = v.value > 0
@@ -167,17 +180,15 @@ object NumericAccumulatorWithCount {
       else k.toString
     }
 
-    override def getValue(row: UnsafeRow): V = {
+    override def getValue(row: UnsafeRow): V =
       AccumulatorValue(
         row.get(1, LongType).asInstanceOf[VC],
-        row.get(2, DoubleType).asInstanceOf[VN]
+        row.get(2, DoubleType).asInstanceOf[VN],
       )
-    }
 
     override def decodeKey(k: Any): K = k.toString
     override def decodeValue(v: Any): V = AccumulatorValue(1, v.asInstanceOf[VN])
   }
-
 }
 
 trait MapKVOps[K, V] { // map pair operations type class
@@ -194,20 +205,21 @@ trait MapKVOps[K, V] { // map pair operations type class
   def decodeValue(v: Any): V // v.asInstanceOf[Number].doubleValue()
 }
 
-case class AccumulatorValue(count: NumericAccumulatorWithCount.VC, value: NumericAccumulatorWithCount.VN)
+case class AccumulatorValue(
+  count: NumericAccumulatorWithCount.VC,
+  value: NumericAccumulatorWithCount.VN,
+)
 
 trait Accumulator {
   def serialize: Array[Byte]
   def deserialize(bytes: Array[Byte]): Accumulator
 
-  /**
-    * Set `container is null` property, for "container" columns like map or array.
+  /** Set `container is null` property, for "container" columns like map or array.
     * @param isnull container is null if it's true
     */
   def containerIsNull(isnull: Boolean): Unit
 
-  /**
-    * Get `container is null` property, for "container" columns like map or array.
+  /** Get `container is null` property, for "container" columns like map or array.
     * @return true if container is null, false otherwise
     */
   def containerIsNull: Boolean

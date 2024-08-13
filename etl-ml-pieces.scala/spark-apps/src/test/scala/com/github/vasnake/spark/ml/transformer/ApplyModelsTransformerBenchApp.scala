@@ -1,35 +1,28 @@
-/**
- * Created by vasnake@gmail.com on 2024-08-13
- */
+/** Created by vasnake@gmail.com on 2024-08-13
+  */
 package com.github.vasnake.spark.ml.transformer
 
 import com.github.vasnake.`etl-core`.GroupedFeatures
-import com.github.vasnake.`ml-models`.complex.ComplexMLModel
+import com.github.vasnake.`ml-models`.complex._
 import com.github.vasnake.common.file.FileToolbox
-import com.github.vasnake.spark.app.SparkApp
 import com.github.vasnake.core.text.StringToolbox
 import com.github.vasnake.json.JsonToolbox
 import com.github.vasnake.json.read.ModelConfig
-import com.github.vasnake.`ml-models`.complex._
-
-import org.apache.spark.sql.catalyst.encoders.{ExpressionEncoder, RowEncoder}
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
+import com.github.vasnake.spark.app.SparkApp
 import org.apache.spark.sql
+import org.apache.spark.sql._
+import org.apache.spark.sql.catalyst.encoders._
 import org.apache.spark.storage.StorageLevel
-
 import org.slf4j.LoggerFactory
 
-/**
-{{{
-Run scala-apply benchmarks. This code was useful during 'optimisation' stage of development.
-see run-job-dm-6915.sh
-
-}}}
+/** {{{
+  * Run scala-apply benchmarks. This code was useful during 'optimisation' stage of development.
+  * see run-job-dm-6915.sh
+  *
+  * }}}
   */
 object ApplyModelsTransformerBenchApp extends SparkApp {
-
   class Config(args: Iterable[String]) {
-
     private val cfg = {
       import StringToolbox._
 
@@ -70,7 +63,11 @@ object ApplyModelsTransformerBenchApp extends SparkApp {
     override def toString: String = cfg.toList.map(kv => s"${kv._1}=${kv._2}").sorted.mkString(";")
   }
 
-  case class DummyModel(groupedFeatures: GroupedFeatures, audienceName: String, mulFactor: Double) extends ComplexMLModel {
+  case class DummyModel(
+    groupedFeatures: GroupedFeatures,
+    audienceName: String,
+    mulFactor: Double,
+  ) extends ComplexMLModel {
     override def isOK: Boolean = true
 
     override def apply(features: Array[Double]): Seq[Any] = {
@@ -82,16 +79,18 @@ object ApplyModelsTransformerBenchApp extends SparkApp {
         scores_raw, // raw scores array
         scores, // equalized scores array
         audienceName, // project id (target)
-        category
+        category,
       )
     }
 
     private val category = "positive"
   }
 
-  run { case args => implicit spark =>
-    println(s"ApplyModelsJob arguments: <${args.mkString(";")}>")
-    applyModels(spark, new Config(args))
+  run {
+    case args =>
+      implicit spark =>
+        println(s"ApplyModelsJob arguments: <${args.mkString(";")}>")
+        applyModels(spark, new Config(args))
   }
 
   def applyModels(spark: SparkSession, config: Config): Unit = {
@@ -105,33 +104,52 @@ object ApplyModelsTransformerBenchApp extends SparkApp {
     log.info(s"loaded features index, features: ${groupedFeatures.featuresSize}")
 
     // model config, optional
-    val tfidfScaledSgdcModelCfg = config.tfidfScaledSgdcModelPath.map(path =>
-      ModelConfig.loadLalTfidfScaledSgdcModelConfigFromJson(
-        JsonToolbox.parseJson(
-          FileToolbox.loadTextFile(path))))
+    val tfidfScaledSgdcModelCfg = config
+      .tfidfScaledSgdcModelPath
+      .map(path =>
+        ModelConfig.loadLalTfidfScaledSgdcModelConfigFromJson(
+          JsonToolbox.parseJson(FileToolbox.loadTextFile(path))
+        )
+      )
     if (tfidfScaledSgdcModelCfg.isDefined) log.info("loaded LalTfidfScaledSgdcModel config")
 
     // model config, optional
-    val binarizedMultinomialNbModelCfg = config.binarizedMultinomialNbModelPath.map(path =>
-      ModelConfig.loadLalBinarizedMultinomialNbModelConfigFromJson(
-        JsonToolbox.parseJson((
-          FileToolbox.loadTextFile(path)))))
-    if (binarizedMultinomialNbModelCfg.isDefined) log.info("loaded LalBinarizedMultinomialNbModel config")
+    val binarizedMultinomialNbModelCfg = config
+      .binarizedMultinomialNbModelPath
+      .map(path =>
+        ModelConfig.loadLalBinarizedMultinomialNbModelConfigFromJson(
+          JsonToolbox.parseJson(FileToolbox.loadTextFile(path))
+        )
+      )
+    if (binarizedMultinomialNbModelCfg.isDefined)
+      log.info("loaded LalBinarizedMultinomialNbModel config")
 
     // models to apply
-    val models: Seq[ComplexMLModel] = tfidfScaledSgdcModelCfg.map(cfg => Seq(
-      LalTfidfScaledSgdcModel(cfg, groupedFeatures, "tfidf1", "OKID"),
-      LalTfidfScaledSgdcModel(cfg, groupedFeatures, "tfidf2", "VKID"),
-      LalTfidfScaledSgdcModel(cfg, groupedFeatures, "tfidf3", "EMAIL")
-    )).getOrElse(binarizedMultinomialNbModelCfg.map(cfg => Seq(
-      LalBinarizedMultinomialNbModel(cfg, groupedFeatures, "binmnb1", "OKID"),
-      LalBinarizedMultinomialNbModel(cfg, groupedFeatures, "binmnb2", "VKID"),
-      LalBinarizedMultinomialNbModel(cfg, groupedFeatures, "binmnb3", "EMAIL")
-    )).getOrElse(Seq(
-      DummyModel(groupedFeatures, "dm1", 0.1),
-      DummyModel(groupedFeatures, "dm2", 0.01),
-      DummyModel(groupedFeatures, "dm3", 0.001)
-    )))
+    val models: Seq[ComplexMLModel] = tfidfScaledSgdcModelCfg
+      .map(cfg =>
+        Seq(
+          LalTfidfScaledSgdcModel(cfg, groupedFeatures, "tfidf1", "OKID"),
+          LalTfidfScaledSgdcModel(cfg, groupedFeatures, "tfidf2", "VKID"),
+          LalTfidfScaledSgdcModel(cfg, groupedFeatures, "tfidf3", "EMAIL"),
+        )
+      )
+      .getOrElse(
+        binarizedMultinomialNbModelCfg
+          .map(cfg =>
+            Seq(
+              LalBinarizedMultinomialNbModel(cfg, groupedFeatures, "binmnb1", "OKID"),
+              LalBinarizedMultinomialNbModel(cfg, groupedFeatures, "binmnb2", "VKID"),
+              LalBinarizedMultinomialNbModel(cfg, groupedFeatures, "binmnb3", "EMAIL"),
+            )
+          )
+          .getOrElse(
+            Seq(
+              DummyModel(groupedFeatures, "dm1", 0.1),
+              DummyModel(groupedFeatures, "dm2", 0.01),
+              DummyModel(groupedFeatures, "dm3", 0.001),
+            )
+          )
+      )
 
     val transformer = getTransformer(models, keepColumns = Seq("uid"))
     log.info(s"created transformer ${transformer}")
@@ -156,33 +174,40 @@ object ApplyModelsTransformerBenchApp extends SparkApp {
     if (config.scalameter == "on") {
       val timeBench = {
         import org.scalameter._
-        org.scalameter.config(
-          Key.exec.minWarmupRuns -> 1,
-          Key.exec.maxWarmupRuns -> 2,
-          Key.exec.benchRuns -> 3,
-          Key.verbose -> false
-        ).withWarmer(new Warmer.Default)
+        org
+          .scalameter
+          .config(
+            Key.exec.minWarmupRuns -> 1,
+            Key.exec.maxWarmupRuns -> 2,
+            Key.exec.benchRuns -> 3,
+            Key.verbose -> false,
+          )
+          .withWarmer(new Warmer.Default)
       }
       log.info(s"scalameter time bench created, measuring ...")
-      val benchResult = timeBench measure { transform(input, transformer, 0) }
+      val benchResult = timeBench measure transform(input, transformer, 0)
       log.info(s"transform time: ${benchResult}")
     }
   }
 
-  private def transform(input: DataFrame, transformer: ApplyModelsTransformer, round: Int): Unit = {
+  private def transform(
+    input: DataFrame,
+    transformer: ApplyModelsTransformer,
+    round: Int,
+  ): Unit = {
     if (!transformer.initialize()) sys.error("can't initialize scala-apply transformer")
     val output: DataFrame = transformer.transform(input)
 
     // materialize methods
-    //println(output.count())
-    //output.describe().show(truncate = false)
+    // println(output.count())
+    // output.describe().show(truncate = false)
 
     // WARNING: iterators are lazy!
-    //import input.sparkSession.implicits._
-    //output.mapPartitions(iter => Iterator(MurmurHash3.unorderedHash(iter.map(_.hashCode())))).collect()
+    // import input.sparkSession.implicits._
+    // output.mapPartitions(iter => Iterator(MurmurHash3.unorderedHash(iter.map(_.hashCode())))).collect()
 
     // should be the fastest materializer:
-    //output.foreachPartition(rows => println(s"partition hash: ${MurmurHash3.unorderedHash(rows.map(_.hashCode))}"))
+    // output.foreachPartition(rows => println(s"partition hash: ${MurmurHash3.unorderedHash(rows.map(_.hashCode))}"))
 
     // 0.5 sec faster than hash
     val materialize: (Iterator[sql.Row] => Unit) =
@@ -190,19 +215,21 @@ object ApplyModelsTransformerBenchApp extends SparkApp {
 
     output.foreachPartition(materialize)
 
-    //if (round == 1) output.explain(extended = true)
+    // if (round == 1) output.explain(extended = true)
   }
 
-  private def getTransformer(grinderModels: Seq[ComplexMLModel], keepColumns: Seq[String] = Seq.empty) =
+  private def getTransformer(
+    grinderModels: Seq[ComplexMLModel],
+    keepColumns: Seq[String] = Seq.empty,
+  ) =
     new ApplyModelsTransformer() {
-      override def buildConfig(): ApplyModelsTransformerConfig = ApplyModelsTransformerConfig(grinderModels, keepColumns)
+      override def buildConfig(): ApplyModelsTransformerConfig =
+        ApplyModelsTransformerConfig(grinderModels, keepColumns)
     }
 
   private def explode(df: DataFrame, factor: Int): DataFrame = {
     implicit val encoder: ExpressionEncoder[Row] = RowEncoder(df.schema)
-    df.flatMap(row => for { _ <- (1 to factor) } yield row.copy())
+    df.flatMap(row => for { _ <- 1 to factor } yield row.copy())
     // outdf.repartition(1).write.mode("overwrite").option("compression", "gzip").parquet(path)
   }
-
 }
-

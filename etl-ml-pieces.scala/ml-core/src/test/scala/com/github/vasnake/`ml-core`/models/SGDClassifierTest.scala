@@ -1,19 +1,16 @@
-/**
- * Created by vasnake@gmail.com on 2024-08-12
- */
+/** Created by vasnake@gmail.com on 2024-08-12
+  */
 package com.github.vasnake.`ml-core`.models
 
-import org.scalatest._
-import flatspec._
-import matchers._
-import org.scalactic.Equality
-
-import com.github.vasnake.test.{Conversions => CoreConversions}
-import com.github.vasnake.test.EqualityCheck.createSeqFloatsEquality
 import com.github.vasnake.common.file.FileToolbox
+import com.github.vasnake.test.EqualityCheck.createSeqFloatsEquality
+import com.github.vasnake.test.{ Conversions => CoreConversions }
+import org.scalactic.Equality
+//import org.scalatest._
+import org.scalatest.flatspec._
+import org.scalatest.matchers._
 
 class SGDClassifierTest extends AnyFlatSpec with should.Matchers {
-
   import CoreConversions.implicits._
   import SGDClassifierTest._
 
@@ -21,7 +18,7 @@ class SGDClassifierTest extends AnyFlatSpec with should.Matchers {
     val config = PMMLEstimatorConfig(
       featuresLength = 0,
       predictLength = 0,
-      fileName = ""
+      fileName = "",
     )
     val estimator = SGDClassifier(config)
     assert(estimator.config.fileName === "")
@@ -31,7 +28,7 @@ class SGDClassifierTest extends AnyFlatSpec with should.Matchers {
     val config = PMMLEstimatorConfig(
       featuresLength = 3,
       predictLength = 1,
-      fileName = "test.pmml"
+      fileName = "test.pmml",
     )
     val estimator = SGDClassifier(config)
 
@@ -46,7 +43,7 @@ class SGDClassifierTest extends AnyFlatSpec with should.Matchers {
     val config = PMMLEstimatorConfig(
       featuresLength = 4,
       predictLength = 3,
-      fileName = fpath
+      fileName = fpath,
     )
     val estimator = SGDClassifier(config)
     estimator.init()
@@ -56,24 +53,24 @@ class SGDClassifierTest extends AnyFlatSpec with should.Matchers {
     val config = PMMLEstimatorConfig(
       featuresLength = 4,
       predictLength = 3,
-      fileName = FileToolbox.getResourcePath(this, "/sgd_classifier.pmml")
+      fileName = FileToolbox.getResourcePath(this, "/sgd_classifier.pmml"),
     )
     val estimator = SGDClassifier(config)
     estimator.init()
 
     implicit val seqFloatEquals = createSeqFloatsEquality((a, b) => floatsAreEqual(a, b)(0.0001f))
 
-    input.indices.foreach(idx =>{
+    input.indices.foreach { idx =>
       val output: Array[Double] = estimator.predict(input(idx))
       assert(output.toSeq.toFloat === expected(idx))
-    })
+    }
   }
 
   it should "predict having sparse inputFields in pmml" in {
     val config = PMMLEstimatorConfig(
       featuresLength = 200,
       predictLength = 2,
-      pmmlDump = sparsePmml
+      pmmlDump = sparsePmml,
     )
 
     val input: Seq[Array[Float]] = sparseInput
@@ -81,7 +78,8 @@ class SGDClassifierTest extends AnyFlatSpec with should.Matchers {
     input.foreach(vec => assert(vec.length === 200))
 
     val expected: Seq[Float] = Seq(
-      1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0
+      1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0,
+      1.0,
     ).map(_.toFloat)
     assert(expected.length === 20)
 
@@ -96,7 +94,7 @@ class SGDClassifierTest extends AnyFlatSpec with should.Matchers {
     val config = PMMLEstimatorConfig(
       featuresLength = 4,
       predictLength = 3,
-      fileName = FileToolbox.getResourcePath(this, "/sgd_classifier.pmml")
+      fileName = FileToolbox.getResourcePath(this, "/sgd_classifier.pmml"),
     )
     val estimator = SGDClassifier(config)
     estimator.init()
@@ -110,7 +108,7 @@ class SGDClassifierTest extends AnyFlatSpec with should.Matchers {
     val config = PMMLEstimatorConfig(
       featuresLength = 4,
       predictLength = 1,
-      fileName = FileToolbox.getResourcePath(this, "/sgd_classifier.pmml")
+      fileName = FileToolbox.getResourcePath(this, "/sgd_classifier.pmml"),
     )
     val estimator = SGDClassifier(config)
 
@@ -118,7 +116,6 @@ class SGDClassifierTest extends AnyFlatSpec with should.Matchers {
       estimator.init()
     }
   }
-
 }
 
 object SGDClassifierTest {
@@ -144,8 +141,12 @@ object SGDClassifierTest {
       | 0.0, -4.909475458221696, -8.509347770154061, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -7.916532820860374, 0.0, 0.0, 0.0, 0.0, 0.0, -14.077150560273637, -14.794535177618732, 0.0, 0.0, 0.0, 0.0, -17.058216391772884, 0.0, 0.0, 0.0, 0.0, 0.0, -30.84195064894865, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 7.863245494842499, 0.0, 0.0, 12.441408897932508, -5.677430168231016, 0.0, 0.0, 0.0, 0.0, 4.833748003779386, -21.927680672747886, 0.0, 0.0, 0.0, 0.0, 0.0, -4.940268017844292, 0.0, -6.585364407570895, 0.0, 0.0, -10.510311177927896, -14.564790184362261, 0.0, -7.600896919428566, -17.756864315030146, 0.0, 0.0, 0.0, 0.0, 4.735930133575019, -4.533560517189799, 0.0, 0.0, 5.632216853512475, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 7.905134716323109, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -14.921794337203032, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -5.129457064910389, 0.0, 0.0, 0.0, 0.0, 0.0, 5.737399923830968, 0.0, -5.719784171248021, 0.0, 0.0, 0.0, 0.0, -4.380944287080926, 0.0, 4.064071891793434, 0.0, 0.0, 0.0, 0.0, -17.564463577946157, 0.0, 0.0, 0.0, 19.888270256655346, 0.0, 0.0, 0.0, 0.0, -9.591036423372678, 0.0, 5.758306632816075, -10.078953467462611, 0.0, 0.0, 0.0, 0.0, 7.489457524151877, 0.0, 0.0, 0.0, -51.84115224860294, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -49.326086333244255, 0.0, 0.0, 6.734744220565346, 0.0, 0.0, 0.0, -5.719784171248021, -26.148588816461903, -17.564463577946157, -4.903337097001144, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 6.3534588546202855, 0.0, 0.0, 0.0, -7.226823291590486, 0.0, 0.0, -4.80928868184378, 0.0, 20.399224430144137, 0.0, 0.0, 7.999284135900612, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
       | 0.0, 53.45869242520451, 0.0, 0.0, 0.0, 18.47453475026194, -6.171300183640114, 9.014405579793547, 0.0, 0.0, 0.0, 0.0, -8.476637744722467, 0.0, 0.0, 0.0, 0.0, 4.211614119411372, 0.0, 7.538064955254073, 0.0, 4.057528060033032, 0.0, 0.0, 30.392875951289614, 7.930583831542968, 0.0, 0.0, 0.0, 0.0, -53.602905768396305, 0.0, 0.0, 8.265346784131962, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.258837745060399, 0.0, 0.0, 0.0, 0.0, 11.45687574849311, -4.395547164785265, 0.0, 0.0, -6.791878003447843, 0.0, 0.0, 36.7972899990614, -7.254709594483552, 0.0, -8.272036258593287, -31.333179624890267, 0.0, 0.0, 0.0, 0.0, 0.0, 5.6821436732052435, 0.0, 0.0, -8.731671528203979, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.304991990787729, 0.0, -10.649702997490722, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 13.888475212813566, 0.0, 0.0, 0.0, -7.442253917871312, 0.0, 0.0, 0.0, 0.0, -4.403775971399794, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -8.073134979748314, 0.0, -7.2199082732803195, 0.0, 0.0, 10.734994370447888, -7.825962493499959, 7.092759561309137, 0.0, 0.0, -9.203656696191642, 0.0, -7.658836966880582, 0.0, 0.0, 0.0, 9.555801210520908, -10.018653624249223, -19.587536025908122, 0.0, 0.0, 4.517776401691477, 0.0, 0.0, 0.0, 8.265346784131962, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -35.47469198171174, 9.014405579793547, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.669774984562766, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 10.78601971601601, 0.0, 0.0, -6.506933254227406, -4.395547164785265, 0.0, 0.0, -8.073134979748314, -20.929160552170288, -7.658836966880582, 11.991208740636683, 0.0, 0.0, 8.859463564635867, 0.0, 0.0, 0.0, -4.024603183731632, -5.3100974206379385, 0.0, -7.501563094309512, 0.0, 0.0, 0.0, 0.0, 38.71898081363767, 0.0, -20.1862075297673, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
       | 0.0, -6.041197498621786, 0.0, 0.0, 0.0, 6.973558458545257, 0.0, 0.0, 0.0, 0.0, 0.0, 4.2458899688557965, 8.477930597809113, 0.0, 0.0, 0.0, 0.0, -12.659270611114337, 0.0, 38.61611874931019, 0.0, 11.73886826740476, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -9.856784229996398, 0.0, 7.68891866912011, 0.0, 0.0, 0.0, 0.0, -6.078077481212682, -5.316121060081505, 0.0, -4.0550143661748885, 0.0, -4.429518031008868, 0.0, 0.0, 0.0, 0.0, 33.864268610115815, 0.0, 0.0, 0.0, 0.0, 6.253681882997736, 4.443064262961547, 0.0, -7.994363364186999, 0.0, 0.0, 4.50175395016301, 7.151157019264575, 0.0, 3.836526480012708, -24.58877014061829, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 6.5545150297889805, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -10.898111662759176, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.927353040622265, -19.62774495991418, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 10.109287008592506, 0.0, -7.7927960683370125, 0.0, 0.0, 0.0, 0.0, 0.0, 6.43540051499908, 6.581179060834059, 0.0, 0.0, 0.0, 0.0, 0.0, 30.423410478806446, -5.155438577345391, 3.947027580426326, 6.926868888647855, 0.0, -4.32455300097529, 0.0, -14.935793945141752, 8.497667194185794, 4.2458899688557965, 0.0, 0.0, 0.0, -8.191766678071897, 0.0, 0.0, 0.0, 3.927353040622265, 0.0, 0.0, -9.856784229996398, 0.0, 0.0, 0.0, -9.168184905649463, 0.0, 0.0, 0.0, 31.42271985306877, 0.0, 0.0, 0.0, 0.0, 9.708681238377011, 0.0, 0.0, -8.502378368579187, 0.0, 0.0, -8.203751436617441, 0.0, 7.68891866912011, -7.562782730848495, -12.33473126515925, 0.0, 0.0, 0.0, 6.253681882997736, 0.0, 0.0, 0.0, 9.078916591910666, -14.935793945141752, 7.75102873007489, 0.0, 0.0, 0.0, 8.497667194185794, 0.0, -3.8821377047722585, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 37.28630857019705, 0.0, 19.942078980604965, 10.109287008592506, 0.0, 4.700488316357877, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
-      |""".stripMargin.trim
-      .split('\n').toSeq.map(line => line.trim.split(',').map(x => x.trim.toFloat))
+      |"""
+      .stripMargin
+      .trim
+      .split('\n')
+      .toSeq
+      .map(line => line.trim.split(',').map(x => x.trim.toFloat))
 
   val sparsePmml: String =
     """
@@ -538,7 +539,7 @@ object SGDClassifierTest {
     Seq(2, 3, 4, 5),
     Seq(6, 0, 0, 0),
     Seq(7, 0, 8, 0),
-    Seq(0, 9, 8, 7)
+    Seq(0, 9, 8, 7),
   ).map(_.map(_.toFloat).toArray)
 
   val expected: Seq[Seq[Float]] = Seq(
@@ -546,16 +547,20 @@ object SGDClassifierTest {
     Seq(0.328769, 0.334168, 0.337063),
     Seq(0.332482, 0.334245, 0.333273),
     Seq(0.331098, 0.333233, 0.335669),
-    Seq(0.324599, 0.334442, 0.340959)
+    Seq(0.324599, 0.334442, 0.340959),
   ).map(_.map(_.toFloat))
 
-  def floatsAreEqual(a: Float, b: Float)(implicit tolerance: Float): Boolean = {
+  def floatsAreEqual(
+    a: Float,
+    b: Float,
+  )(implicit
+    tolerance: Float
+  ): Boolean =
     (a <= b + tolerance) && (a >= b - tolerance)
-  }
 
   object implicits {
     implicit val tolerance: Float = 0.0001f
-    implicit val seqFloatEquals: Equality[Seq[Float]] = createSeqFloatsEquality((a, b) => floatsAreEqual(a, b))
+    implicit val seqFloatEquals: Equality[Seq[Float]] =
+      createSeqFloatsEquality((a, b) => floatsAreEqual(a, b))
   }
-
 }

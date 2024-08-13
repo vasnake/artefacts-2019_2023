@@ -1,18 +1,14 @@
-/**
- * Created by vasnake@gmail.com on 2024-08-13
- */
+/** Created by vasnake@gmail.com on 2024-08-13
+  */
 package org.apache.spark.sql.catalyst.vasnake.udf
 
-import org.scalatest._
-import flatspec._
-import matchers._
-
-import org.apache.spark.sql
-
 import com.github.vasnake.spark.test.LocalSpark
+import org.apache.spark.sql
+//import org.scalatest._
+import org.scalatest.flatspec._
+import org.scalatest.matchers._
 
 class PrimitiveDoubleTest extends AnyFlatSpec with should.Matchers with LocalSpark with Checks {
-
   import sql.DataFrame
   import Fixtures._
   import functions.generic_sum
@@ -31,7 +27,9 @@ class PrimitiveDoubleTest extends AnyFlatSpec with should.Matchers with LocalSpa
     show(input, message = "input")
 
     // DataFrame API
-    def nativeCall = input.groupBy("part").agg(sql.Column(GenericSum(sql.Column("feature").expr).toAggregateExpression))
+    def nativeCall = input
+      .groupBy("part")
+      .agg(sql.Column(GenericSum(sql.Column("feature").expr).toAggregateExpression))
     val output = input.groupBy("part").agg(generic_sum("feature"))
     output.explain(extended = true)
     show(output, message = "generic imperative sum output, DataFrame API", force = true)
@@ -43,7 +41,7 @@ class PrimitiveDoubleTest extends AnyFlatSpec with should.Matchers with LocalSpa
     show(
       spark.sql("select part, generic_sum(feature) from features group by part"),
       message = "generic_sum output, SQL API",
-      force = true
+      force = true,
     )
   }
 
@@ -95,5 +93,4 @@ class PrimitiveDoubleTest extends AnyFlatSpec with should.Matchers with LocalSpa
     mfqAndCheckFull(input, expected = "1.0", index = "0")
     mfqAndCheckFull(input, expected = "42.0", prefer = "42.0", index = "0", threshold = "1") // prefer exists
   }
-
 }

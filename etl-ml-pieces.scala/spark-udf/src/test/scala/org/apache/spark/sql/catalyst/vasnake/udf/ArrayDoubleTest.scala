@@ -1,18 +1,14 @@
-/**
- * Created by vasnake@gmail.com on 2024-08-13
- */
+/** Created by vasnake@gmail.com on 2024-08-13
+  */
 package org.apache.spark.sql.catalyst.vasnake.udf
 
-import org.scalatest._
-import flatspec._
-import matchers._
-
-import org.apache.spark.sql.DataFrame
-
 import com.github.vasnake.spark.test.LocalSpark
+import org.apache.spark.sql.DataFrame
+//import org.scalatest._
+import org.scalatest.flatspec._
+import org.scalatest.matchers._
 
 class ArrayDoubleTest extends AnyFlatSpec with should.Matchers with LocalSpark with Checks {
-
   import Fixtures._
 
   lazy val inputDF: DataFrame = cache(
@@ -68,5 +64,4 @@ class ArrayDoubleTest extends AnyFlatSpec with should.Matchers with LocalSpark w
     maxAndCheck(input, "WrappedArray(1.0, 2.0, 3.0)")
     avgAndCheck(input, "WrappedArray(1.0, 2.0, 3.0)")
   }
-
 }

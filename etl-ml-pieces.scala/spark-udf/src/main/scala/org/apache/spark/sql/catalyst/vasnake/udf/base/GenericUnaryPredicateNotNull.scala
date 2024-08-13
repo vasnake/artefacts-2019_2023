@@ -1,26 +1,27 @@
-/**
- * Created by vasnake@gmail.com on 2024-07-19
- */
+/** Created by vasnake@gmail.com on 2024-07-19
+  */
 package org.apache.spark.sql.catalyst.vasnake.udf.base
 
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.expressions.codegen.{CodegenContext, ExprCode, CodeGenerator, FalseLiteral}
-import org.apache.spark.sql.catalyst.expressions.codegen.Block.BlockHelper
-import org.apache.spark.sql.catalyst.expressions.{
-  UnaryExpression, ImplicitCastInputTypes, Predicate
-}
+import org.apache.spark.sql.catalyst.expressions._
+import org.apache.spark.sql.catalyst.expressions.codegen
 
-trait GenericUnaryPredicateNotNull extends UnaryExpression with Predicate with ImplicitCastInputTypes {
+trait GenericUnaryPredicateNotNull
+    extends UnaryExpression
+       with Predicate
+       with ImplicitCastInputTypes {
+
   // Base implementation
-
-  override final def nullable: Boolean = false
+  final override def nullable: Boolean = false
 
   override def eval(input: InternalRow): Any = nullUnsafeEval(child.eval(input))
 
-  private def nullUnsafeEval(input: Any): Any = {
+  private def nullUnsafeEval(input: Any): Any =
     if (input == null) onNullInput
     else nullSafeEval(input)
-  }
+
+  import codegen._
+  import codegen.Block.BlockHelper
 
   override def doGenCode(ctx: CodegenContext, ev: ExprCode): ExprCode = {
     val eval = child.genCode(ctx)
@@ -32,7 +33,7 @@ trait GenericUnaryPredicateNotNull extends UnaryExpression with Predicate with I
         ${CodeGenerator.javaType(dataType)} ${ev.value} = ${CodeGenerator.defaultValue(dataType)};
         ${ev.value} = ${eval.isNull} ? (boolean) $javaOnNullInput : (boolean) ${javaNullSafeEval(eval.value)};
       """,
-      isNull = FalseLiteral
+      isNull = FalseLiteral,
     )
   }
 
@@ -45,5 +46,4 @@ trait GenericUnaryPredicateNotNull extends UnaryExpression with Predicate with I
   // with codegen
   def javaOnNullInput: String
   def javaNullSafeEval(input: Any): String
-
 }

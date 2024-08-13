@@ -1,16 +1,17 @@
-/**
- * Created by vasnake@gmail.com on 2024-08-09
- */
+/** Created by vasnake@gmail.com on 2024-08-09
+  */
 package com.github.vasnake.spark.io.hive
 
 import com.github.vasnake.spark.test.LocalSpark
-
 import org.scalatest._
-import flatspec._
-import matchers._
+import org.scalatest.flatspec._
+import org.scalatest.matchers._
 
-class TableSmartWriterTest extends AnyFlatSpec with should.Matchers with PrivateMethodTester with LocalSpark {
-
+class TableSmartWriterTest
+    extends AnyFlatSpec
+       with should.Matchers
+       with PrivateMethodTester
+       with LocalSpark {
   it should "produce pool size parameter value" in {
     // private def _poolSizeParameterValue(spark: SparkSession, key: String, default: Int)
     val key = TableSmartWriter.METASTORE_CONNECTIONS_POOL_SIZE_KEY
@@ -43,13 +44,17 @@ class TableSmartWriterTest extends AnyFlatSpec with should.Matchers with Private
       (8, 7, 3, 3),
       (2, 7, 3, 2),
       (1, 7, 3, 1),
-    ).foreach { case (maxSize, partsTotalCount, chunkSize, expected) =>
-      assert(TableSmartWriter.invokePrivate(_poolSize(maxSize, partsTotalCount, chunkSize)) === expected)
+    ).foreach {
+      case (maxSize, partsTotalCount, chunkSize, expected) =>
+        assert(
+          TableSmartWriter.invokePrivate(
+            _poolSize(maxSize, partsTotalCount, chunkSize)
+          ) === expected
+        )
     }
 
     assertThrows[AssertionError] {
       TableSmartWriter.invokePrivate(_poolSize(-1, 7, 3))
     }
   }
-
 }

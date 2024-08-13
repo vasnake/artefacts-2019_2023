@@ -1,24 +1,25 @@
-/**
- * Created by vasnake@gmail.com on 2024-08-13
- */
+/** Created by vasnake@gmail.com on 2024-08-13
+  */
 package com.github.vasnake.core.num
 
-import org.scalatest._
-import flatspec._
-import matchers._
-//import org.scalactic.Equality
-
-//import com.github.vasnake.test.Conversions
-//import com.github.vasnake.test.Conversions.floatsAreEqual
-//import com.github.vasnake.test.EqualityCheck.createSeqFloatsEquality
 import com.github.vasnake.core.num.NumPy._
+//import org.scalatest._
+import org.scalatest.flatspec._
+import org.scalatest.matchers._
 
 class NumPyTest extends AnyFlatSpec with should.Matchers {
 //  import Conversions.implicits.SeqOfDouble
-
   it should "make array slices like python" in {
-    def check(xs: Array[Int], expected: Array[Int], start: Int, stop: Int, step: Int) = assert(
-      slice(xs.map(_.toDouble), start, stop, step).map(_.toInt).mkString(",") === expected.mkString(",")
+    def check(
+      xs: Array[Int],
+      expected: Array[Int],
+      start: Int,
+      stop: Int,
+      step: Int,
+    ) = assert(
+      slice(xs.map(_.toDouble), start, stop, step).map(_.toInt).mkString(",") === expected.mkString(
+        ","
+      )
     )
 
     val xs: Array[Int] = Array(1, 2, 3, 4, 5)
@@ -44,8 +45,9 @@ class NumPyTest extends AnyFlatSpec with should.Matchers {
   }
 
   it should "produce reference histogram" in {
-    val xs: Array[Double] = Array(0.001, 0.016455,  0.4757729,  0.6251235, 0.999)
-    val bins: Array[Double] = Array(0.0, 0.001, 0.016455, 0.4757729, 0.6251235, 0.999, 0.999000001, 1.0)
+    val xs: Array[Double] = Array(0.001, 0.016455, 0.4757729, 0.6251235, 0.999)
+    val bins: Array[Double] =
+      Array(0.0, 0.001, 0.016455, 0.4757729, 0.6251235, 0.999, 0.999000001, 1.0)
 
     val hist = histogram(xs, bins)
     assert(hist.toSeq === Seq(0, 1, 1, 1, 1, 1, 0))
@@ -70,11 +72,9 @@ class NumPyTest extends AnyFlatSpec with should.Matchers {
     )
     assert(bins === Seq(1, 1, 2, 2, 3, 3, 4, 4))
 
-    val bins2 = Seq(-1, 1, 1.5, 2, 2.5, 3, 3.5).map(x =>
-      digitize(x, bins = Array(1, 2, 3), right = false)
-    )
+    val bins2 =
+      Seq(-1, 1, 1.5, 2, 2.5, 3, 3.5).map(x => digitize(x, bins = Array(1, 2, 3), right = false))
     assert(bins2 === Seq(0, 1, 1, 2, 2, 3, 3))
 
   }
-
 }

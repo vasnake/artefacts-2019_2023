@@ -1,17 +1,14 @@
-/**
- * Created by vasnake@gmail.com on 2024-08-08
- */
+/** Created by vasnake@gmail.com on 2024-08-08
+  */
 package com.github.vasnake.`ml-core`.models
 
-import org.scalatest._
-import flatspec._
-import matchers._
-
-import com.github.vasnake.test.{Conversions => CoreConversions}
+import com.github.vasnake.test.{ Conversions => CoreConversions }
+//import org.scalatest._
+import org.scalatest.flatspec._
+import org.scalatest.matchers._
 
 // testOnly *Imputer*
-class ImputerTest extends AnyFlatSpec  with should.Matchers {
-
+class ImputerTest extends AnyFlatSpec with should.Matchers {
   import CoreConversions.implicits._
   import Conversions.implicits._
 
@@ -75,5 +72,4 @@ class ImputerTest extends AnyFlatSpec  with should.Matchers {
       imputer._transform(input.toArray)
     }
   }
-
 }
