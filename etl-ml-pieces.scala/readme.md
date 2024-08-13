@@ -198,6 +198,8 @@ com.github.vasnake.spark.ml.transformer.ApplyModelsTransformerBenchApp
 com.github.vasnake.core.num.NumPyTest
 com.github.vasnake.common.num.NumPyTest
 
+com.github.vasnake.core.num.SciPyTest
+
 ## integration tests
 
 ## Spark notes
