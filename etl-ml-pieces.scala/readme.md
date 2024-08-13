@@ -188,6 +188,8 @@ com.github.vasnake.spark.ml.estimator.NEPriorClassProbaTest
 com.github.vasnake.spark.ml.estimator.ScoreEqualizerTest
 com.github.vasnake.spark.ml.estimator.ScoreQuantileThresholdTest
 
+com.github.vasnake.spark.udf.`java-api`.MurmurHash3_32UDFTest
+
 ## integration tests
 
 ## Spark notes
