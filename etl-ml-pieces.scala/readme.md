@@ -203,6 +203,7 @@ com.github.vasnake.core.num.SciPyTest
 com.github.vasnake.core.text.StringToolboxTest
 
 org.apache.spark.sql.catalyst.vasnake.udf.ArrayByteTest
+org.apache.spark.sql.catalyst.vasnake.udf.ArrayDecimalTest
 
 ## integration tests
 

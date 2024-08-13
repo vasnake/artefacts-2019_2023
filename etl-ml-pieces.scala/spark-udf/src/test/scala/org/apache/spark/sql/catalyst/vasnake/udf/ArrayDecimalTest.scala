@@ -11,7 +11,7 @@ import org.apache.spark.sql.DataFrame
 
 import com.github.vasnake.spark.test.LocalSpark
 
-class ArrayByteTest extends AnyFlatSpec with should.Matchers with LocalSpark with Checks {
+class ArrayDecimalTest extends AnyFlatSpec with should.Matchers with LocalSpark with Checks {
 
   import Fixtures._
 
@@ -22,12 +22,12 @@ class ArrayByteTest extends AnyFlatSpec with should.Matchers with LocalSpark wit
         "uid",
         "transform(feature_list, _x -> if(_x in (null, 'NaN', 'Infinity', '-Infinity'), null, _x)) as feature_list"
       )
-      .selectExpr("part", "uid", "cast(feature_list as array<byte>) as feature")
+      .selectExpr("part", "uid", "cast(feature_list as array<decimal(4,3)>) as feature")
       .orderBy("uid")
       .repartition(4)
   )
 
-  val resultColumnType: String = "ArrayType(ByteType,true)"
+  val resultColumnType: String = "ArrayType(DecimalType(4,3),true)"
 
   it should "produce null if all collections are null, part E" in {
     val input = inputDF.where("part = 'E'")
@@ -50,28 +50,28 @@ class ArrayByteTest extends AnyFlatSpec with should.Matchers with LocalSpark wit
   it should "produce null if all values are invalid, part G" in {
     val input = inputDF.where("part = 'G'")
     show(input, message = "input")
-    sumAndCheck(input, "WrappedArray(7, null)")
-    minAndCheck(input, "WrappedArray(3, null)")
-    maxAndCheck(input, "WrappedArray(4, null)")
-    avgAndCheck(input, "WrappedArray(3, null)")
+    sumAndCheck(input, "WrappedArray(7.000, null)")
+    minAndCheck(input, "WrappedArray(3.000, null)")
+    maxAndCheck(input, "WrappedArray(4.000, null)")
+    avgAndCheck(input, "WrappedArray(3.500, null)")
   }
 
   it should "ignore invalid if valid values exists, part I" in {
     val input = inputDF.where("part = 'I'")
     show(input, message = "input")
-    sumAndCheck(input, "WrappedArray(7, 5)")
-    minAndCheck(input, "WrappedArray(3, 2)")
-    maxAndCheck(input, "WrappedArray(4, 3)")
-    avgAndCheck(input, "WrappedArray(3, 2)")
+    sumAndCheck(input, "WrappedArray(7.000, 5.000)")
+    minAndCheck(input, "WrappedArray(3.000, 2.000)")
+    maxAndCheck(input, "WrappedArray(4.000, 3.000)")
+    avgAndCheck(input, "WrappedArray(3.500, 2.500)")
   }
 
   it should "consider absent values as null, part J" in {
     val input = inputDF.where("part = 'J'")
     show(input, message = "input")
-    sumAndCheck(input, "WrappedArray(1, 2, 3)")
-    minAndCheck(input, "WrappedArray(1, 2, 3)")
-    maxAndCheck(input, "WrappedArray(1, 2, 3)")
-    avgAndCheck(input, "WrappedArray(1, 2, 3)")
+    sumAndCheck(input, "WrappedArray(1.000, 2.000, 3.000)")
+    minAndCheck(input, "WrappedArray(1.000, 2.000, 3.000)")
+    maxAndCheck(input, "WrappedArray(1.000, 2.000, 3.000)")
+    avgAndCheck(input, "WrappedArray(1.000, 2.000, 3.000)")
   }
 
 }
