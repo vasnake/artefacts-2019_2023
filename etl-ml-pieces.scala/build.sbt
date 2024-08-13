@@ -68,6 +68,7 @@ lazy val core =
 lazy val common =
   project
     .in(file("common"))
+    .dependsOn(Seq(core).map(_ % Cctt): _*)
     .settings(commonSettings)
     .settings(commonDependencies)
     .settings(

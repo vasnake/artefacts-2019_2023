@@ -195,6 +195,9 @@ com.github.vasnake.spark.udf.`java-api`.MapValuesOrderedUDFTest
 
 com.github.vasnake.spark.ml.transformer.ApplyModelsTransformerBenchApp
 
+com.github.vasnake.core.num.NumPyTest
+com.github.vasnake.common.num.NumPyTest
+
 ## integration tests
 
 ## Spark notes
