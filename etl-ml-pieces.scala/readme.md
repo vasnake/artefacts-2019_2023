@@ -200,6 +200,10 @@ com.github.vasnake.common.num.NumPyTest
 
 com.github.vasnake.core.num.SciPyTest
 
+com.github.vasnake.core.text.StringToolboxTest
+
+org.apache.spark.sql.catalyst.vasnake.udf.ArrayByteTest
+
 ## integration tests
 
 ## Spark notes
