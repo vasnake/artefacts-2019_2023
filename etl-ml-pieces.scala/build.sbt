@@ -336,6 +336,6 @@ lazy val commonDependencies = Seq(
     org.scalameta.munit,
     org.typelevel.`discipline-munit`,
     tf.tofu.`derevo-scalacheck`,
+    com.`storm-enroute`.scalameter,
   ).map(_ % Test),
 )
-

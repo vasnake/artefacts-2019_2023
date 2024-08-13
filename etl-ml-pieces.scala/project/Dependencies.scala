@@ -13,6 +13,10 @@ object Dependencies {
 
   object com {
 
+    object `storm-enroute` {
+      val scalameter = "com.storm-enroute" %% "scalameter" % "0.19"
+    }
+
     object holdenkarau {
       // libraryDependencies += "com.holdenkarau" %% "spark-testing-base" % "2.4.8_1.5.3" % Test
       val `spark-testing-base` = "com.holdenkarau" %% "spark-testing-base" % s"${org.apache.spark.sparkVersion}_1.5.3" // % Test

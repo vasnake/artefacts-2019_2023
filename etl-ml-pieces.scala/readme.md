@@ -193,6 +193,8 @@ com.github.vasnake.spark.udf.`java-api`.Uid2UserUDFTest
 com.github.vasnake.spark.udf.`java-api`.MapJoinUDFTest
 com.github.vasnake.spark.udf.`java-api`.MapValuesOrderedUDFTest
 
+com.github.vasnake.spark.ml.transformer.ApplyModelsTransformerBenchApp
+
 ## integration tests
 
 ## Spark notes
