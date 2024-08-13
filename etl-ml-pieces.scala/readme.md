@@ -189,6 +189,7 @@ com.github.vasnake.spark.ml.estimator.ScoreEqualizerTest
 com.github.vasnake.spark.ml.estimator.ScoreQuantileThresholdTest
 
 com.github.vasnake.spark.udf.`java-api`.MurmurHash3_32UDFTest
+com.github.vasnake.spark.udf.`java-api`.Uid2UserUDFTest
 
 ## integration tests
 
