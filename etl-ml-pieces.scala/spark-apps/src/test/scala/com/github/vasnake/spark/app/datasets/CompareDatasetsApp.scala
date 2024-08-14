@@ -470,4 +470,31 @@ object CompareDatasetsApp {
     // val diff = spark.read.parquet("hdfs:/.../dev-prod-compare/hid_dataset_3_0/diff")
     // val diff2 = diff.where("diff not like '%topics100:%' and diff not like '%all_profs:%'")
   }
+
+  object LowLevelFunctions extends Serializable {
+
+    import scala.math.{max, abs}
+
+    @inline
+    def compareDouble(a: Double, b: Double, epsilon: Double = 0.00001): Int = {
+      if (a == b) 0
+      else if (a.isNaN && b.isNaN) 0
+      else if (a.isNaN) 1
+      else if (b.isNaN) -1
+      else if (a.isPosInfinity) 1
+      else if (b.isPosInfinity) -1
+      else if (a.isNegInfinity) -1
+      else if (b.isNegInfinity) 1
+      else {
+        // two valid numbers
+        val maxV = max(1.0, max(abs(a), abs(b)))
+        val diff = a - b
+
+        if (abs(diff) <= epsilon * maxV) 0
+        else if (diff < 0) -1 else 1
+      }
+    }
+
+  }
+
 }

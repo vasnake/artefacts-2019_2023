@@ -196,6 +196,9 @@ unit tests for each module
     * org.apache.spark.sql.catalyst.vasnake.udf.*Test
     * org.apache.spark.sql.hive.vasnake.MetastoreQueryProcessorWithConnPoolTest
 
+com.github.vasnake.spark.io.hive.SQLHiveWriterTest
+com.github.vasnake.spark.app.datasets.CompareDatasetsAppTest
+
 TODO
 
 ## integration tests
