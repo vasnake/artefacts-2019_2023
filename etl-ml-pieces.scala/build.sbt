@@ -193,7 +193,7 @@ lazy val `spark-apps` =
   project
     .in(file("spark-apps"))
     .dependsOn(
-      Seq(core, `spark-core`, `spark-io`, `spark-transformers`, `spark-ml`, `ml-models-json`).map(
+      Seq(core, `spark-core`, `spark-io`, `spark-transformers`, `spark-ml`, `ml-models-json`, `hive-udaf-java`).map(
         _ % Cctt
       ): _*
     )

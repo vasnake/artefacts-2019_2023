@@ -65,6 +65,11 @@ object catalog extends Logging {
       // According to https://spark.apache.org/docs/3.3.1/sql-ref-syntax-ddl-create-function.html
       val ifNotExists = if (overrideIfExists) "" else "IF NOT EXISTS"
       val expr = s"CREATE OR REPLACE TEMPORARY FUNCTION ${ifNotExists} ${alias} AS '${classPath}'"
+
+      // TODO: need tests for cases with/wo overrideIfExists
+      // val expr = s"CREATE FUNCTION IF NOT EXISTS ${alias} AS '${classPath}'"
+      // val expr = s"CREATE OR REPLACE TEMPORARY FUNCTION ${alias} AS '${classPath}'"
+
       spark.sql(expr)
       logInfo(s"Registered Hive UDF: ${expr}")
     }

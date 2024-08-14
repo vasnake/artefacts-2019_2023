@@ -43,6 +43,14 @@ trait SimpleLocalSpark extends LocalSpark { this: Suite =>
     .config("spark.sql.shuffle.partitions", 1)
 }
 
+trait SimpleLocalSparkWithHive extends LocalSpark { this: Suite =>
+  override def sparkBuilder: SparkSession.Builder = super
+    .sparkBuilder
+    .master("local[1]")
+    .config("spark.sql.shuffle.partitions", 1)
+    .enableHiveSupport()
+}
+
 trait SimpleLocalSparkWithInfoLogger extends SimpleLocalSpark { this: Suite =>
   override protected def beforeAll(): Unit = {
     super.beforeAll()
