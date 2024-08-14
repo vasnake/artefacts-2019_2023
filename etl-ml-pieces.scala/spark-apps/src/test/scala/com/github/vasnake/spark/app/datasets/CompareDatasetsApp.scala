@@ -472,11 +472,14 @@ object CompareDatasetsApp {
   }
 
   object LowLevelFunctions extends Serializable {
-
-    import scala.math.{max, abs}
+    import scala.math.{ max, abs }
 
     @inline
-    def compareDouble(a: Double, b: Double, epsilon: Double = 0.00001): Int = {
+    def compareDouble(
+      a: Double,
+      b: Double,
+      epsilon: Double = 0.00001,
+    ): Int =
       if (a == b) 0
       else if (a.isNaN && b.isNaN) 0
       else if (a.isNaN) 1
@@ -491,10 +494,8 @@ object CompareDatasetsApp {
         val diff = a - b
 
         if (abs(diff) <= epsilon * maxV) 0
-        else if (diff < 0) -1 else 1
+        else if (diff < 0) -1
+        else 1
       }
-    }
-
   }
-
 }

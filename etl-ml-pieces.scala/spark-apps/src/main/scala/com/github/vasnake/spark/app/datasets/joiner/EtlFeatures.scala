@@ -12,13 +12,12 @@ import com.github.vasnake.spark.features.aggregate.DatasetAggregator
 import com.github.vasnake.spark.features.aggregate.DatasetAggregator.DatasetAggregators
 import com.github.vasnake.spark.io
 import com.github.vasnake.text.evaluator._
-
 import org.apache.log4j.Logger
 import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.sql
-import sql.catalyst.encoders.ExpressionEncoder
-import sql.types.StructType
-import sql.{SparkSession, DataFrame, Dataset}
+import org.apache.spark.sql._
+import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
+import org.apache.spark.sql.types.StructType
 import org.json4s
 
 object EtlFeatures {
@@ -310,9 +309,12 @@ object EtlFeatures {
   )(implicit
     log: Logger
   ): Unit = {
-    val writer = io.hive
+    val writer = io
+      .hive
       .SQLWriterFactoryImpl
-      .getWriter(new io.hive.WriterConfig { def spark: Option[SparkSession] = Some(df.sparkSession) })
+      .getWriter(new io.hive.WriterConfig {
+        def spark: Option[SparkSession] = Some(df.sparkSession)
+      })
 
     val res: Try[Unit] = for {
       (db, table) <- Try(splitTableName(fqTableName))
@@ -333,9 +335,12 @@ object EtlFeatures {
   )(implicit
     log: Logger
   ): Unit = {
-    val writer = io.hive
+    val writer = io
+      .hive
       .SQLWriterFactoryImpl
-      .getWriter(new io.hive.WriterConfig { def spark: Option[SparkSession] = Some(df.sparkSession) })
+      .getWriter(new io.hive.WriterConfig {
+        def spark: Option[SparkSession] = Some(df.sparkSession)
+      })
 
     val res: Try[Unit] = for {
       (db, table) <- Try(splitTableName(fqTableName))

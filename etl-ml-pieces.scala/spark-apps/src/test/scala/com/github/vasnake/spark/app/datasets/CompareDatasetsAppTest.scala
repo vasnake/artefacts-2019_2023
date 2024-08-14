@@ -1,6 +1,5 @@
-/**
- * Created by vasnake@gmail.com on 2024-08-14
- */
+/** Created by vasnake@gmail.com on 2024-08-14
+  */
 package com.github.vasnake.spark.app.datasets
 
 import com.github.vasnake.spark.test.SimpleLocalSpark
@@ -9,7 +8,6 @@ import org.scalatest.flatspec._
 import org.scalatest.matchers._
 
 class CompareDatasetsAppTest extends AnyFlatSpec with should.Matchers with SimpleLocalSpark {
-
   private val ops = new CompareDatasetsApp.CopyPasteToSparkShell.DataFrameActions {
     override def cache(df: DataFrame): DataFrame = df
     override def checkpoint(df: DataFrame): DataFrame = df
@@ -22,25 +20,31 @@ class CompareDatasetsAppTest extends AnyFlatSpec with should.Matchers with Simpl
 
   it should "find no diff in array<int> domain" in {
 
-    val a: DataFrame = df(List(
-      ("uid_1", ai(1, 2)),
-      ("uid_2", None),
-      ("uid_3", ai()),
-      ("uid_4", ai(None, None)),
-      ("uid_5", ai(1, None)),
-      ("uid_6", ai(None, 3, None)),
-      ("uid_7", ai(1, None))
-    ), int)
+    val a: DataFrame = df(
+      List(
+        ("uid_1", ai(1, 2)),
+        ("uid_2", None),
+        ("uid_3", ai()),
+        ("uid_4", ai(None, None)),
+        ("uid_5", ai(1, None)),
+        ("uid_6", ai(None, 3, None)),
+        ("uid_7", ai(1, None)),
+      ),
+      int,
+    )
 
-    val b: DataFrame = df(List(
-      ("uid_1", ai(1, 2)),
-      ("uid_2", None),
-      ("uid_3", ai()),
-      ("uid_4", ai(None, None)),
-      ("uid_5", ai(1, None)),
-      ("uid_6", ai(None, 3, None)),
-      ("uid_7", ai(1, None))
-    ), int)
+    val b: DataFrame = df(
+      List(
+        ("uid_1", ai(1, 2)),
+        ("uid_2", None),
+        ("uid_3", ai()),
+        ("uid_4", ai(None, None)),
+        ("uid_5", ai(1, None)),
+        ("uid_6", ai(None, 3, None)),
+        ("uid_7", ai(1, None)),
+      ),
+      int,
+    )
 
     val diffDF = CompareDatasetsApp.CopyPasteToSparkShell.Functions.comparePartitions(a, b, ops)
 
@@ -49,25 +53,31 @@ class CompareDatasetsAppTest extends AnyFlatSpec with should.Matchers with Simpl
 
   it should "find 7 diff in array<int> domain" in {
 
-    val a: DataFrame = df(List(
-      ("uid_1", ai(1, 2)),
-      ("uid_2", None),
-      ("uid_3", ai()),
-      ("uid_4", ai(None, None)),
-      ("uid_5", ai(1, 2)),
-      ("uid_6", ai(None, 3, None)),
-      ("uid_7", ai(1, None, 2))
-    ), int)
+    val a: DataFrame = df(
+      List(
+        ("uid_1", ai(1, 2)),
+        ("uid_2", None),
+        ("uid_3", ai()),
+        ("uid_4", ai(None, None)),
+        ("uid_5", ai(1, 2)),
+        ("uid_6", ai(None, 3, None)),
+        ("uid_7", ai(1, None, 2)),
+      ),
+      int,
+    )
 
-    val b: DataFrame = df(List(
-      ("uid_1", ai(1, 3)),
-      ("uid_2", ai()),
-      ("uid_3", None),
-      ("uid_4", ai(None, 1)),
-      ("uid_5", ai(None, 2)),
-      ("uid_6", ai(None, None)),
-      ("uid_7", ai(1, 2, None))
-    ), int)
+    val b: DataFrame = df(
+      List(
+        ("uid_1", ai(1, 3)),
+        ("uid_2", ai()),
+        ("uid_3", None),
+        ("uid_4", ai(None, 1)),
+        ("uid_5", ai(None, 2)),
+        ("uid_6", ai(None, None)),
+        ("uid_7", ai(1, 2, None)),
+      ),
+      int,
+    )
 
     val diffDF = CompareDatasetsApp.CopyPasteToSparkShell.Functions.comparePartitions(a, b, ops)
     diffDF.show(truncate = false)
@@ -77,25 +87,31 @@ class CompareDatasetsAppTest extends AnyFlatSpec with should.Matchers with Simpl
 
   it should "find no diff in array<float> domain" in {
 
-    val a: DataFrame = df(List(
-      ("uid_1", af(1, 2)),
-      ("uid_2", None),
-      ("uid_3", af()),
-      ("uid_4", af(None, None)),
-      ("uid_5", af(1, None)),
-      ("uid_6", af(None, 3, None)),
-      ("uid_7", af(1, None))
-    ), float)
+    val a: DataFrame = df(
+      List(
+        ("uid_1", af(1, 2)),
+        ("uid_2", None),
+        ("uid_3", af()),
+        ("uid_4", af(None, None)),
+        ("uid_5", af(1, None)),
+        ("uid_6", af(None, 3, None)),
+        ("uid_7", af(1, None)),
+      ),
+      float,
+    )
 
-    val b: DataFrame = df(List(
-      ("uid_1", af(1, 2)),
-      ("uid_2", None),
-      ("uid_3", af()),
-      ("uid_4", af(None, None)),
-      ("uid_5", af(1, None)),
-      ("uid_6", af(None, 3, None)),
-      ("uid_7", af(1, None))
-    ), float)
+    val b: DataFrame = df(
+      List(
+        ("uid_1", af(1, 2)),
+        ("uid_2", None),
+        ("uid_3", af()),
+        ("uid_4", af(None, None)),
+        ("uid_5", af(1, None)),
+        ("uid_6", af(None, 3, None)),
+        ("uid_7", af(1, None)),
+      ),
+      float,
+    )
 
     val diffDF = CompareDatasetsApp.CopyPasteToSparkShell.Functions.comparePartitions(a, b, ops)
 
@@ -104,27 +120,33 @@ class CompareDatasetsAppTest extends AnyFlatSpec with should.Matchers with Simpl
 
   it should "find 7 diff in array<float> domain" in {
 
-    val a: DataFrame = df(List(
-      ("uid_0", af(1, 2)),
-      ("uid_1", af(1, 2)),
-      ("uid_2", None),
-      ("uid_3", af()),
-      ("uid_4", af(None, None)),
-      ("uid_5", af(1, 2)),
-      ("uid_6", af(None, 3, None)),
-      ("uid_7", af(1, None, 2))
-    ), float)
+    val a: DataFrame = df(
+      List(
+        ("uid_0", af(1, 2)),
+        ("uid_1", af(1, 2)),
+        ("uid_2", None),
+        ("uid_3", af()),
+        ("uid_4", af(None, None)),
+        ("uid_5", af(1, 2)),
+        ("uid_6", af(None, 3, None)),
+        ("uid_7", af(1, None, 2)),
+      ),
+      float,
+    )
 
-    val b: DataFrame = df(List(
-      ("uid_0", af(1, 2.00001)),
-      ("uid_1", af(1, 2.0001)),
-      ("uid_2", af()),
-      ("uid_3", None),
-      ("uid_4", af(None, 1)),
-      ("uid_5", af(None, 2)),
-      ("uid_6", af(None, None)),
-      ("uid_7", af(1, 2, None))
-    ), float)
+    val b: DataFrame = df(
+      List(
+        ("uid_0", af(1, 2.00001)),
+        ("uid_1", af(1, 2.0001)),
+        ("uid_2", af()),
+        ("uid_3", None),
+        ("uid_4", af(None, 1)),
+        ("uid_5", af(None, 2)),
+        ("uid_6", af(None, None)),
+        ("uid_7", af(1, 2, None)),
+      ),
+      float,
+    )
 
     val diffDF = CompareDatasetsApp.CopyPasteToSparkShell.Functions.comparePartitions(a, b, ops)
     diffDF.show(truncate = false)
@@ -134,25 +156,33 @@ class CompareDatasetsAppTest extends AnyFlatSpec with should.Matchers with Simpl
 
   it should "find no diff in map<string,float> domain" in {
 
-    val a: DataFrame = df(List(
-      ("uid_1", mf("k1", "k2")(1, 2)),
-      ("uid_2", None),
-      ("uid_3", mf()()),
-      ("uid_4", mf("k1", "k2")(None, None)),
-      ("uid_5", mf("k1", "k2")(1, None)),
-      ("uid_6", mf("k1", "k2", "k3")(None, 3, None)),
-      ("uid_7", mf("k1", "k2")(1, None))
-    ), float, fmap)
+    val a: DataFrame = df(
+      List(
+        ("uid_1", mf("k1", "k2")(1, 2)),
+        ("uid_2", None),
+        ("uid_3", mf()()),
+        ("uid_4", mf("k1", "k2")(None, None)),
+        ("uid_5", mf("k1", "k2")(1, None)),
+        ("uid_6", mf("k1", "k2", "k3")(None, 3, None)),
+        ("uid_7", mf("k1", "k2")(1, None)),
+      ),
+      float,
+      fmap,
+    )
 
-    val b: DataFrame = df(List(
-      ("uid_1", mf("k1", "k2")(1, 2)),
-      ("uid_2", None),
-      ("uid_3", mf()()),
-      ("uid_4", mf("k1", "k2")(None, None)),
-      ("uid_5", mf("k1", "k2")(1, None)),
-      ("uid_6", mf("k1", "k2", "k3")(None, 3, None)),
-      ("uid_7", mf("k1", "k2")(1, None))
-    ), float, fmap)
+    val b: DataFrame = df(
+      List(
+        ("uid_1", mf("k1", "k2")(1, 2)),
+        ("uid_2", None),
+        ("uid_3", mf()()),
+        ("uid_4", mf("k1", "k2")(None, None)),
+        ("uid_5", mf("k1", "k2")(1, None)),
+        ("uid_6", mf("k1", "k2", "k3")(None, 3, None)),
+        ("uid_7", mf("k1", "k2")(1, None)),
+      ),
+      float,
+      fmap,
+    )
 
     val diffDF = CompareDatasetsApp.CopyPasteToSparkShell.Functions.comparePartitions(a, b, ops)
 
@@ -161,29 +191,37 @@ class CompareDatasetsAppTest extends AnyFlatSpec with should.Matchers with Simpl
 
   it should "find 8 diff in map<string,float> domain" in {
 
-    val a: DataFrame = df(List(
-      ("uid_0", mf("k1", "k2")(1, 2)),
-      ("uid_1", mf("k1", "k2")(1, 2)),
-      ("uid_2", None),
-      ("uid_3", mf()()),
-      ("uid_4", mf("k1", "k2")(None, None)),
-      ("uid_5", mf("k1", "k2")(1, 2)),
-      ("uid_6", mf("k1", "k2", "k3")(None, 3, None)),
-      ("uid_7", mf("k1", "k2", "k3")(1, None, 2)),
-      ("uid_8", mf("k1", "k2", "k3")(1, None, 2))
-    ), float, fmap)
+    val a: DataFrame = df(
+      List(
+        ("uid_0", mf("k1", "k2")(1, 2)),
+        ("uid_1", mf("k1", "k2")(1, 2)),
+        ("uid_2", None),
+        ("uid_3", mf()()),
+        ("uid_4", mf("k1", "k2")(None, None)),
+        ("uid_5", mf("k1", "k2")(1, 2)),
+        ("uid_6", mf("k1", "k2", "k3")(None, 3, None)),
+        ("uid_7", mf("k1", "k2", "k3")(1, None, 2)),
+        ("uid_8", mf("k1", "k2", "k3")(1, None, 2)),
+      ),
+      float,
+      fmap,
+    )
 
-    val b: DataFrame = df(List(
-      ("uid_0", mf("k1", "k2")(1, 2.00001)),
-      ("uid_1", mf("k1", "k2")(1, 2.0001)),
-      ("uid_2", mf()()),
-      ("uid_3", None),
-      ("uid_4", mf("k1", "k2")(None, 1)),
-      ("uid_5", mf("k1", "k2")(None, 2)),
-      ("uid_6", mf("k1", "k2")(None, None)),
-      ("uid_7", mf("k1", "k2", "k3")(1, 2, None)),
-      ("uid_8", mf("k1", "kd", "k3")(None, None, 2.0001))
-    ), float, fmap)
+    val b: DataFrame = df(
+      List(
+        ("uid_0", mf("k1", "k2")(1, 2.00001)),
+        ("uid_1", mf("k1", "k2")(1, 2.0001)),
+        ("uid_2", mf()()),
+        ("uid_3", None),
+        ("uid_4", mf("k1", "k2")(None, 1)),
+        ("uid_5", mf("k1", "k2")(None, 2)),
+        ("uid_6", mf("k1", "k2")(None, None)),
+        ("uid_7", mf("k1", "k2", "k3")(1, 2, None)),
+        ("uid_8", mf("k1", "kd", "k3")(None, None, 2.0001)),
+      ),
+      float,
+      fmap,
+    )
 
     val diffDF = CompareDatasetsApp.CopyPasteToSparkShell.Functions.comparePartitions(a, b, ops)
     diffDF.show(truncate = false)
@@ -193,25 +231,33 @@ class CompareDatasetsAppTest extends AnyFlatSpec with should.Matchers with Simpl
 
   it should "find no diff in map<string,int> domain" in {
 
-    val a: DataFrame = df(List(
-      ("uid_1", mi("k1", "k2")(1, 2)),
-      ("uid_2", None),
-      ("uid_3", mi()()),
-      ("uid_4", mi("k1", "k2")(None, None)),
-      ("uid_5", mi("k1", "k2")(1, None)),
-      ("uid_6", mi("k1", "k2", "k3")(None, 3, None)),
-      ("uid_7", mi("k1", "k2")(1, None))
-    ), int, imap)
+    val a: DataFrame = df(
+      List(
+        ("uid_1", mi("k1", "k2")(1, 2)),
+        ("uid_2", None),
+        ("uid_3", mi()()),
+        ("uid_4", mi("k1", "k2")(None, None)),
+        ("uid_5", mi("k1", "k2")(1, None)),
+        ("uid_6", mi("k1", "k2", "k3")(None, 3, None)),
+        ("uid_7", mi("k1", "k2")(1, None)),
+      ),
+      int,
+      imap,
+    )
 
-    val b: DataFrame = df(List(
-      ("uid_1", mi("k1", "k2")(1, 2)),
-      ("uid_2", None),
-      ("uid_3", mi()()),
-      ("uid_4", mi("k1", "k2")(None, None)),
-      ("uid_5", mi("k1", "k2")(1, None)),
-      ("uid_6", mi("k1", "k2", "k3")(None, 3, None)),
-      ("uid_7", mi("k1", "k2")(1, None))
-    ), int, imap)
+    val b: DataFrame = df(
+      List(
+        ("uid_1", mi("k1", "k2")(1, 2)),
+        ("uid_2", None),
+        ("uid_3", mi()()),
+        ("uid_4", mi("k1", "k2")(None, None)),
+        ("uid_5", mi("k1", "k2")(1, None)),
+        ("uid_6", mi("k1", "k2", "k3")(None, 3, None)),
+        ("uid_7", mi("k1", "k2")(1, None)),
+      ),
+      int,
+      imap,
+    )
 
     val diffDF = CompareDatasetsApp.CopyPasteToSparkShell.Functions.comparePartitions(a, b, ops)
 
@@ -220,27 +266,35 @@ class CompareDatasetsAppTest extends AnyFlatSpec with should.Matchers with Simpl
 
   it should "find 8 diff in map<string,int> domain" in {
 
-    val a: DataFrame = df(List(
-      ("uid_1", mi("k1", "k2")(1, 3)),
-      ("uid_2", None),
-      ("uid_3", mi()()),
-      ("uid_4", mi("k1", "k2")(None, None)),
-      ("uid_5", mi("k1", "k2")(1, 2)),
-      ("uid_6", mi("k1", "k2", "k3")(None, 3, None)),
-      ("uid_7", mi("k1", "k2", "k3")(1, None, 2)),
-      ("uid_8", mi("k1", "k2", "k3")(1, None, 2))
-    ), int, imap)
+    val a: DataFrame = df(
+      List(
+        ("uid_1", mi("k1", "k2")(1, 3)),
+        ("uid_2", None),
+        ("uid_3", mi()()),
+        ("uid_4", mi("k1", "k2")(None, None)),
+        ("uid_5", mi("k1", "k2")(1, 2)),
+        ("uid_6", mi("k1", "k2", "k3")(None, 3, None)),
+        ("uid_7", mi("k1", "k2", "k3")(1, None, 2)),
+        ("uid_8", mi("k1", "k2", "k3")(1, None, 2)),
+      ),
+      int,
+      imap,
+    )
 
-    val b: DataFrame = df(List(
-      ("uid_1", mi("k1", "k2")(1, 2)),
-      ("uid_2", mi()()),
-      ("uid_3", None),
-      ("uid_4", mi("k1", "k2")(None, 1)),
-      ("uid_5", mi("k1", "k2")(None, 2)),
-      ("uid_6", mi("k1", "k2")(None, None)),
-      ("uid_7", mi("k1", "k2", "k3")(1, 2, None)),
-      ("uid_8", mi("k1", "kd", "k3")(None, None, 3))
-    ), int, imap)
+    val b: DataFrame = df(
+      List(
+        ("uid_1", mi("k1", "k2")(1, 2)),
+        ("uid_2", mi()()),
+        ("uid_3", None),
+        ("uid_4", mi("k1", "k2")(None, 1)),
+        ("uid_5", mi("k1", "k2")(None, 2)),
+        ("uid_6", mi("k1", "k2")(None, None)),
+        ("uid_7", mi("k1", "k2", "k3")(1, 2, None)),
+        ("uid_8", mi("k1", "kd", "k3")(None, None, 3)),
+      ),
+      int,
+      imap,
+    )
 
     val diffDF = CompareDatasetsApp.CopyPasteToSparkShell.Functions.comparePartitions(a, b, ops)
     diffDF.show(truncate = false)
@@ -317,42 +371,34 @@ class CompareDatasetsAppTest extends AnyFlatSpec with should.Matchers with Simpl
 
   }
 
-  private def mf(keys: String*)(xs: Any*): Option[Map[String, Option[Float]]] = {
+  private def mf(keys: String*)(xs: Any*): Option[Map[String, Option[Float]]] =
     af(xs: _*)
-      .map(
-        xs =>
-          keys.zip(xs).toMap
-      )
-  }
+      .map(xs => keys.zip(xs).toMap)
 
-  private def mi(keys: String*)(xs: Any*): Option[Map[String, Option[Int]]] = {
+  private def mi(keys: String*)(xs: Any*): Option[Map[String, Option[Int]]] =
     ai(xs: _*)
-      .map(
-        xs =>
-          keys.zip(xs).toMap
-      )
-  }
+      .map(xs => keys.zip(xs).toMap)
 
   private def ai(xs: Any*): Option[Array[Option[Int]]] =
     Some(
-      (xs.map {
+      xs.map {
         case None => None
         case x => Some(x.asInstanceOf[Int])
-      }).toArray[Option[Int]]
+      }.toArray[Option[Int]]
     )
 
   private def af(xs: Any*): Option[Array[Option[Float]]] =
     Some(
-      (xs.map {
+      xs.map {
         case None => None
         case x: Int => Some(x.toFloat)
         case x: Double => Some(x.toFloat)
         case x => Some(x.asInstanceOf[Float])
-      }).toArray[Option[Float]]
+      }.toArray[Option[Float]]
     )
 
   // N.B. not working due to type erasure, use ClassTag:
-  //private def make_array[T](xs: Any*): Option[Array[Option[T]]] =
+  // private def make_array[T](xs: Any*): Option[Array[Option[T]]] =
   //  Some(
   //    (xs.map {
   //      case None => None
@@ -371,14 +417,21 @@ class CompareDatasetsAppTest extends AnyFlatSpec with should.Matchers with Simpl
     rows.toDF("uid", "arr_float_domain")
   }
 
-  private def df(rows: List[(String, Option[Map[String, Option[Int]]])], ev: Int, coll: Map[String, Int]): DataFrame = {
+  private def df(
+    rows: List[(String, Option[Map[String, Option[Int]]])],
+    ev: Int,
+    coll: Map[String, Int],
+  ): DataFrame = {
     import spark.implicits._
     rows.toDF("uid", "map_int_domain")
   }
 
-  private def df(rows: List[(String, Option[Map[String, Option[Float]]])], ev: Float, coll: Map[String, Float]): DataFrame = {
+  private def df(
+    rows: List[(String, Option[Map[String, Option[Float]]])],
+    ev: Float,
+    coll: Map[String, Float],
+  ): DataFrame = {
     import spark.implicits._
     rows.toDF("uid", "map_float_domain")
   }
-
 }

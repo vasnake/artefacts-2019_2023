@@ -12,7 +12,6 @@ import com.github.vasnake.test.{ Conversions => CoreConversions }
 import org.apache.spark.ml.Pipeline
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types._
-//import org.scalatest._
 import org.scalatest.flatspec._
 import org.scalatest.matchers._
 
