@@ -164,35 +164,35 @@ Other sbt related resources
 ## unit tests
 
 unit tests for each module
-    * com.github.vasnake.`ml-core`.models.BinarizerTest
+    * com.github.vasnake.core.num.NumPyTest
+    * com.github.vasnake.core.num.SciPyTest
+    * com.github.vasnake.core.text.StringToolboxTest
+    * com.github.vasnake.common.num.NumPyTest
     * com.github.vasnake.`etl-core`.GroupedFeaturesTest
+    * com.github.vasnake.`ml-core`.models.BinarizerTest
     * com.github.vasnake.`ml-core`.models.GroupedFeaturesTfidfTest
     * com.github.vasnake.`ml-core`.models.ImputerTest
     * com.github.vasnake.`ml-core`.models.ScalerTest
-    * com.github.vasnake.spark.features.vector.FeaturesRowDecoderTest
-    * com.github.vasnake.spark.io.hive.TableSmartWriterTest
+    * com.github.vasnake.`ml-core`.models.SlicerTest
+    * com.github.vasnake.`ml-core`.models.SGDClassifierTest
     * com.github.vasnake.`ml-models`.complex.LalBinarizedMultinomialNbTest
     * com.github.vasnake.`ml-models`.complex.LalTfidfScaledSgdcTest
-    * com.github.vasnake.spark.ml.transformer.ApplyModelsTransformerTest
-    * com.github.vasnake.spark.ml.transformer.ScoreAudienceTest
     * com.github.vasnake.`ml-models`.complex.GroupedTransformerTest
     * com.github.vasnake.`ml-models`.complex.ScoreEqualizerTest
-    * com.github.vasnake.`ml-core`.models.SlicerTest
     * com.github.vasnake.`ml-models`.complex.MultinomialNBTest
     * com.github.vasnake.`ml-models`.complex.PredictorWrapperTest
-    * com.github.vasnake.`ml-core`.models.SGDClassifierTest
+    * com.github.vasnake.spark.features.vector.FeaturesRowDecoderTest
+    * com.github.vasnake.spark.io.hive.TableSmartWriterTest
+    * com.github.vasnake.spark.ml.transformer.ApplyModelsTransformerTest
+    * com.github.vasnake.spark.ml.transformer.ScoreAudienceTest
     * com.github.vasnake.spark.ml.estimator.NEPriorClassProbaTest
     * com.github.vasnake.spark.ml.estimator.ScoreEqualizerTest
     * com.github.vasnake.spark.ml.estimator.ScoreQuantileThresholdTest
+    * com.github.vasnake.spark.ml.transformer.ApplyModelsTransformerBenchApp
     * com.github.vasnake.spark.udf.`java-api`.MurmurHash3_32UDFTest
     * com.github.vasnake.spark.udf.`java-api`.Uid2UserUDFTest
     * com.github.vasnake.spark.udf.`java-api`.MapJoinUDFTest
     * com.github.vasnake.spark.udf.`java-api`.MapValuesOrderedUDFTest
-    * com.github.vasnake.spark.ml.transformer.ApplyModelsTransformerBenchApp
-    * com.github.vasnake.core.num.NumPyTest
-    * com.github.vasnake.common.num.NumPyTest
-    * com.github.vasnake.core.num.SciPyTest
-    * com.github.vasnake.core.text.StringToolboxTest
     * org.apache.spark.sql.catalyst.vasnake.udf.*Test
     * org.apache.spark.sql.hive.vasnake.MetastoreQueryProcessorWithConnPoolTest
 
