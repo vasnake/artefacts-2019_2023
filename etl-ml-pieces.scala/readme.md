@@ -201,7 +201,7 @@ unit tests for each module
 
 ## integration tests, scripts
 
-TODO
+[See scripts directory](../scripts.python/readme.md)
 
 ## Spark notes
 
