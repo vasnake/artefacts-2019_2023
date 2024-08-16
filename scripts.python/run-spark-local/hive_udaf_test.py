@@ -402,7 +402,7 @@ def null_map_keys():
 
 # catalyst "builtin" aggregate functions
 def catalyst_udaf():
-    spark._jvm.org.apache.spark.sql.catalyst.vasnake.udf.functions.register(spark._jsparkSession, True)
+    spark._jvm.org.apache.spark.sql.catalyst.vasnake.udf.functions.registerAll(spark._jsparkSession, True)
     spark._jvm.org.apache.spark.sql.catalyst.vasnake.udf.functions.registerAs("generic_sum", "gsum", spark._jsparkSession, True)
     for qry in [
         """select sum_features(score_map) from features where uid = 'o' group by uid""",

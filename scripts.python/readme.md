@@ -6,16 +6,23 @@ Collection of some interesting pieces from my projects.
 
 ## What do we have here
 
+- [Unfinished experiments, spark-submit app logger](./spark-submit-app-logger/readme.md)
+
 - [Run local Spark cluster](./run-spark-local/run-spark-standalone.sh)
 - [Local spark-submit, scala-apply benchmarks](./run-spark-local/spark-submit-scala-apply-test.sh)
+
 - [Insert-into-hive procedure tests, runner](./run-spark-local/spark-submit-writer-test.sh)
 - [Insert-into-hive procedure tests, script](./run-spark-local/writer_test.py)
-- [Unfinished experiments, spark-submit app logger](./spark-submit-app-logger/readme.md)
 
 - [Hive UDAF tests, runner](./run-spark-local/spark-submit-hive-udaf-test.sh)
 - [Hive UDAF tests, script](./run-spark-local/hive_udaf_test.py)
 
-Тесты быстродействия scala-apply трансформера, задача https://jira.mail.ru/browse/DM-6915
+- [Spark Catalyst UDF tests, runner](./run-spark-local/spark-submit-catalyst-udf-test.sh)
+- [Spark Catalyst UDF tests, script](./run-spark-local/catalyst_udf_test.py)
+- [Spark Catalyst UDF tests, ipynb](./run-spark-local/catalyst_udf_test.ipynb)
+
+- [Spark Java UDF tests, runner](./run-spark-local/spark-submit-java-udf-test.sh)
+- [Spark Java UDF tests, script](./run-spark-local/java_udf_test.py)
 
 ???
 
