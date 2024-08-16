@@ -183,6 +183,7 @@ unit tests for each module
     * com.github.vasnake.`ml-models`.complex.PredictorWrapperTest
     * com.github.vasnake.spark.features.vector.FeaturesRowDecoderTest
     * com.github.vasnake.spark.io.hive.TableSmartWriterTest
+    * com.github.vasnake.spark.io.hive.SQLHiveWriterTest
     * com.github.vasnake.spark.ml.transformer.ApplyModelsTransformerTest
     * com.github.vasnake.spark.ml.transformer.ScoreAudienceTest
     * com.github.vasnake.spark.ml.estimator.NEPriorClassProbaTest
@@ -195,13 +196,12 @@ unit tests for each module
     * com.github.vasnake.spark.udf.`java-api`.MapValuesOrderedUDFTest
     * org.apache.spark.sql.catalyst.vasnake.udf.*Test
     * org.apache.spark.sql.hive.vasnake.MetastoreQueryProcessorWithConnPoolTest
+    * com.github.vasnake.spark.app.datasets.CompareDatasetsAppTest
+    * com.github.vasnake.text.parser.JoinExpressionParserTest
 
-com.github.vasnake.spark.io.hive.SQLHiveWriterTest
-com.github.vasnake.spark.app.datasets.CompareDatasetsAppTest
+## integration tests, scripts
 
 TODO
-
-## integration tests
 
 ## Spark notes
 

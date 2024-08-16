@@ -9,12 +9,6 @@ import org.scalatest.flatspec._
 import org.scalatest.matchers._
 import com.github.vasnake.spark.app.datasets.JoinerAppAggregationTest.{avgAggregator, maxAggregator, minAggregator, pipelines}
 import com.github.vasnake.spark.app.datasets.joiner.EtlFeatures.{DomainAggregationConfig, defaultAggregationConfig}
-//import com.github.vasnake.core.text.StringToolbox
-//import org.apache.spark.sql
-//import org.apache.spark.storage.StorageLevel
-//import com.github.vasnake.spark.dataset.transform.Joiner.JoinRule
-//import scala.collection.mutable
-//import scala.util.Try
 
 class JoinerAppAggregationTest  extends AnyFlatSpec with should.Matchers  with SimpleLocalSpark {
 
@@ -22,11 +16,6 @@ class JoinerAppAggregationTest  extends AnyFlatSpec with should.Matchers  with S
   import EtlFeaturesFunctionsTest._
   import joiner._
   import joiner.implicits._
-//  import StringToolbox._
-//  import sql.{functions => sf}
-//  import com.github.vasnake.spark.dataset.transform.Joiner.parseJoinRule
-//  import DefaultSeparators._
-//  import joiner.config._
 
   it should "perform default aggregation" in {
 
@@ -570,8 +559,6 @@ class JoinerAppAggregationConcurrentTest extends AnyFlatSpec with should.Matcher
   import scala.math.random
   import org.apache.spark.sql
   import spark.implicits._
-//  import StringToolbox._
-//  import DefaultSeparators._
   import joiner._
   import joiner.implicits._
 
@@ -617,13 +604,6 @@ class JoinerAppAggregationConcurrentTest extends AnyFlatSpec with should.Matcher
 object JoinerAppAggregationTest {
 
   import joiner.config._
-//  import EtlFeaturesFunctionsTest._
-//  import StringToolbox._
-//  import DefaultSeparators._
-//  import joiner._
-//  import joiner.implicits._
-//  import sql.{functions => sf}
-//  import com.github.vasnake.spark.dataset.transform.Joiner.parseJoinRule
 
   val avgAggregator = AggregationConfig(
     pipeline = List("filter", "avg"),
