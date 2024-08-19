@@ -53,6 +53,35 @@ Other sbt related resources
 
 ## project modules
 
+### hive-udaf-java
+
+Class `com.github.vasnake.hive.java.udaf.GenericAvgUDAF`: generic UDAF based on an old Hive API `hive.ql.udf.generic`.
+Can be used on columns of type `array<numeric>`, `map<string, numeric>` along with plain numeric types.
+
+I don't recommend it, use Spark Catalyst API for UDF/UDAF development.
+
+### spark-io
+
+Method `com.github.vasnake.spark.io.hive.TableSmartWriter.insertIntoHive`: insert partition into Hive (partitioned) table or,
+if table is not partitioned, overwrite table.
+Uses `df.write.insertInto(tableFQN)` under the hood.
+
+Method has two distinct features:
+- resulting files size are even and under control of `maxRowsPerBucket` parameter;
+- in HMS the boolean flag maintained for each written partition. It's semantics similar with `SUCCESS_` flag for HDFS.
+
+* com.github.vasnake.spark.io.HDFSFileToolbox
+* com.github.vasnake.spark.io.CheckpointService
+* com.github.vasnake.spark.io.Logging
+* com.github.vasnake.hive.SQLPartitionsWriterI
+* com.github.vasnake.spark.io.hive.SQLHiveWriter
+* com.github.vasnake.spark.io.hive.SQLWriterFactory
+* com.github.vasnake.spark.io.hive.SQLWriterFactoryImpl
+* org.apache.spark.sql.hive.vasnake.HiveExternalCatalog
+* org.apache.spark.sql.hive.vasnake.MetastoreQueryProcessorWithConnPool
+
+### other
+
 - core
     * com.github.vasnake.core.text.StringToolbox
     * com.github.vasnake.core.num.VectorToolbox
@@ -91,9 +120,6 @@ Other sbt related resources
 - ml-models-json
     * com.github.vasnake.json.read.ModelConfig
 
-- hive udf (java)
-    * com.github.vasnake.hive.java.udaf.GenericAvgUDAF
-
 - spark-udf
     * spark-udf-java-api: grep 'import org.apache.spark.sql.api.java.UDF*'
         - com.github.vasnake.spark.udf.`java-api`.HtmlUnescapeUDF
@@ -119,19 +145,6 @@ Other sbt related resources
 
     * spark-udf-catalog
         - com.github.vasnake.spark.udf.catalog
-
-- spark-io
-    * com.github.vasnake.spark.io.HDFSFileToolbox
-    * com.github.vasnake.spark.io.CheckpointService
-    * com.github.vasnake.spark.io.Logging
-    * hive (partition) writer
-        * com.github.vasnake.spark.io.hive.TableSmartWriter#insertIntoHive
-        * com.github.vasnake.hive.SQLPartitionsWriterI
-        * com.github.vasnake.spark.io.hive.SQLHiveWriter
-        * com.github.vasnake.spark.io.hive.SQLWriterFactory
-        * com.github.vasnake.spark.io.hive.SQLWriterFactoryImpl
-    * org.apache.spark.sql.hive.vasnake.HiveExternalCatalog
-    * org.apache.spark.sql.hive.vasnake.MetastoreQueryProcessorWithConnPool
 
 - spark-transformers
     * com.github.vasnake.`etl-core`.aggregate.AggregationPipeline
