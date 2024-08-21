@@ -24,6 +24,8 @@ Collection of some interesting pieces from my projects.
 - [Spark Java UDF tests, runner](./run-spark-local/spark-submit-java-udf-test.sh)
 - [Spark Java UDF tests, script](./run-spark-local/java_udf_test.py)
 
+- [InsertIntoHive python wrapper](luigi-pyspark-apps/spark_utils.py#insert_into_hive)
+
 ???
 
 - npz_to_json.py

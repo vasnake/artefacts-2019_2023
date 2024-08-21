@@ -55,7 +55,7 @@ Other sbt related resources
 
 ### hive-udaf-java
 
-Class `com.github.vasnake.hive.java.udaf.GenericAvgUDAF`: generic UDAF based on an old Hive API `hive.ql.udf.generic`.
+Class `com.github.vasnake.hive.java.udaf.GenericAvgUDAF`: generic UDAF based on the old Hive API `hive.ql.udf.generic`.
 Can be used on columns of type `array<numeric>`, `map<string, numeric>` along with plain numeric types.
 
 I don't recommend it, use Spark Catalyst API for UDF/UDAF development.
@@ -68,17 +68,20 @@ Uses `df.write.insertInto(tableFQN)` under the hood.
 
 Method has two distinct features:
 - resulting files size are even and under control of `maxRowsPerBucket` parameter;
-- in HMS the boolean flag maintained for each written partition. It's semantics similar with `SUCCESS_` flag for HDFS.
+- in HMS the boolean flag maintained for each written partition. It's semantics similar to `SUCCESS_` flag for HDFS.
 
+The second feature implemented on top of custom ExternalCatalog implementation combined with parallel-query-processor
+based on the managed pool of HMS (Hive Meta Store) query processors.
+Custom external catalog: `org.apache.spark.sql.hive.vasnake.HiveExternalCatalog`.
+HMS query processor: `org.apache.spark.sql.hive.vasnake.MetastoreQueryProcessorWithConnPool`.
+This implementation was created to solve the problem with spark ExternalCatalog inability to process queries concurrently.
+
+Other spark-io modules:
 * com.github.vasnake.spark.io.HDFSFileToolbox
 * com.github.vasnake.spark.io.CheckpointService
 * com.github.vasnake.spark.io.Logging
-* com.github.vasnake.hive.SQLPartitionsWriterI
 * com.github.vasnake.spark.io.hive.SQLHiveWriter
-* com.github.vasnake.spark.io.hive.SQLWriterFactory
 * com.github.vasnake.spark.io.hive.SQLWriterFactoryImpl
-* org.apache.spark.sql.hive.vasnake.HiveExternalCatalog
-* org.apache.spark.sql.hive.vasnake.MetastoreQueryProcessorWithConnPool
 
 ### other
 
