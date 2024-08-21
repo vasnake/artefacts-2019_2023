@@ -4,7 +4,7 @@ WIP
 
 Collection of some interesting bits and pieces from my projects.
 
-Spark 2.4.8; Scala 2.12.19; sbt 1.10.0 (migration to Spark 3 is WIP)
+Spark 2.4.8; Scala 2.12.19; sbt 1.10.0; java 1.8 (migration to Spark 3 is WIP)
 
 My local station env (win11 + wsl2)
 ```sh
@@ -51,7 +51,16 @@ Other sbt related resources
 - https://mvnrepository.com/artifact/org.unbescape/unbescape/1.1.6.RELEASE
 - https://stackoverflow.com/questions/57521738/how-to-solve-sbt-dependency-problem-with-spark-and-whisklabs-docker-it-scala
 
+- set envvars for sbt `export JAVA_OPTS="-XX:MaxMetaspaceSize=1G -Xmx4G -XX:+UseParallelGC" JAVA_HOME=$(/usr/libexec/java_home -v 1.8) && sbt -v`
+- set envvars for tests `sbt> set Test/envVars := Map("DEBUG_MODE" -> "true", "SPARK_LOCAL_IP" -> "127.0.0.1")`; `sbt> set Test/logBuffered := false`
+- select individual test `sbt> testQuick *InverseVariabilityTransformer* -- -z "reference"`
+- logs selectors/tuning `test/resources/log4j*.properties`
+
 ## project modules
+
+TODO: build uber-jar (fat-jar) using sbt-assembly.
+All modules packed to uber-jar and can be used in spark apps.
+For that you should add library to spark session: `spark-submit ... --jars hdfs:/lib/custom-transformers-SNAPSHOT.jar`.
 
 ### hive-udaf-java
 
@@ -83,6 +92,15 @@ Other spark-io modules:
 * com.github.vasnake.spark.io.hive.SQLHiveWriter
 * com.github.vasnake.spark.io.hive.SQLWriterFactoryImpl
 * com.github.vasnake.spark.io.hive.TableSmartReader.readTableAsUnionOrcFiles
+
+### spark-apps
+
+Spark-submit app `com.github.vasnake.spark.app.ml-models.ApplyerApp`
+and main workhorse for that app `com.github.vasnake.spark.ml.transformer.ApplyModelsTransformer`.
+This app takes a batch of ML models, trained earlier in some 'learn' app, and applied them to each row of an input dataset (DataFrame).
+Each ML model transform an input features vector to a score value, so that each input row transformed (exploded) to a batch of output rows.
+
+* com.github.vasnake.spark.app.datasets.JoinerApp
 
 ### other
 
@@ -168,11 +186,6 @@ Other spark-io modules:
     * com.github.vasnake.spark.ml.model.ScoreQuantileThresholdModel
     * com.github.vasnake.spark.ml.estimator.ScoreQuantileThresholdEstimator
 
-- spark-apps
-    * com.github.vasnake.spark.app.datasets.JoinerApp
-    * com.github.vasnake.spark.app.ml-models.ApplyerApp
-    * com.github.vasnake.spark.ml.transformer.ApplyModelsTransformer
-
 - spark-apps test (experiments)
     * com.github.vasnake.spark.app.interview.transform_array.InvalidValuesToNullApp
     * com.github.vasnake.spark.app.external_catalog.Alter_HMS_PartitionsApp
@@ -223,3 +236,6 @@ unit tests for each module
 ## Spark notes
 
 - https://spark.apache.org/news/index.html
+- https://spark.apache.org/releases/
+- [Project Matrix: Linear Models revisit and refactor / Blockification (vectorization of vectors)](https://issues.apache.org/jira/browse/SPARK-30641)
+- [BLAS, LAPACK, Breeze, netlib-java acceleration](https://spark.apache.org/docs/latest/ml-linalg-guide.html#mllib-linear-algebra-acceleration-guide)
