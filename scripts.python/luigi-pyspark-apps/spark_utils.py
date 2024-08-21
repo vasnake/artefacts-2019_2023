@@ -334,3 +334,116 @@ def read_orc_table(what, partition_filter_expr, spark, jar="hdfs:/lib/custom-tra
         ),
         SQLContext(spark.sparkContext),
     )
+
+
+def join_filter(df, filter_dicts, exclusion=False, broadcast_max_size=250000, salt_parts=100):
+    """Filter input dataframe with a list of rows, using join with synthetic DF and optional filter predicates.
+
+    Selected Join type depends on filter size (rows_count * columns_count) and a given parameters.
+    For a small filter the tool uses broadcast join; for a big filter there is a choice: skewed or regular join.
+    This choice is managed by the `salt_parts` parameter.
+
+    Two modes of filters are supported: inclusion or exclusion.
+
+    .. note:: There are no restrictions for filter columns data type but filter data are transformed to strings before
+    executing actual filtering. Transformation implemented using Spark cast mechanics.
+    Dataframe columns used in filter also cast to string in order to perform equality check.
+    Actually it make no sense to use types other than (StringType, IntegralType, BooleanType), and dataframe
+    columns checked against these types during parameters validation phase.
+
+    .. note:: `NULL` value can't be expressed in `filter_dicts` in any other way but using python `None` value.
+    For other values that restriction is inapplicable.
+    For example, you may express int value (e.g. 42) as string `"42"` or int 42.
+
+    :param df: input dataframe, must have columns enumerated in `filter_dicts`.
+    :type df: :class:`pyspark.sql.DataFrame`
+    :param filter_dicts: a list of rows where each row is a dict that represents a mapping from column name to column
+        value. Values equality are null-safe, see `<=>` operator in Spark SQL. Row can't be empty, each row must have
+        the same set of keys.
+        Empty list means 'empty filter' and, depending on `exclusion` parameter, function produces an empty dataframe as
+        inclusion of input with empty filter; or un-filtered dataframe, as exclusion of empty filter from input.
+    :type filter_dicts: list[dict[str, Any]]
+    :param bool exclusion: one of the two modes of filtering: inclusion or exclusion.
+        If `False`, then filter selects rows from input where values are equal to values of any `filter_dicts` element.
+        Otherwise, filter condition is negated.
+    :param int broadcast_max_size: amount of elements in filter (rows_count * columns_count) as a filter size limit.
+        Filter under that limit uses broadcast join. Filter above that limit uses skewed or regular join where parameter
+        `salt_parts` makes sense.
+    :param int salt_parts: amount of join key subpartitions. Used only with skewed join when size of a filter exceeds
+        `broadcast_max_size` limit. Values less-or-equal `1` works as a flag that forces regular join.
+    :return: filtered dataframe.
+    :rtype: :class:`pyspark.sql.DataFrame`
+    """
+    if filter_dicts:
+        rows_keys = [set(row.keys()) for row in filter_dicts]
+        filter_keys = set.intersection(*rows_keys)
+
+        if filter_keys != set.union(*rows_keys):
+            raise ValueError("Invalid `filter_dicts` value, rows must have identical structure")
+        if not filter_keys:
+            raise ValueError("Invalid `filter_dicts` value, each row must have at least one item")
+        if not filter_keys.issubset(df.columns):
+            raise ValueError("Invalid `filter_dicts` value, row keys must be a subset of `df.columns`")
+        for col_name in filter_keys:
+            if not isinstance(df.schema[col_name].dataType, (StringType, IntegralType, BooleanType)):
+                raise ValueError(
+                    "Invalid filter keys, df.schema[key].dataType must be one of "
+                    "(StringType, IntegralType, BooleanType)"
+                )
+
+    else:
+        if exclusion:
+            return df
+        else:
+            return df.where("false")
+
+    filter_pdf = pd.DataFrame(filter_dicts, dtype=object)
+
+    # Filter constants with SQL expression
+
+    count_unique = filter_pdf.nunique(dropna=False)
+
+    constant_columns = {
+        c: filter_pdf[c].tolist().pop() for c in filter_keys if count_unique[c] == 1
+    }  # col_name -> constant_value
+
+    if constant_columns and (not exclusion or len(constant_columns) == len(filter_keys)):
+        conditions = [df[k].cast("string").eqNullSafe(sqlfn.lit(v).cast("string")) for k, v in constant_columns.items()]
+        filter_expr = functools.reduce(Column.__and__, conditions)
+
+        if exclusion:
+            filter_expr = ~filter_expr
+
+        df = df.where(filter_expr)
+        filter_pdf = filter_pdf.drop(constant_columns.keys(), axis=1)
+
+        if len(constant_columns) == len(filter_keys):
+            return df
+
+    # Filter the rest with join
+
+    filter_columns = [str(c) for c in filter_pdf.columns]
+    # N.B. str(c) to fix problem with `StructType keys should be strings` sql/types bug
+
+    filter_df = df.sql_ctx.createDataFrame(
+        data=filter_pdf.drop_duplicates(),
+        schema=",".join(["{}:string".format(c) for c in filter_columns]),
+    )
+
+    if filter_pdf.size <= broadcast_max_size:
+        join_type = "broadcast"
+    elif salt_parts <= 1:
+        join_type = "regular"
+    else:
+        join_type = "skewed"
+
+    return configured_join(
+        left=df,
+        right=filter_df,
+        on=functools.reduce(Column.__and__, [df[c].cast("string").eqNullSafe(filter_df[c]) for c in filter_df.columns]),
+        how="left_anti" if exclusion else "left_semi",
+        type=join_type,
+        salt_parts=salt_parts,
+    ).select(
+        df.columns
+    )  # Restore columns order
