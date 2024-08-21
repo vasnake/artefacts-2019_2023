@@ -306,3 +306,31 @@ def configured_join(left, right, **conf):
         raise ValueError("Invalid join type '{}' in conf {}.".format(join_type, pformat(conf)))
 
 
+def read_orc_table(what, partition_filter_expr, spark, jar="hdfs:/lib/custom-transformers-SNAPSHOT.jar"):
+    """Read Hive table stored in ORC format as a union of its partition paths.
+
+    Increases data loading speed from tables with a large number of files
+    by parallel listing leaf files and directories.
+
+    .. note:: This method is a wrapper for a corresponding Scala implementation.
+
+    :param str what: dot-separated database and table name.
+    :param str partition_filter_expr: Spark SQL valid filter expression.
+        Must contain ONLY table partitioning columns.
+    :param spark: an instance of spark session.
+    :type spark: :class:`pyspark.sql.SparkSession`
+    :param str jar: a path to JAR containing related Scala implementation. It is intentionally defined by default.
+    :return: result table as a PySpark dataframe.
+    :rtype: :class:`pyspark.sql.DataFrame`
+    """
+    spark.sql("ADD JAR {}".format(jar))
+
+    return DataFrame(
+        JavaWrapper._new_java_obj(
+            "com.github.vasnake.spark.io.hive.TableSmartReader.readTableAsUnionOrcFiles",
+            what,
+            sqlfn.expr(partition_filter_expr)._jc,
+            spark._jsparkSession,
+        ),
+        SQLContext(spark.sparkContext),
+    )

@@ -82,6 +82,7 @@ Other spark-io modules:
 * com.github.vasnake.spark.io.Logging
 * com.github.vasnake.spark.io.hive.SQLHiveWriter
 * com.github.vasnake.spark.io.hive.SQLWriterFactoryImpl
+* com.github.vasnake.spark.io.hive.TableSmartReader.readTableAsUnionOrcFiles
 
 ### other
 
