@@ -97,7 +97,7 @@ Other spark-io modules:
 
 Spark-submit app `com.github.vasnake.spark.app.ml-models.ApplyerApp`
 and main workhorse for that app `com.github.vasnake.spark.ml.transformer.ApplyModelsTransformer`.
-This app takes a batch of ML models, trained earlier in some 'learn' app, and applied them to each row of an input dataset (DataFrame).
+This app takes a batch of ML models, trained earlier in some 'learn' app, and apply them to each row of an input dataset (DataFrame).
 Each ML model transform an input features vector to a score value, so that each input row transformed (exploded) to a batch of output rows.
 
 * com.github.vasnake.spark.app.datasets.JoinerApp

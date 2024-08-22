@@ -9,8 +9,8 @@ from pyspark.ml.util import JavaMLReadable, JavaMLWritable
 class ApplyModelsTransformer(JavaTransformer, JavaMLReadable, JavaMLWritable):
     """
     Spark.ml transformer.
-    Python wrapper for jvm class ApplyModelsTransformer.
-    Apply previously saved pipelines to input DataFrame.
+    Python wrapper for jvm class 'ApplyModelsTransformer'.
+    Apply previously saved models to input DataFrame.
 
     >>> df = spark.createDataFrame(
     ...     [("a", {}, {}, {}, [])],

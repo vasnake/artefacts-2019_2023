@@ -14,18 +14,11 @@ from scipy.stats.distributions import beta, expon, uniform, randint
 
 from lightgbm import LGBMClassifier
 
-from ..base import SApplyMixin
-from .base import BaseScoring, ScoringPLearnMixin, ScoringPApplyMixin
-
 from dmcore.predictors import SklearnNumericPredictorWrapper
 from dmcore.utils.io import write_json
-
-from .base import BaseClal, ClalPLearnMixin, ClalPApplyMixin
-
 from dmcore.metrics import uplift
 from dmcore.utils.common import filter_nans
 from dmcore.predictors import NMSLibKNeighbors, SklearnNumericPredictorWrapper
-
 from dmcore.transformers import (
     ImputeFeaturesTransformer,
     GroupedFeaturesTfidfTransformer,
@@ -35,22 +28,23 @@ from dmcore.transformers import (
     ImputeFeaturesTransformer
 )
 
-from dmgrinder.interface.models.base import SApplyMixin
-from dmgrinder.interface.tools import flatten_grouped_features, get_features_mask
+from .base import SApplyMixin, BaseLalBinaryRankerSA, LalBinarizedMultinomialNbPLPA, LalTfidfScaledSgdcPLPA
+from .base import BaseScoring, ScoringPLearnMixin, ScoringPApplyMixin
+from .base import BaseClal, ClalPLearnMixin, ClalPApplyMixin
 
-from dmgrinder.interface.models.clal.sa_repr.lal_binary_ranking import (
+from .sa_repr import (
     LalTfidfScaledSgdcRepr,
-    LalBinarizedMultinomialNbRepr
+    LalBinarizedMultinomialNbRepr,
 )
 
 
 class ScoringCustomLogRegSA(BaseScoring, SApplyMixin):
     """
-    Scala Apply for already learned and appropriately serialized
-    custom logistic regression scoring model.
+    Scala-Apply for already learned and appropriately serialized
+    custom scoring model (logistic regression).
 
-    Grinder model as a wrapper for scala-apply transformer called via
-    'interface.transformers.scala_wrappers.ApplyModelsTransformer'.
+    Model as a wrapper for scala-apply transformer called via
+    'ApplyModelsTransformer' class.
     """
 
     MODEL_FILENAME = "model_weights.json"
@@ -60,6 +54,8 @@ class ScoringCustomLogRegSA(BaseScoring, SApplyMixin):
 
 
 class LalBinarizedMultinomialNbPLSA(BaseLalBinaryRankerSA, LalBinarizedMultinomialNbPLPA):
+    """Scala-apply model, trained in python"""
+
     MODEL_REPR_FACTORY = LalBinarizedMultinomialNbRepr
 
     def __init__(self, *args, **kwargs):
@@ -72,6 +68,8 @@ class LalBinarizedMultinomialNbPLSA(BaseLalBinaryRankerSA, LalBinarizedMultinomi
 
 
 class LalTfidfScaledSgdcPLSA(BaseLalBinaryRankerSA, LalTfidfScaledSgdcPLPA):
+    """Scala-apply model, trained in python"""
+
     MODEL_REPR_FACTORY = LalTfidfScaledSgdcRepr
 
     def __init__(self, *args, **kwargs):

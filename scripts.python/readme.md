@@ -27,31 +27,10 @@ Collection of some interesting pieces from my projects.
 - [InsertIntoHive python wrapper](luigi-pyspark-apps/spark_utils.py#insert_into_hive)
 
 Scala-Apply wrappers and helpers for JVM implementation of the ScalaApply project
+- [Luigi 'Apply' task and 'apply_scala_models' method](luigi-pyspark-apps/scala_apply/apply_task.py#apply_scala_models)
 - [Spark.ml transformer ApplyModelsTransformer](luigi-pyspark-apps/scala_apply/apply_models_transformer.py#ApplyModelsTransformer)
-- [Three ML models adapted for Scala-Apply](luigi-pyspark-apps/scala_apply/ml_models_binary_rank.py)
-
-```s
-c:\Users\valik\Downloads\gitlab\dm.dmgrinder-workdir-local\dmgrinder\dmgrinder\interface\models\__init__.py
-
-- классы сериализации моделей в json, при сохранении обученных моделей
-  - `dmgrinder.interface.models.clal.sa_repr.lal_binary_ranking.LalTfidfScaledSgdcRepr`
-  - `dmgrinder.interface.models.clal.sa_repr.lal_binary_ranking.LalBinarizedMultinomialNbRepr`
-которые используют восемь классов сериализации стадий пайплайна моделей
-from dmgrinder.interface.models.utils.sa_repr import (
-    BinarizerRepr,
-    MultinomialNBRepr,
-    SGDClassifierRepr,
-    StandardScalerRepr,
-    SNPredictorWrapperRepr,
-    SBGroupedTransformerRepr,
-    ImputeFeaturesTransformerRepr,
-    GroupedFeaturesTfidfTransformerRepr
-)
-
-- функция `dmgrinder.tasks.ml.apply.apply.ApplyTask.apply_scala_models`;
-
-```
-snippets
+- [Three ML models adopted for Scala-Apply](luigi-pyspark-apps/scala_apply/ml_models_binary_rank.py)
+- [Models json serialization code](luigi-pyspark-apps/scala_apply/sa_repr.py)
 
 ???
 
