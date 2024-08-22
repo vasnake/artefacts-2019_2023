@@ -27,6 +27,7 @@ Integration test, bash scripts
 
 JVM procedure wrapper
 - [InsertIntoHive python wrapper](luigi-pyspark-apps/spark_utils.py#insert_into_hive)
+- [UDF/UDAF registration, register_all_udf](luigi-pyspark-apps/spark_utils.py#register_all_udf)
 
 Scala-Apply wrappers and helpers for JVM implementation of the ScalaApply project
 - [Luigi 'Apply' task and 'apply_scala_models' method](luigi-pyspark-apps/scala_apply/apply_task.py#apply_scala_models)

@@ -115,6 +115,39 @@ Used for transforming scores to meet a given prior class label distribution, aft
 `com.github.vasnake.spark.ml.estimator.ScoreQuantileThresholdEstimator` + `com.github.vasnake.spark.ml.model.ScoreQuantileThresholdModel`
 Used for transforming regression scores to class labels, keeping class distribution close to a given prior distribution.
 
+### spark-udf
+
+Before using mentioned here UDF/UDAF in your session you have to register them: `com.github.vasnake.spark.udf.catalog.registerAll(spark)`
+
+The set of generic SQL UDAF functions: `gavg, gsum, gmin, gmax, most_freq`.
+Supported data types: primitive numeric types, arrays of primitive numeric types, and maps
+with keys: `float`, `double`, `int`, `byte`, `long`, `short`, `bool`, `date`, `timestamp`, `string`;
+and values: `float`, `double`, `int`, `byte`, `long`, `short`, `decimal`.
+- org.apache.spark.sql.catalyst.vasnake.udf.GenericMin
+- org.apache.spark.sql.catalyst.vasnake.udf.GenericMax
+- org.apache.spark.sql.catalyst.vasnake.udf.GenericSum
+- org.apache.spark.sql.catalyst.vasnake.udf.GenericAvg
+- org.apache.spark.sql.catalyst.vasnake.udf.GenericMostFreq
+
+The set of vector/matrix UDF
+- org.apache.spark.sql.catalyst.vasnake.udf.GenericVectorCooMul
+- org.apache.spark.sql.catalyst.vasnake.udf.GenericVectorSemiSum
+- org.apache.spark.sql.catalyst.vasnake.udf.GenericVectorSemiDiff
+- org.apache.spark.sql.catalyst.vasnake.udf.GenericVectorMatMul
+
+Two generic functions, complementary to stock `isnan`
+- org.apache.spark.sql.catalyst.vasnake.udf.GenericIsInf
+- org.apache.spark.sql.catalyst.vasnake.udf.GenericIsFinite
+
+The set of non-generic trivial UDF
+- com.github.vasnake.spark.udf.`java-api`.HtmlUnescapeUDF
+- com.github.vasnake.spark.udf.`java-api`.MapValuesOrderedUDF
+- com.github.vasnake.spark.udf.`java-api`.CheckUINT32UDF
+- com.github.vasnake.spark.udf.`java-api`.HashToUINT32UDF
+- com.github.vasnake.spark.udf.`java-api`.MurmurHash3_32UDF
+- com.github.vasnake.spark.udf.`java-api`.MapJoinUDF
+- com.github.vasnake.spark.udf.`java-api`.Uid2UserUDF
+
 ### other
 
 - core
@@ -154,32 +187,6 @@ Used for transforming regression scores to class labels, keeping class distribut
 
 - ml-models-json
     * com.github.vasnake.json.read.ModelConfig
-
-- spark-udf
-    * spark-udf-java-api: grep 'import org.apache.spark.sql.api.java.UDF*'
-        - com.github.vasnake.spark.udf.`java-api`.HtmlUnescapeUDF
-        - com.github.vasnake.spark.udf.`java-api`.MapValuesOrderedUDF
-        - com.github.vasnake.spark.udf.`java-api`.CheckUINT32UDF
-        - com.github.vasnake.spark.udf.`java-api`.HashToUINT32UDF
-        - com.github.vasnake.spark.udf.`java-api`.MurmurHash3_32UDF
-        - com.github.vasnake.spark.udf.`java-api`.MapJoinUDF
-        - com.github.vasnake.spark.udf.`java-api`.Uid2UserUDF
-
-    * spark-catalyst-api udf: grep 'import org.apache.spark.sql.catalyst.expressions'
-        - org.apache.spark.sql.catalyst.vasnake.udf.GenericMin
-        - org.apache.spark.sql.catalyst.vasnake.udf.GenericMax
-        - org.apache.spark.sql.catalyst.vasnake.udf.GenericSum
-        - org.apache.spark.sql.catalyst.vasnake.udf.GenericAvg
-        - org.apache.spark.sql.catalyst.vasnake.udf.GenericMostFreq
-        - org.apache.spark.sql.catalyst.vasnake.udf.GenericVectorCooMul
-        - org.apache.spark.sql.catalyst.vasnake.udf.GenericVectorSemiSum
-        - org.apache.spark.sql.catalyst.vasnake.udf.GenericVectorSemiDiff
-        - org.apache.spark.sql.catalyst.vasnake.udf.GenericVectorMatMul
-        - org.apache.spark.sql.catalyst.vasnake.udf.GenericIsInf
-        - org.apache.spark.sql.catalyst.vasnake.udf.GenericIsFinite
-
-    * spark-udf-catalog
-        - com.github.vasnake.spark.udf.catalog
 
 - spark-transformers
     * com.github.vasnake.`etl-core`.aggregate.AggregationPipeline
