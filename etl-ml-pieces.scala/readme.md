@@ -102,6 +102,19 @@ Each ML model transform an input features vector to a score value, so that each 
 
 * com.github.vasnake.spark.app.datasets.JoinerApp
 
+### spark-ml
+
+Three spark.ml estimators + models. All three support stratification and sampling inside stratas.
+
+`com.github.vasnake.spark.ml.estimator.ScoreEqualizerEstimator` + `com.github.vasnake.spark.ml.model.ScoreEqualizerModel`
+Used for fixing values distribution.
+
+`com.github.vasnake.spark.ml.estimator.NEPriorClassProbaEstimator` + `com.github.vasnake.spark.ml.model.NEPriorClassProbaModel`
+Used for transforming scores to meet a given prior class label distribution, after ArgMax is applied.
+
+`com.github.vasnake.spark.ml.estimator.ScoreQuantileThresholdEstimator` + `com.github.vasnake.spark.ml.model.ScoreQuantileThresholdModel`
+Used for transforming regression scores to class labels, keeping class distribution close to a given prior distribution.
+
 ### other
 
 - core
@@ -177,14 +190,6 @@ Each ML model transform an input features vector to a score value, so that each 
     * com.github.vasnake.spark.dataset.transform.Joiner#joinDatasets
     * com.github.vasnake.spark.dataset.transform.TopNRowsExact
     * com.github.vasnake.spark.dataset.transform.TopNRowsApprox
-
-- spark-ml
-    * com.github.vasnake.spark.ml.model.ScoreEqualizerModel
-    * com.github.vasnake.spark.ml.estimator.ScoreEqualizerEstimator
-    * com.github.vasnake.spark.ml.model.NEPriorClassProbaModel
-    * com.github.vasnake.spark.ml.estimator.NEPriorClassProbaEstimator
-    * com.github.vasnake.spark.ml.model.ScoreQuantileThresholdModel
-    * com.github.vasnake.spark.ml.estimator.ScoreQuantileThresholdEstimator
 
 - spark-apps test (experiments)
     * com.github.vasnake.spark.app.interview.transform_array.InvalidValuesToNullApp

@@ -6,6 +6,7 @@ Collection of some interesting pieces from my projects.
 
 ## What do we have here
 
+Integration test, bash scripts
 - [Unfinished experiments, spark-submit app logger](./spark-submit-app-logger/readme.md)
 
 - [Run local Spark cluster](./run-spark-local/run-spark-standalone.sh)
@@ -24,6 +25,7 @@ Collection of some interesting pieces from my projects.
 - [Spark Java UDF tests, runner](./run-spark-local/spark-submit-java-udf-test.sh)
 - [Spark Java UDF tests, script](./run-spark-local/java_udf_test.py)
 
+JVM procedure wrapper
 - [InsertIntoHive python wrapper](luigi-pyspark-apps/spark_utils.py#insert_into_hive)
 
 Scala-Apply wrappers and helpers for JVM implementation of the ScalaApply project
@@ -31,6 +33,11 @@ Scala-Apply wrappers and helpers for JVM implementation of the ScalaApply projec
 - [Spark.ml transformer ApplyModelsTransformer](luigi-pyspark-apps/scala_apply/apply_models_transformer.py#ApplyModelsTransformer)
 - [Three ML models adopted for Scala-Apply](luigi-pyspark-apps/scala_apply/ml_models_binary_rank.py)
 - [Models json serialization code](luigi-pyspark-apps/scala_apply/sa_repr.py)
+
+Spark.ml wrappers for JVM implementation of estimators and models (see spark.ml lib)
+- [ScoreEqualizeTransformer + ScoreEqualizeTransformerModel](spark_ml/postprocessing.py#ScoreEqualizeTransformer)
+- [NEPriorClassProbaTransformer + NEPriorClassProbaTransformerModel](spark_ml/postprocessing.py#NEPriorClassProbaTransformer)
+- [ScoreQuantileThresholdTransformer + ScoreQuantileThresholdTransformerModel](spark_ml/postprocessing.py#ScoreQuantileThresholdTransformer)
 
 ???
 
@@ -41,4 +48,4 @@ Scala-Apply wrappers and helpers for JVM implementation of the ScalaApply projec
 - wrappers for spark-scala classes, functions
 - apps: learn, apply, export, join
 
-TODO: all scripts should run successfully, in proper docker containers.
+TODO: all scripts should run successfully, in proper docker container.
