@@ -10,7 +10,7 @@ case class Scaler(config: ScalerConfig) extends GroupedFeaturesTransformer {
   if (config.withStd && config.withMean)
     require(
       config.scales.length == config.means.length,
-      "mean and scale arrays length must be equal",
+      "mean and scale arrays length must be equal"
     )
 
   private val nFeatures =
@@ -22,7 +22,7 @@ case class Scaler(config: ScalerConfig) extends GroupedFeaturesTransformer {
     require(
       (nFeatures > 0 && input.length == nFeatures) ||
       (nFeatures == 0 && input.length > 0),
-      "input vector must not be empty and size must correspond to coeff. vector size",
+      "input vector must not be empty and size must correspond to coeff. vector size"
     )
 
     if (nFeatures > 0) {
@@ -41,5 +41,5 @@ case class ScalerConfig(
   withMean: Boolean = false,
   withStd: Boolean = false,
   means: Array[Double] = Array.empty,
-  scales: Array[Double] = Array.empty,
+  scales: Array[Double] = Array.empty
 )

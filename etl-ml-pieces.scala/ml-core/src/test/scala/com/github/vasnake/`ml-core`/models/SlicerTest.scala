@@ -33,7 +33,7 @@ class SlicerTest extends AnyFlatSpec with should.Matchers {
     val expected: Seq[Seq[Float]] = Seq(
       Seq(2),
       Seq(12),
-      Seq(22),
+      Seq(22)
     ).map(_.map(_.toFloat))
 
     val transformer = Slicer(columns = Array(1))
@@ -48,7 +48,7 @@ class SlicerTest extends AnyFlatSpec with should.Matchers {
     val expected: Seq[Seq[Float]] = Seq(
       Seq(4, 2),
       Seq(14, 12),
-      Seq(24, 22),
+      Seq(24, 22)
     ).map(_.map(_.toFloat))
 
     val transformer = Slicer(columns = Array(3, 1))
@@ -63,7 +63,7 @@ class SlicerTest extends AnyFlatSpec with should.Matchers {
     val expected: Seq[Seq[Float]] = Seq(
       Seq(3, 3),
       Seq(13, 13),
-      Seq(23, 23),
+      Seq(23, 23)
     ).map(_.map(_.toFloat))
 
     val transformer = Slicer(columns = Array(2, 2))
@@ -79,12 +79,12 @@ object SlicerTest {
   val input: Seq[Array[Float]] = Seq(
     Seq(1, 2, 3, 4, 5),
     Seq(11, 12, 13, 14, 15),
-    Seq(21, 22, 23, 24, 25),
+    Seq(21, 22, 23, 24, 25)
   ).map(_.map(_.toFloat).toArray)
 
   def floatsAreEqual(
     a: Float,
-    b: Float,
+    b: Float
   )(implicit
     tolerance: Float
   ): Boolean =

@@ -59,7 +59,7 @@ class NEPriorClassProbaEstimator(override val uid: String)
             s"size(score) = ${getNumClasses} and " +
             s"not exists(score, x -> isnull(x) or isnan(x) or x < 0) and " +
             s"exists(score, x -> x > 0)",
-          cacheFunction = cacheFunction,
+          cacheFunction = cacheFunction
         )
 
         // Dataset[(group, score)], cached
@@ -98,7 +98,7 @@ object NEPriorClassProbaEstimator {
   def distributedFit(
     group_score: DataFrame,
     numClasses: Int,
-    priorValues: Array[Double],
+    priorValues: Array[Double]
   ): Dataset[(String, String, Option[Array[Double]])] = {
     import group_score.sparkSession.implicits._
     val ds = group_score.as[(String, Array[Double])]
@@ -116,7 +116,7 @@ object NEPriorClassProbaEstimator {
   def fit(
     probs: Iterator[Array[Double]],
     numClasses: Int,
-    priorValues: Array[Double],
+    priorValues: Array[Double]
   ): (String, Option[Array[Double]]) =
     NEPriorClassProba.fit(probs, numClasses, priorValues)
 }

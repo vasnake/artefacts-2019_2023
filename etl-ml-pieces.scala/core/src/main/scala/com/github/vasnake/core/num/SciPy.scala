@@ -70,15 +70,15 @@ object SciPy {
     def fromDerivatives(
       xs: Array[Double],
       ys: Array[Double],
-      dk: Array[Double],
+      dk: Array[Double]
     ): Array[Array[Double]] = {
       require(
         xs.length == ys.length && ys.length == dk.length,
-        "xi and yi and dk need to have the same length",
+        "xi and yi and dk need to have the same length"
       )
       require(
         xs.indices.forall(idx => idx == 0 || (xs(idx) - xs(idx - 1)) > 0),
-        "x coordinates are not in increasing order",
+        "x coordinates are not in increasing order"
       )
 
       val m = xs.length - 1
@@ -92,7 +92,7 @@ object SciPy {
           ys(idx),
           ys(idx + 1),
           dk(idx),
-          dk(idx + 1),
+          dk(idx + 1)
         )
         c(idx) = b
       }
@@ -106,7 +106,7 @@ object SciPy {
       ya: Double,
       yb: Double,
       da: Double,
-      db: Double,
+      db: Double
     ): Array[Double] = {
       val c = new Array[Double](4)
 
@@ -125,7 +125,7 @@ object SciPy {
       h0: Double,
       h1: Double,
       m0: Double,
-      m1: Double,
+      m1: Double
     ): Double = {
       val d = ((2.0 * h0 + h1) * m0 - h0 * m1) / (h0 + h1)
 
@@ -147,7 +147,7 @@ object SciPy {
     def interpolate(
       xval: Double,
       coefficients: Array[Array[Double]],
-      intervals: Array[Double],
+      intervals: Array[Double]
     ): Double = {
       val idx = searchSorted(intervals, xval)
 
@@ -156,14 +156,14 @@ object SciPy {
         evaluateBpoly(
           (xval - intervals(idx)) / (intervals(idx + 1) - intervals(idx)),
           coefficients,
-          idx,
+          idx
         )
     }
 
     @inline private def evaluateBpoly(
       point: Double,
       coefficients: Array[Array[Double]],
-      idx: Int,
+      idx: Int
     ): Double = {
       val one = 1.0 - point
 

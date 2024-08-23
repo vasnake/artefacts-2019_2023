@@ -1,7 +1,5 @@
 # Scripts and modules (Python)
 
-WIP
-
 Collection of some interesting pieces from my projects.
 
 ## What do we have here

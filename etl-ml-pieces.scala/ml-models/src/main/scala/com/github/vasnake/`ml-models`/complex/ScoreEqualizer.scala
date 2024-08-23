@@ -17,7 +17,7 @@ case class ScoreEqualizerConfig(
   eps: Double,
   coefficients: Array[Array[Double]],
   intervals: Array[Double],
-  random_value: Option[Double] = None,
+  random_value: Option[Double] = None
 ) extends PostprocessorConfig {
   override def toString: String =
     s"minval = ${minval}, maxval = ${maxval}, noise = $noise, eps = $eps, random_value = $random_value, " +
@@ -33,7 +33,7 @@ case class ScoreEqualizer(config: ScoreEqualizerConfig) extends InplaceTransform
   require(config.coefficients.length == 4, "polynomial order must be = 3")
   require(
     config.coefficients.forall(_.length == nIntervals - 1),
-    "must have coefficients for each interval",
+    "must have coefficients for each interval"
   )
 
   require(
@@ -47,7 +47,7 @@ case class ScoreEqualizer(config: ScoreEqualizerConfig) extends InplaceTransform
       .intervals
       .indices
       .forall(idx => idx == 0 || config.intervals(idx) < config.intervals(idx - 1)),
-    "wrong intervals endpoints",
+    "wrong intervals endpoints"
   )
 
   private val random: () => Double = {
@@ -83,14 +83,14 @@ case class ScoreEqualizer(config: ScoreEqualizerConfig) extends InplaceTransform
     PPolyBernsteinCubic.interpolate(
       scaleAddNoiseAndStretch(xval),
       config.coefficients,
-      config.intervals,
+      config.intervals
     )
 
   @inline def scaleAddNoiseAndStretch(xval: Double): Double =
     stretchEdgesUnitScale(
       if (config.noise > 0.0) addnoise((xval - config.minval) / maxmin, config.noise)
       else (xval - config.minval) / maxmin,
-      config.eps,
+      config.eps
     )
 
   @inline private def addnoise(xval: Double, noise: Double): Double =
@@ -124,7 +124,7 @@ object ScoreEqualizer {
     noiseValue: Double,
     epsValue: Double,
     randomValue: Double,
-    numBins: Int,
+    numBins: Int
   ): (String, Option[ScoreEqualizerConfig]) = Try {
 
     // compute min,max: fail if no data; default minmax = 0..1 if only one unique value
@@ -145,7 +145,7 @@ object ScoreEqualizer {
 
     require(
       arr.length >= minInputSize,
-      s"Collecting data statistics has failed. No values found to estimate scores CDF, input.size = ${arr.length}",
+      s"Collecting data statistics has failed. No values found to estimate scores CDF, input.size = ${arr.length}"
     )
 
     val msg = if (minval >= maxval) {
@@ -164,7 +164,7 @@ object ScoreEqualizer {
       maxval = maxval,
       // TODO: we don't need cdf right here, ScoreEqualizer should be split on two transformers: normalizer and equalizer
       coefficients = (0 to 3).map(_ => Array(0.0)).toArray,
-      intervals = Array(0.0, 1.0),
+      intervals = Array(0.0, 1.0)
     )
 
     // scale, add noise, stretch
@@ -221,7 +221,7 @@ object ScoreEqualizer {
 
     CDFCoefficients(
       coefficients = PCHIP.coefficients(bins, ys),
-      intervals = bins,
+      intervals = bins
     )
   }
 

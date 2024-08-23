@@ -10,23 +10,23 @@ case class MultinomialNB(config: MultinomialNBConfig) extends Estimator {
   // https://github.com/scikit-learn/scikit-learn/blob/3743a55aed5c9ee18c8b94b95dfc4c41d0ae99f5/sklearn/naive_bayes.py#L102
   require(
     config.featuresLength > 0 && config.predictLength > 0,
-    "features length and number of classes must be greater than zero",
+    "features length and number of classes must be greater than zero"
   )
   require(
     config.featureLogProb.forall(_.length == config.featuresLength),
-    "features length must be consistent in config parameters",
+    "features length must be consistent in config parameters"
   )
   require(
     config.predictLength == config
       .classLogPrior
       .length && config.predictLength == config.featureLogProb.length,
-    "number of classes must be consistent in config parameters",
+    "number of classes must be consistent in config parameters"
   )
 
   override def predict(features: Array[Double]): Array[Double] = {
     require(
       features.length == config.featuresLength,
-      "features vector must have size declared in config",
+      "features vector must have size declared in config"
     )
     // version with C-style loops 3-times faster than scala collections operators
     var jllMax: Double = Double.MinValue
@@ -84,5 +84,5 @@ case class MultinomialNBConfig(
   featuresLength: Int,
   predictLength: Int,
   classLogPrior: Array[Double],
-  featureLogProb: Array[Array[Double]],
+  featureLogProb: Array[Array[Double]]
 )

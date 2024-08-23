@@ -12,7 +12,7 @@ object NumPy {
   def digitize(
     x: Double,
     bins: Array[Double],
-    right: Boolean = false,
+    right: Boolean = false
   ): Int = {
     // TODO: add tests
     /*
@@ -210,7 +210,7 @@ object NumPy {
     xs: Array[Double],
     start: Int,
     stop: Int,
-    step: Int,
+    step: Int
   ): Array[Double] = {
     // TODO: add negative indices; tests, docs, optimizations
     // more options here https://github.com/botkop/numsca

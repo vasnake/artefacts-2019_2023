@@ -11,7 +11,7 @@ case class LalTfidfScaledSgdcModelConfig(
   scalerConfig: ScalerConfig,
   predictorWrapperConfig: PredictorWrapperConfig,
   predictorConfig: PMMLEstimatorConfig,
-  equalizerConfig: SBGroupedTransformerConfig,
+  equalizerConfig: SBGroupedTransformerConfig
 )
 
 case class LalTfidfScaledSgdcModel // TODO: rename to LalTfidfScaledSgdc
@@ -19,7 +19,7 @@ case class LalTfidfScaledSgdcModel // TODO: rename to LalTfidfScaledSgdc
   config: LalTfidfScaledSgdcModelConfig,
   groupedFeatures: GroupedFeatures,
   audienceName: String,
-  equalizerSelector: String,
+  equalizerSelector: String
 ) extends ComplexMLModel {
   private val imputer = Imputer(config.imputerConfig)
   private val tfidf = GroupedFeaturesTfidfTransformer(config.tfidfConfig)
@@ -37,7 +37,7 @@ case class LalTfidfScaledSgdcModel // TODO: rename to LalTfidfScaledSgdc
   private val equalizer = SBGroupedTransformer(
     config.equalizerConfig,
     group = equalizerSelector,
-    transformerFactory = cfg => ScoreEqualizer(cfg.asInstanceOf[ScoreEqualizerConfig]),
+    transformerFactory = cfg => ScoreEqualizer(cfg.asInstanceOf[ScoreEqualizerConfig])
   )
 
   // TODO: check stages parameters consistency before deciding that model is OK
@@ -57,7 +57,7 @@ case class LalTfidfScaledSgdcModel // TODO: rename to LalTfidfScaledSgdc
       scores_raw,
       scores,
       audienceName,
-      "positive",
+      "positive"
     )
   }
 

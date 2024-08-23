@@ -66,7 +66,7 @@ object ApplyModelsTransformerBenchApp extends SparkApp {
   case class DummyModel(
     groupedFeatures: GroupedFeatures,
     audienceName: String,
-    mulFactor: Double,
+    mulFactor: Double
   ) extends ComplexMLModel {
     override def isOK: Boolean = true
 
@@ -79,7 +79,7 @@ object ApplyModelsTransformerBenchApp extends SparkApp {
         scores_raw, // raw scores array
         scores, // equalized scores array
         audienceName, // project id (target)
-        category,
+        category
       )
     }
 
@@ -130,7 +130,7 @@ object ApplyModelsTransformerBenchApp extends SparkApp {
         Seq(
           LalTfidfScaledSgdcModel(cfg, groupedFeatures, "tfidf1", "OKID"),
           LalTfidfScaledSgdcModel(cfg, groupedFeatures, "tfidf2", "VKID"),
-          LalTfidfScaledSgdcModel(cfg, groupedFeatures, "tfidf3", "EMAIL"),
+          LalTfidfScaledSgdcModel(cfg, groupedFeatures, "tfidf3", "EMAIL")
         )
       )
       .getOrElse(
@@ -139,14 +139,14 @@ object ApplyModelsTransformerBenchApp extends SparkApp {
             Seq(
               LalBinarizedMultinomialNbModel(cfg, groupedFeatures, "binmnb1", "OKID"),
               LalBinarizedMultinomialNbModel(cfg, groupedFeatures, "binmnb2", "VKID"),
-              LalBinarizedMultinomialNbModel(cfg, groupedFeatures, "binmnb3", "EMAIL"),
+              LalBinarizedMultinomialNbModel(cfg, groupedFeatures, "binmnb3", "EMAIL")
             )
           )
           .getOrElse(
             Seq(
               DummyModel(groupedFeatures, "dm1", 0.1),
               DummyModel(groupedFeatures, "dm2", 0.01),
-              DummyModel(groupedFeatures, "dm3", 0.001),
+              DummyModel(groupedFeatures, "dm3", 0.001)
             )
           )
       )
@@ -180,7 +180,7 @@ object ApplyModelsTransformerBenchApp extends SparkApp {
             Key.exec.minWarmupRuns -> 1,
             Key.exec.maxWarmupRuns -> 2,
             Key.exec.benchRuns -> 3,
-            Key.verbose -> false,
+            Key.verbose -> false
           )
           .withWarmer(new Warmer.Default)
       }
@@ -193,7 +193,7 @@ object ApplyModelsTransformerBenchApp extends SparkApp {
   private def transform(
     input: DataFrame,
     transformer: ApplyModelsTransformer,
-    round: Int,
+    round: Int
   ): Unit = {
     if (!transformer.initialize()) sys.error("can't initialize scala-apply transformer")
     val output: DataFrame = transformer.transform(input)
@@ -220,7 +220,7 @@ object ApplyModelsTransformerBenchApp extends SparkApp {
 
   private def getTransformer(
     grinderModels: Seq[ComplexMLModel],
-    keepColumns: Seq[String] = Seq.empty,
+    keepColumns: Seq[String] = Seq.empty
   ) =
     new ApplyModelsTransformer() {
       override def buildConfig(): ApplyModelsTransformerConfig =

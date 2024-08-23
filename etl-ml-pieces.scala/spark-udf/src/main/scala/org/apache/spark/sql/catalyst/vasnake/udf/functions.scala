@@ -23,7 +23,7 @@ object functions {
     funcName: String,
     targetName: String,
     spark: SparkSession,
-    overrideIfExists: Boolean = false,
+    overrideIfExists: Boolean = false
   ): Unit = {
     val (info, builder, alias) = expressions(funcName) // possible NoSuchElementException
 
@@ -34,10 +34,10 @@ object functions {
         CatalogFunction(
           FunctionIdentifier(if (targetName.isEmpty) alias else targetName),
           info.getClassName,
-          Seq.empty,
+          Seq.empty
         ),
         overrideIfExists = overrideIfExists,
-        Some(builder),
+        Some(builder)
       )
   }
 
@@ -59,7 +59,7 @@ object functions {
   def registerJava(
     funcName: String,
     classPath: String,
-    spark: SparkSession,
+    spark: SparkSession
   ): Unit =
     spark.udf.registerJava(funcName, classPath, null)
 
@@ -94,19 +94,19 @@ object functions {
     columnName: String,
     index: String = "null",
     threshold: String = "null",
-    prefer: String = "null",
+    prefer: String = "null"
   ): Column = generic_most_freq(
     Column(columnName),
     sql.functions.expr(index).expr,
     sql.functions.expr(threshold).expr,
-    sql.functions.expr(prefer).expr,
+    sql.functions.expr(prefer).expr
   )
 
   def generic_most_freq(
     e: Column,
     index: Expression,
     threshold: Expression,
-    prefer: Expression,
+    prefer: Expression
   ): Column = withAggregateFunction {
     GenericMostFreq(e.expr, index, threshold, prefer)
   }
@@ -156,7 +156,7 @@ object functions {
     expression[GenericVectorSemiDiff]("generic_semidiff", "semidiff"),
     expression[GenericVectorMatMul]("generic_matmul", "matmul"),
     expression[GenericIsInf]("generic_isinf", "isinf"),
-    expression[GenericIsFinite]("generic_isfinite", "isfinite"),
+    expression[GenericIsFinite]("generic_isfinite", "isfinite")
   )
 
   // Internals, see org.apache.spark.sql.catalyst.analysis.FunctionRegistry
@@ -170,7 +170,7 @@ object functions {
 
   private def expression[T <: Expression](
     name: String,
-    alias: String,
+    alias: String
   )(implicit
     tag: ClassTag[T]
   ): (String, (ExpressionInfo, FunctionBuilder, String)) = {
@@ -242,7 +242,7 @@ object functions {
         anno.arguments(),
         anno.examples(),
         anno.note(),
-        anno.since(),
+        anno.since()
       )
     else
       new ExpressionInfo(clazz.getCanonicalName, name)

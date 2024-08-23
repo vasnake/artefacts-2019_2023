@@ -19,7 +19,7 @@ class ScoreEqualizerTest extends AnyFlatSpec with should.Matchers {
       noise = 0f,
       eps = 0f,
       coefficients = Seq(Array(1f), Array(2f), Array(3f), Array(4f)).map(_.map(_.toDouble)).toArray,
-      intervals = Array(0f, 1f),
+      intervals = Array(0f, 1f)
     )
     val transformer = ScoreEqualizer(config)
   }
@@ -31,7 +31,7 @@ class ScoreEqualizerTest extends AnyFlatSpec with should.Matchers {
       noise = 0f,
       eps = 0f,
       coefficients = Seq(Array(1f), Array(2f), Array(3f), Array(4f)).map(_.map(_.toDouble)).toArray,
-      intervals = Array(0f, 1f),
+      intervals = Array(0f, 1f)
     )
     val transformer = ScoreEqualizer(config)
 
@@ -51,7 +51,7 @@ class ScoreEqualizerTest extends AnyFlatSpec with should.Matchers {
           noise = 0,
           eps = 0,
           coefficients = Seq(Array.empty[Double]),
-          intervals = Array.empty[Double],
+          intervals = Array.empty[Double]
         )
       )
     }
@@ -65,7 +65,7 @@ class ScoreEqualizerTest extends AnyFlatSpec with should.Matchers {
           noise = 0f,
           eps = 0f,
           coefficients = Seq(Array(1f), Array(2f), Array(3f)).map(_.map(_.toDouble)).toArray,
-          intervals = Array(0f, 1f),
+          intervals = Array(0f, 1f)
         )
       )
     }
@@ -80,7 +80,7 @@ class ScoreEqualizerTest extends AnyFlatSpec with should.Matchers {
           eps = 0f,
           coefficients =
             Seq(Array(1f), Array(2f), Array(3f), Array(4f, 5f)).map(_.map(_.toDouble)).toArray,
-          intervals = Array(0f, 1f),
+          intervals = Array(0f, 1f)
         )
       )
     }
@@ -95,7 +95,7 @@ class ScoreEqualizerTest extends AnyFlatSpec with should.Matchers {
           eps = 0f,
           coefficients =
             Seq(Array(1f), Array(2f), Array(3f), Array(4f)).map(_.map(_.toDouble)).toArray,
-          intervals = Array(0f),
+          intervals = Array(0f)
         )
       )
     }
@@ -124,12 +124,12 @@ class ScoreEqualizerTest extends AnyFlatSpec with should.Matchers {
             1.0),
           Seq(0.0, 0.1111111111111111, 0.2222222222222222, 0.3333333333333333, 0.4444444444444444,
             0.5555555555555556, 0.6666666666666666, 0.7777777777777778, 0.8888888888888888, 1.0,
-            1.0),
+            1.0)
         ).map(_.toArray),
         intervals = Array(
           0.0, 1e-06, 0.125001125, 0.25000075, 0.375000375, 0.5, 0.624999625, 0.74999925,
-          0.8749988749999998, 0.999999, 0.999999000001, 1.0,
-        ),
+          0.8749988749999998, 0.999999, 0.999999000001, 1.0
+        )
       )
     )
 
@@ -164,7 +164,7 @@ class ScoreEqualizerTest extends AnyFlatSpec with should.Matchers {
           |0.0, 1.1213807660226394e-12, 1.0,                1.0
           |0.0, 0.4377145164546739,     1.0,                1.0
           |""".stripMargin.trim.split('\n').toSeq.map(line => line.split(',').map(_.trim.toDouble)),
-        intervals = "0.0, 0.001, 0.999, 0.999000000001, 1.0".split(',').map(_.toDouble),
+        intervals = "0.0, 0.001, 0.999, 0.999000000001, 1.0".split(',').map(_.toDouble)
       )
     )
 
@@ -180,7 +180,7 @@ object ScoreEqualizerTest {
   def floatsAreEqual(
     a: Float,
     b: Float,
-    tolerance: Float,
+    tolerance: Float
   ): Boolean =
     (a.isNaN && b.isNaN) || (
       (a <= b + tolerance) && (a >= b - tolerance)

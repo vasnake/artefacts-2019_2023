@@ -16,7 +16,7 @@ import com.github.vasnake.core.num.VectorToolbox
 case class FeaturesGroup(
   name: String,
   index: Array[String],
-  isArray: Boolean = false,
+  isArray: Boolean = false
 ) {
   override def toString: String =
     s"""FeaturesGroup("${name}", Array(${index.mkString(", ")}), isArray = ${isArray})"""
@@ -34,7 +34,7 @@ case class GroupedFeatures(groups: Seq[FeaturesGroup]) {
 object GroupedFeatures {
   def sliceFeaturesVector[@specialized(Double, Float) T: ClassTag](
     features: Array[T],
-    indices: Array[Int],
+    indices: Array[Int]
   ): Array[T] =
     VectorToolbox.selectIndexed(features, indices)
 
@@ -58,7 +58,7 @@ object GroupedFeatures {
             name,
             throw new IndexOutOfBoundsException(
               s"can't find feature name '${name}' in group '${mergedGroup}'"
-            ),
+            )
           ) + prefixSize
         )
 
@@ -90,7 +90,7 @@ object GroupedFeatures {
     if (groupedFeatures.isDefinedAt(fg.name))
       groupedFeatures.updated(
         fg.name,
-        (groupedFeatures(fg.name) ++ fg.index).distinct,
+        (groupedFeatures(fg.name) ++ fg.index).distinct
       )
     else groupedFeatures + (fg.name -> fg.index.distinct)
 

@@ -50,7 +50,7 @@ object EtlFeatures {
     DOMAIN_AGG_KEY -> AggregationConfig(
       pipeline = List("agg"),
       stages =
-        Map("agg" -> AggregationStageConfig(name = "avg", kind = "agg", parameters = Map.empty)),
+        Map("agg" -> AggregationStageConfig(name = "avg", kind = "agg", parameters = Map.empty))
     )
   )
 
@@ -88,7 +88,7 @@ object EtlFeatures {
   private def columnsSizes(
     domain: String,
     cols: Seq[String],
-    df: DataFrame,
+    df: DataFrame
   ): Map[String, Int] = {
     // TODO: consider optimization possibilities: catalog, pre-calculated stats, analyze table and such
     //  https://jaceklaskowski.gitbooks.io/mastering-spark-sql/spark-sql-cost-based-optimization.html
@@ -122,17 +122,17 @@ object EtlFeatures {
     def collectPrimitives(
       df: DataFrame,
       cols: Seq[String],
-      domainName: String,
+      domainName: String
     ): DataFrame
     def renameToDomain(
       df: DataFrame,
       col: String,
-      domainName: String,
+      domainName: String
     ): DataFrame
     def mergeCollections(
       df: DataFrame,
       domainName: String,
-      cols: Seq[String],
+      cols: Seq[String]
     ): DataFrame
     def notNullItemsCount(domainName: String): sql.Column
   }
@@ -148,7 +148,7 @@ object EtlFeatures {
     def collectPrimitives(
       df: DataFrame,
       cols: Seq[String],
-      domainName: String,
+      domainName: String
     ): DataFrame = {
       // df.withColumn(s"${domainName}_primitives", ...) produces wrong columns order
       val domainColumn = sf.array(cols.map(cn => sf.col(cn).cast(itemDataType)): _*)
@@ -158,20 +158,20 @@ object EtlFeatures {
     def renameToDomain(
       df: DataFrame,
       col: String,
-      domainName: String,
+      domainName: String
     ): DataFrame = df.withColumnRenamed(col, domainName)
 
     def mergeCollections(
       df: DataFrame,
       domainName: String,
-      cols: Seq[String],
+      cols: Seq[String]
     ): DataFrame = {
       // when `$arraycolumn is null`: replace missing features with null values
       lazy val sizes: Map[String, Int] = {
         val name_size = columnsSizes(domainName, cols, df)
         require(
           name_size.values.forall(sz => sz >= 0),
-          s"ARRAY_TYPE domain parts must have size >= 0. Domain `${domainName}`, parts sizes `${name_size}`",
+          s"ARRAY_TYPE domain parts must have size >= 0. Domain `${domainName}`, parts sizes `${name_size}`"
         )
         name_size
       }
@@ -182,10 +182,10 @@ object EtlFeatures {
           cols.map(n =>
             sf.coalesce(
               sf.col(n),
-              sf.expr(s"array_repeat(cast(null as float), ${sizes(n)})"),
+              sf.expr(s"array_repeat(cast(null as float), ${sizes(n)})")
             )
           ): _*
-        ),
+        )
       )
     }
 
@@ -204,7 +204,7 @@ object EtlFeatures {
     def collectPrimitives(
       df: DataFrame,
       cols: Seq[String],
-      domainName: String,
+      domainName: String
     ): DataFrame = {
       val domainColumn = sf.map(
         cols
@@ -223,30 +223,30 @@ object EtlFeatures {
     def renameToDomain(
       df: DataFrame,
       col: String,
-      domainName: String,
+      domainName: String
     ): DataFrame =
       dropMapNullValues(
         df.withColumnRenamed(col, domainName),
-        domainName,
+        domainName
       )
 
     def mergeCollections(
       df: DataFrame,
       domainName: String,
-      cols: Seq[String],
+      cols: Seq[String]
     ): DataFrame =
       cols
         .foldLeft(df)((df, colName) => dropMapNullValues(df, colName, Some(collectionDataType)))
         .withColumn(
           domainName,
-          sf.expr(s"brickhouse_combine(${cols.mkString(",")})"), // TODO: eliminate external dependency (create catalyst UDF)
+          sf.expr(s"brickhouse_combine(${cols.mkString(",")})") // TODO: eliminate external dependency (create catalyst UDF)
         )
 
     def notNullItemsCount(domainName: String): sql.Column =
       sf.size(
         sf.coalesce(
           sf.col(domainName),
-          sf.expr("map()"),
+          sf.expr("map()")
         )
       )
   }
@@ -254,7 +254,7 @@ object EtlFeatures {
   def dropMapNullValues(
     df: DataFrame,
     colName: String,
-    colType: Option[sql.types.DataType] = None,
+    colType: Option[sql.types.DataType] = None
   ): DataFrame = {
     import sql.{ functions => sf }
 
@@ -305,7 +305,7 @@ object EtlFeatures {
   def createEmptyTable(
     df: DataFrame,
     fqTableName: String,
-    partitionColumnsNames: Seq[String],
+    partitionColumnsNames: Seq[String]
   )(implicit
     log: Logger
   ): Unit = {
@@ -324,14 +324,14 @@ object EtlFeatures {
 
     escalateError(
       res,
-      exception => log.fatal(s"Create table failed: ${exception.getMessage}", exception),
+      exception => log.fatal(s"Create table failed: ${exception.getMessage}", exception)
     )
   }
 
   def writePartitionToTable(
     df: DataFrame,
     fqTableName: String,
-    partition: Map[String, String],
+    partition: Map[String, String]
   )(implicit
     log: Logger
   ): Unit = {
@@ -350,7 +350,7 @@ object EtlFeatures {
 
     escalateError(
       res,
-      exception => log.fatal(s"Write to table failed: ${exception.getMessage}", exception),
+      exception => log.fatal(s"Write to table failed: ${exception.getMessage}", exception)
     )
   }
 
@@ -358,7 +358,7 @@ object EtlFeatures {
     df: DataFrame,
     stagingHdfsDir: String,
     minTargetRows: Long,
-    outputPartitions: Int,
+    outputPartitions: Int
   )(implicit
     log: Logger
   ): Try[DataFrame] = Try {
@@ -385,7 +385,7 @@ object EtlFeatures {
     val rowsCount = persistedDF.count()
     require(
       rowsCount >= minTargetRows,
-      s"Result rows count must be not less than $minTargetRows, got $rowsCount",
+      s"Result rows count must be not less than $minTargetRows, got $rowsCount"
     )
     log.info(s"Result rows count: $rowsCount")
 
@@ -394,7 +394,7 @@ object EtlFeatures {
 
   def repartitionToOutputParts(
     df: DataFrame,
-    outputPartitions: Int,
+    outputPartitions: Int
   )(implicit
     log: Logger
   ): DataFrame =
@@ -459,7 +459,7 @@ object EtlFeatures {
 
   def prepareMatchingTable(
     cfg: TableConfig,
-    df: DataFrame,
+    df: DataFrame
   )(implicit
     spark: SparkSession
   ): Dataset[MatchingTableRow] = {
@@ -472,7 +472,7 @@ object EtlFeatures {
         "cast(uid1 as string) uid1",
         "cast(uid2 as string) uid2",
         "cast(uid1_type as string) uid1_type",
-        "cast(uid2_type as string) uid2_type",
+        "cast(uid2_type as string) uid2_type"
       )
       .na
       .drop()
@@ -493,7 +493,7 @@ object EtlFeatures {
 
     require(
       sources.length == cfg.source.names.length,
-      s"Domain sources and config.source.names must be collections of the same size. cfg: ${cfg}, sources: ${sources}",
+      s"Domain sources and config.source.names must be collections of the same size. cfg: ${cfg}, sources: ${sources}"
     )
 
     val srcWrapper = sources.head
@@ -523,13 +523,13 @@ object EtlFeatures {
     JoinRule.join(
       tree = joinTree,
       catalog = name => tables(name).as(name),
-      keys = uidKeyPair,
+      keys = uidKeyPair
     )
 
   def joinDomains(
     domains: Map[String, DataFrame],
     joinRule: JoinExpressionEvaluator[String],
-    checkpointService: Option[io.CheckpointService] = None,
+    checkpointService: Option[io.CheckpointService] = None
   ): DataFrame = {
     val checkPointFun: Option[DataFrame => DataFrame] =
       checkpointService.map(cpService => df => cpService.checkpoint(df))
@@ -551,7 +551,7 @@ object EtlFeatures {
   def buildPrefixDomain(
     domainName: String,
     source: DataFrame,
-    castType: String,
+    castType: String
   ): DataFrame = {
     // rename features columns
     import sql.functions.col
@@ -572,29 +572,29 @@ object EtlFeatures {
   def buildArrayDomain(
     domainName: String,
     source: DataFrame,
-    castType: String,
+    castType: String
   ): DataFrame =
     buildCollectionDomain(
       domainName,
       source,
-      new ArrayDomainBuilder(sql.types.DataType.fromDDL(castType)),
+      new ArrayDomainBuilder(sql.types.DataType.fromDDL(castType))
     )
 
   def buildMapDomain(
     domainName: String,
     source: DataFrame,
-    castType: String,
+    castType: String
   ): DataFrame =
     buildCollectionDomain(
       domainName,
       source,
-      new MapDomainBuilder(sql.types.DataType.fromDDL(castType)),
+      new MapDomainBuilder(sql.types.DataType.fromDDL(castType))
     )
 
   def buildCollectionDomain(
     domainName: String,
     source: DataFrame,
-    builder: DomainBuilder,
+    builder: DomainBuilder
   ): DataFrame = {
     // collect primitive columns to collection; add merged column:
     // if have primitives: add collection column
@@ -645,7 +645,7 @@ object EtlFeatures {
       sf.when(builder.notNullItemsCount(domainName) < 1, null)
         .otherwise(res(domainName))
         .cast(builder.collectionDataType)
-        .alias(domainName),
+        .alias(domainName)
     )
   }
 
@@ -653,7 +653,7 @@ object EtlFeatures {
     records: DataFrame,
     mtable: Dataset[MatchingTableRow],
     inUidTypes: Seq[String],
-    outUidType: String,
+    outUidType: String
   )(
     cache: DataFrame => DataFrame
   ): DataFrame = {
@@ -675,7 +675,7 @@ object EtlFeatures {
         .join(
           cross.as("b"),
           sf.expr("a.uid_type = b.uid1_type and a.uid = b.uid1"),
-          "inner",
+          "inner"
         )
 
       mapped
@@ -712,7 +712,7 @@ object EtlFeatures {
 
   def aggregateDomains(
     df: DataFrame,
-    cfg: Map[String, DomainAggregationConfig],
+    cfg: Map[String, DomainAggregationConfig]
   )(implicit
     spark: SparkSession
   ): DataFrame = {
@@ -734,7 +734,7 @@ object EtlFeatures {
   def reduceRows(
     key: String,
     iter: Iterator[sql.Row],
-    aggregators: Broadcast[DatasetAggregators],
+    aggregators: Broadcast[DatasetAggregators]
   ): sql.Row = {
     // apply agg to each column (uid is a special case)
     val aggs = aggregators.value
@@ -772,11 +772,11 @@ object EtlFeatures {
                   AggregationStageConfig(
                     name = stageCgf.name,
                     kind = stageCgf.kind,
-                    parameters = stageCgf.parameters,
-                  ),
+                    parameters = stageCgf.parameters
+                  )
                 )
-            },
-          ),
+            }
+          )
         )
     }
   }
@@ -786,5 +786,5 @@ case class DomainSourceDataFrame(
   domain: String,
   source: NameWithAlias,
   table: NameWithAlias,
-  df: Option[DataFrame],
+  df: Option[DataFrame]
 )

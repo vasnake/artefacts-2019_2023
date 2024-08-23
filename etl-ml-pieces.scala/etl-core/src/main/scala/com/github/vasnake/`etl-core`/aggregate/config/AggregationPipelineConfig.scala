@@ -8,7 +8,7 @@ package com.github.vasnake.`etl-core`.aggregate.config
   */
 case class AggregationPipelineConfig(
   pipeline: List[String],
-  stages: Map[String, AggregationStageConfig],
+  stages: Map[String, AggregationStageConfig]
 ) {
   override def toString: String =
     s"""AggregationPipelineConfig(
@@ -25,7 +25,7 @@ case class AggregationPipelineConfig(
 case class AggregationStageConfig(
   name: String,
   kind: String,
-  parameters: Map[String, String],
+  parameters: Map[String, String]
 ) {
   override def toString: String =
     s"""AggregationStageConfig(

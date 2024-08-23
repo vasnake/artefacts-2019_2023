@@ -17,7 +17,7 @@ trait ParamsServices {
       name = param.name,
       value = get(param).map(p => param2String(p)).getOrElse("None"),
       doc = param.doc,
-      default = getDefault(param).map(p => param2String(p)).getOrElse("None"),
+      default = getDefault(param).map(p => param2String(p)).getOrElse("None")
     )
 
   def param2String[T](p: T): String = p match {
@@ -30,7 +30,7 @@ case class ParamExplained(
   name: String,
   value: String,
   doc: String,
-  default: String,
+  default: String
 )
 
 trait HasOutputCol extends Params {
@@ -71,7 +71,7 @@ trait HasRandomValue extends Params {
     this,
     "randomValue",
     "optional `math.random` replacement",
-    isValid = isValidRandomValue,
+    isValid = isValidRandomValue
   )
 
   def getRandomValue: Double = $(randomValue)
@@ -125,7 +125,7 @@ trait HasLabels extends Params {
   def setLabels(value: Iterable[String]): this.type = {
     require(
       isValidLabels(value.toArray),
-      s"Labels list must be empty or contain unique values, got `${value.mkString(", ")}`",
+      s"Labels list must be empty or contain unique values, got `${value.mkString(", ")}`"
     )
     set(labels, value.toArray)
   }
@@ -149,7 +149,7 @@ trait HasPriorValues extends Params {
     this,
     "priorValues",
     "Prior classes distribution ratio",
-    isValid = isValidPriorValues,
+    isValid = isValidPriorValues
   )
 
   def getPriorValues: Array[Double] = $(priorValues)

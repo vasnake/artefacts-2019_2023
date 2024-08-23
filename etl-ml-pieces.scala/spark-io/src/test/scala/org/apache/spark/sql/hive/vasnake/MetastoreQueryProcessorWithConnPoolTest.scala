@@ -157,7 +157,7 @@ class MetastoreQueryProcessorWithConnPoolTest extends AnyFlatSpec with should.Ma
         maxRowsPerBucket = 37,
         overwrite = true,
         raiseOnMissingColumns = false,
-        checkParameterOrNull = "test.partition.success",
+        checkParameterOrNull = "test.partition.success"
       )
 
       // 256 iter * 32 pool will consume 8192 connections
@@ -220,7 +220,7 @@ class MetastoreQueryProcessorWithConnPoolTest extends AnyFlatSpec with should.Ma
 
       import com.github.vasnake.spark.io.hive.TableSmartWriter.{
         _alterPartitions => ap,
-        _listPartitions => lp,
+        _listPartitions => lp
       }
 
       def _listParts(chunk_size: Int): Unit = {
@@ -231,7 +231,7 @@ class MetastoreQueryProcessorWithConnPoolTest extends AnyFlatSpec with should.Ma
 
       timeit(
         () => _listParts(chunk_size = 150),
-        s"Query ${limitedDfParts.length} parts from metastore, time",
+        s"Query ${limitedDfParts.length} parts from metastore, time"
       )
       // pool(12) 14 sec
       // seq: chunk 150, 67 queries, 10K parts = 103 sec
@@ -249,7 +249,7 @@ class MetastoreQueryProcessorWithConnPoolTest extends AnyFlatSpec with should.Ma
 
       timeit(
         () => _alterParts(chunk_size = 500),
-        s"Updated ${limitedPartitions.length} parts in metastore, total time",
+        s"Updated ${limitedPartitions.length} parts in metastore, total time"
       )
       // pool(12) 20 sec
       // seq: chunk 500, 21 queries, 10K parts = 137 sec

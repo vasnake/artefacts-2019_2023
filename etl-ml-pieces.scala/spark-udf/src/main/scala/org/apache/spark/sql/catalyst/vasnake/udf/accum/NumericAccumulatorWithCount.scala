@@ -82,7 +82,7 @@ class NumericAccumulatorWithCount[K, V] extends Accumulator with Iterable[(K, V)
   def containerIsNull(isnull: Boolean): Unit =
     accum.update(
       null.asInstanceOf[K],
-      if (isnull) keyValueOps.positiveValue else keyValueOps.negativeValue,
+      if (isnull) keyValueOps.positiveValue else keyValueOps.negativeValue
     )
 
   def containerIsNull: Boolean =
@@ -93,7 +93,7 @@ class NumericAccumulatorWithCount[K, V] extends Accumulator with Iterable[(K, V)
   def changeValue(
     k: K,
     defaultValue: => V,
-    mergeValue: (V) => V,
+    mergeValue: (V) => V
   ): V = {
     // If the key doesn't exist yet in the hash map, set its value to defaultValue;
     // otherwise, set its value to mergeValue(oldValue).
@@ -148,7 +148,7 @@ object NumericAccumulatorWithCount {
     accum: Accumulator,
     k: K,
     defaultValue: => V,
-    mergeValue: (V) => V,
+    mergeValue: (V) => V
   ): V =
     // If the key doesn't exist yet in the hash map, set its value to defaultValue;
     // otherwise, set its value to mergeValue(oldValue).
@@ -183,7 +183,7 @@ object NumericAccumulatorWithCount {
     override def getValue(row: UnsafeRow): V =
       AccumulatorValue(
         row.get(1, LongType).asInstanceOf[VC],
-        row.get(2, DoubleType).asInstanceOf[VN],
+        row.get(2, DoubleType).asInstanceOf[VN]
       )
 
     override def decodeKey(k: Any): K = k.toString
@@ -207,7 +207,7 @@ trait MapKVOps[K, V] { // map pair operations type class
 
 case class AccumulatorValue(
   count: NumericAccumulatorWithCount.VC,
-  value: NumericAccumulatorWithCount.VN,
+  value: NumericAccumulatorWithCount.VN
 )
 
 trait Accumulator {

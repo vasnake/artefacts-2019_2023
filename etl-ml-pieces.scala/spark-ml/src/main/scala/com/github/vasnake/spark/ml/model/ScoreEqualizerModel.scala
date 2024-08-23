@@ -21,7 +21,7 @@ import org.apache.spark.sql.types.StructType
   */
 class ScoreEqualizerModel(
   override val uid: String,
-  val groupsConfig: List[(String, models.ScoreEqualizerConfig)],
+  val groupsConfig: List[(String, models.ScoreEqualizerConfig)]
 ) extends Model[ScoreEqualizerModel]
        with MLWritable
        with ScoreEqualizerParams
@@ -61,7 +61,7 @@ class ScoreEqualizerModel(
             groupsConfig.map { case (group, cfg) => (group, models.ScoreEqualizer(cfg)) }.toMap,
           inputColIndex = df.schema.fieldIndex(getInputCol),
           groupColIndex = df.schema.fieldIndex(tempColumnWithGroupsNames),
-          outSchema = transformSchema(df.schema),
+          outSchema = transformSchema(df.schema)
         )
       )
 
@@ -104,5 +104,5 @@ case class ScoreEqualizerModelConfig(
   equalizers: Map[String, models.ScoreEqualizer],
   inputColIndex: Int,
   groupColIndex: Int,
-  outSchema: StructType,
+  outSchema: StructType
 )

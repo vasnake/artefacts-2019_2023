@@ -16,7 +16,7 @@ class ArrayDecimalTest extends AnyFlatSpec with should.Matchers with LocalSpark 
       .selectExpr(
         "part",
         "uid",
-        "transform(feature_list, _x -> if(_x in (null, 'NaN', 'Infinity', '-Infinity'), null, _x)) as feature_list",
+        "transform(feature_list, _x -> if(_x in (null, 'NaN', 'Infinity', '-Infinity'), null, _x)) as feature_list"
       )
       .selectExpr("part", "uid", "cast(feature_list as array<decimal(4,3)>) as feature")
       .orderBy("uid")

@@ -17,14 +17,14 @@ trait StratifiedModelParams extends Params with HasInputCol with HasOutputCol {
     this,
     "groupColumns",
     "stratification columns names",
-    isValid = isValidNamesSet,
+    isValid = isValidNamesSet
   )
   def getGroupColumns: Array[String] = $(groupColumns)
 
   def setGroupColumns(value: Iterable[String]): this.type = {
     require(
       isValidNamesSet(value.toArray),
-      s"Group columns list must be empty or contain unique values, got `${value.mkString(", ")}`",
+      s"Group columns list must be empty or contain unique values, got `${value.mkString(", ")}`"
     )
     set(groupColumns, value.toArray)
   }
@@ -51,13 +51,13 @@ trait StratifiedModelParams extends Params with HasInputCol with HasOutputCol {
   def validateOutputColumn(
     colname: Option[String],
     schema: StructType,
-    optional: Boolean,
+    optional: Boolean
   ): Unit = {
     val defined = colname.getOrElse("").nonEmpty
     require(optional || defined, "Output column name can't be empty")
     require(
       !defined || Try(schema.fieldIndex(colname.get)).isFailure,
-      s"Output column `${colname.get}` already exists but mustn't",
+      s"Output column `${colname.get}` already exists but mustn't"
     )
   }
 

@@ -21,7 +21,7 @@ ThisBuild / scalacOptions ++= Seq(
   "-Ywarn-unused-import",
 
   // Configure compiler warnings. // Syntax: -Wconf:<filters>:<action>,<filters>:<action>
-  "-Wconf:any:warning-verbose",
+  // "-Wconf:any:warning-verbose",
 ) ++ warnings.value ++ lint.value
 
 ThisBuild / warnings := {
@@ -32,7 +32,7 @@ ThisBuild / warnings := {
     )
   else if (lintOn.value)
     Seq(
-      "-Wconf:any:warning-verbose"
+      // "-Wconf:any:warning-verbose",
     )
   else
     Seq(
@@ -51,9 +51,9 @@ ThisBuild / shouldLint := insideCI.value || lintOn.value // true if LINT_OFF not
 
 ThisBuild / lintOn := !sys.env.contains("LINT_OFF")
 
-ThisBuild / wartremoverWarnings := {
-  if (shouldLint.value)
-    Seq.empty
-  else
-    (ThisBuild / wartremoverWarnings).value
-}
+//ThisBuild / wartremoverWarnings := {
+//  if (shouldLint.value)
+//    Seq.empty
+//  else
+//    (ThisBuild / wartremoverWarnings).value
+//}

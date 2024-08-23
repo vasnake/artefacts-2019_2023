@@ -8,7 +8,7 @@ case class Imputer(imputedValues: Array[Double]) extends GroupedFeaturesTransfor
   def transform(input: Array[Double]): Unit = {
     require(
       input.length == imputedValues.length,
-      "input vector size must be equal imputed values vector size",
+      "input vector size must be equal imputed values vector size"
     )
 
     var idx: Int = 0

@@ -80,7 +80,7 @@ object CompareDatasetsApp {
         db: String,
         table: String,
         dt: String,
-        uid_type: String,
+        uid_type: String
       )(implicit
         spark: SparkSession
       ): DataFrame = {
@@ -103,7 +103,7 @@ object CompareDatasetsApp {
       def comparePartitions(
         got: DataFrame,
         expected: DataFrame,
-        ops: DataFrameActions,
+        ops: DataFrameActions
       ): DataFrame = {
         // TODO: add some config. At least aliases: actualDF alias (dev), expectedDF alias (prod); pass it to each stage of pipeline
         implicit val ss: SparkSession = got.sparkSession
@@ -115,7 +115,7 @@ object CompareDatasetsApp {
         val expectedFields = expectedDF.schema.fields
         require(
           gotFields.length == expectedFields.length,
-          s"got fields count must be == expected feilds count, ${gotFields.length} == ${expectedFields.length}",
+          s"got fields count must be == expected feilds count, ${gotFields.length} == ${expectedFields.length}"
         )
         val schemaEqual = gotFields.zip(expectedFields).forall {
           case (gf, ef) =>
@@ -123,11 +123,11 @@ object CompareDatasetsApp {
         }
         require(
           schemaEqual,
-          s"1) got fields set must be == expected fields set,\n`${gotDF.schema}`\n!=\n`${expectedDF.schema}`",
+          s"1) got fields set must be == expected fields set,\n`${gotDF.schema}`\n!=\n`${expectedDF.schema}`"
         )
         require(
           gotDF.schema.toString() == expectedDF.schema.toString(),
-          s"2) got fields set must be == expected fields set,\n`${gotDF.schema}`\n!=\n`${expectedDF.schema}`",
+          s"2) got fields set must be == expected fields set,\n`${gotDF.schema}`\n!=\n`${expectedDF.schema}`"
         )
         println(s"Schema OK,\n`${gotDF.schema}`\n==\n`${expectedDF.schema}`")
 
@@ -165,14 +165,14 @@ object CompareDatasetsApp {
           DiffConfig(
             // columns = expectedFields.filter(_.name != "uid").map(_.name),
             columns = joined.selectExpr("prod.*").schema.fieldNames
-          ),
+          )
         )
       }
 
       def packColumnsToStruct(
         df: DataFrame,
         structAlias: String,
-        keyColName: String = "uid",
+        keyColName: String = "uid"
       ): DataFrame =
         df.select(
           df(keyColName),
@@ -180,7 +180,7 @@ object CompareDatasetsApp {
             .struct(
               df.columns.filter(colname => colname != keyColName).map(sqlfn.col): _*
             )
-            .alias(structAlias),
+            .alias(structAlias)
         )
 
       def packAndJoin(
@@ -189,13 +189,13 @@ object CompareDatasetsApp {
         leftName: String = "prod",
         rightName: String = "dev",
         key: Seq[String] = Seq("uid"),
-        joinType: String = "inner",
+        joinType: String = "inner"
       ): DataFrame =
         packColumnsToStruct(left, leftName)
           .join(
             packColumnsToStruct(right, rightName),
             key,
-            joinType,
+            joinType
           )
 
       def computeJoinedDiff(df: DataFrame, diffConfig: DiffConfig): DataFrame = {
@@ -232,7 +232,7 @@ object CompareDatasetsApp {
           def compareDouble(
             a: Double,
             b: Double,
-            epsilon: Double = 0.00001,
+            epsilon: Double = 0.00001
           ): Int =
             if (a == b) 0
             else if (a.isNaN && b.isNaN) 0
@@ -263,7 +263,7 @@ object CompareDatasetsApp {
             right: Any,
             dataType: sql.types.DataType,
             leftName: String = "prod",
-            rightName: String = "dev",
+            rightName: String = "dev"
           ): String = {
             import sql.types._
             import scala.collection.mutable
@@ -272,7 +272,7 @@ object CompareDatasetsApp {
             def arraysDiff[T](
               left: mutable.WrappedArray[Any],
               right: mutable.WrappedArray[Any],
-              cmp: (T, T) => Int,
+              cmp: (T, T) => Int
             ): String =
               if (left.length == right.length) {
                 val diff: Seq[String] = (0 until left.length).foldLeft(Seq.empty[String]) {
@@ -298,7 +298,7 @@ object CompareDatasetsApp {
             def mapsDiff[T](
               left: Map[String, Any],
               right: Map[String, Any],
-              cmp: (T, T) => Int,
+              cmp: (T, T) => Int
             ): String =
               if (left.size == right.size) {
                 val diff: Seq[String] =
@@ -345,7 +345,7 @@ object CompareDatasetsApp {
 
           def findDiff(
             domainName: String,
-            row: sql.Row,
+            row: sql.Row
           ): String = {
 
             // yes, I'm sure it's a struct
@@ -361,7 +361,7 @@ object CompareDatasetsApp {
                 rightStruct(colIdx),
                 leftStruct.schema(colIdx).dataType,
                 leftStructName,
-                rightStructName,
+                rightStructName
               )
             else if (leftStruct.isNullAt(colIdx) && rightStruct.isNullAt(colIdx))
               // println("Domains are equal, both `is null`")
@@ -413,7 +413,7 @@ object CompareDatasetsApp {
       leftStructName: String = "prod",
       leftStructIndex: Int = -1,
       rightStructName: String = "dev",
-      rightStructIndex: Int = -1,
+      rightStructIndex: Int = -1
     )
   }
 
@@ -478,7 +478,7 @@ object CompareDatasetsApp {
     def compareDouble(
       a: Double,
       b: Double,
-      epsilon: Double = 0.00001,
+      epsilon: Double = 0.00001
     ): Int =
       if (a == b) 0
       else if (a.isNaN && b.isNaN) 0

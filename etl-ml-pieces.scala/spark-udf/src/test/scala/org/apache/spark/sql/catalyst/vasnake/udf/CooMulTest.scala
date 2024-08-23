@@ -20,7 +20,7 @@ class CooMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
       funcName = "generic_coomul",
       targetName = "generic_coomul",
       spark,
-      overrideIfExists = true,
+      overrideIfExists = true
     )
   }
 
@@ -40,10 +40,10 @@ class CooMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
           .sql(
             s"select cast(array(${a1}) as array<$elementType>) as a1, cast(array(${a2}) as array<$elementType>) as a2"
           )
-          .select(generic_coomul("a1", "a2").alias(colName)),
+          .select(generic_coomul("a1", "a2").alias(colName))
       ),
       ("SQL API, aliased function", spark.sql(s"select coomul(${params}) as $colName")),
-      ("SQL API, native func.name", spark.sql(s"select generic_coomul(${params}) as $colName")),
+      ("SQL API, native func.name", spark.sql(s"select generic_coomul(${params}) as $colName"))
     ).foreach {
       case (msg, df) =>
         show(df, msg)
@@ -129,9 +129,9 @@ class CooMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
     assertResult(
       coomulEval(
         "null,  null, 3,    4",
-        "null,  2,    null, 4",
+        "null,  2,    null, 4"
       ),
-      "null, null, null, 16.0",
+      "null, null, null, 16.0"
     )
   }
 
@@ -139,9 +139,9 @@ class CooMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
     assertResult(
       coomulEval(
         "+inf,2,    -inf, 4,    +inf, 6",
-        "1,   +inf, 3,    -inf, -inf, 6",
+        "1,   +inf, 3,    -inf, -inf, 6"
       ),
-      "null, null, null, null, null, 36.0",
+      "null, null, null, null, null, 36.0"
     )
   }
 
@@ -149,9 +149,9 @@ class CooMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
     assertResult(
       coomulEval(
         "nan, 2,    nan,  null, nan,  inf,  nan,  8",
-        "1,   nan,  nan,  nan,  null, nan,  -inf, 8",
+        "1,   nan,  nan,  nan,  null, nan,  -inf, 8"
       ),
-      "null, null, null, null, null, null, null, 64.0",
+      "null, null, null, null, null, null, null, 64.0"
     )
   }
 
@@ -165,7 +165,7 @@ class CooMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
     Seq(
       s"select coomul(cast(null as array<float>), cast(null as array<float>)) as coomul",
       s"select coomul(cast(null as array<float>), cast(${array} as array<float>)) as coomul",
-      s"select coomul(cast(${array} as array<float>), cast(null as array<float>)) as coomul",
+      s"select coomul(cast(${array} as array<float>), cast(null as array<float>)) as coomul"
     ) foreach { expr =>
       withCaching { actual =>
         checkSchema(actual)
@@ -187,7 +187,7 @@ class CooMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
       s"select coomul(cast(array() as array<float>), ${array}) as coomul",
       s"select coomul(array(float(1)), ${array}) as coomul",
       s"select coomul(${array}, array(float(1))) as coomul",
-      s"select coomul(${array}, cast(array() as array<float>)) as coomul",
+      s"select coomul(${array}, cast(array() as array<float>)) as coomul"
     ) foreach { expr =>
       val actual = spark.sql(expr).persist(StorageLevel.MEMORY_ONLY)
       checkSchema(actual)
@@ -215,7 +215,7 @@ class CooMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
           "3",
           af(PINF, 2, NINF, 4, PINF, 6),
           af(1, PINF, 3, NINF, NINF, 6),
-          af(None, None, None, None, None, 36),
+          af(None, None, None, None, None, 36)
         ),
 
         // item is nan
@@ -223,7 +223,7 @@ class CooMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
           "4",
           af(NAN, 2, NAN, None, NAN, PINF, NAN, 8),
           af(1, NAN, NAN, NAN, None, NAN, NINF, 8),
-          af(None, None, None, None, None, None, None, 64),
+          af(None, None, None, None, None, None, None, 64)
         ),
 
         // both arguments are empty
@@ -236,7 +236,7 @@ class CooMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
 
         // different size
         ("9", af(1, 2), af(1, 2, 3), None),
-        ("10", af(1, 2, 3), af(1, 2), None),
+        ("10", af(1, 2, 3), af(1, 2), None)
       )
     )
       .persist(StorageLevel.DISK_ONLY) // N.B. codegen ON switch here
@@ -245,7 +245,7 @@ class CooMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
       .selectExpr(
         "upper(uid) as uid",
         "coomul(cast(va as array<double>), cast(vb as array<double>)) as coomul",
-        "expected",
+        "expected"
       )
       .selectExpr("uid", "cast(coomul as array<float>) as coomul", "expected")
 
@@ -278,7 +278,7 @@ class CooMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
       "coomul",
       ArrayType(FloatType, containsNull = true),
       checkSchema = true,
-      checkData = false,
+      checkData = false
     )
 
   private def assertResult(actual: DataFrame, expected: String): Assertion =
@@ -288,7 +288,7 @@ class CooMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
       "coomul",
       ArrayType(FloatType, containsNull = true),
       checkSchema = true,
-      checkData = true,
+      checkData = true
     )
 
   private def _assertResult(
@@ -297,7 +297,7 @@ class CooMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
     colName: String,
     expectedType: DataType,
     checkSchema: Boolean,
-    checkData: Boolean,
+    checkData: Boolean
   ): Assertion =
     withCaching { df =>
       show(df, "result")

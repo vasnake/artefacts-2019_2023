@@ -56,7 +56,7 @@ class ScoreEqualizerTest
           ("b", 0.7, 3.14, 0.27968233),
           ("c", 13.0, 26.0, 0.74796144),
           ("d", 17.0, 28.0, 1.0),
-          ("e", 27.0, 15.0, 0.4982242),
+          ("e", 27.0, 15.0, 0.4982242)
         )
       )
       .toDF("uid", "score_raw_train", "score_raw", "expected")
@@ -150,14 +150,14 @@ class ScoreEqualizerTest
         Map(
           "sep" -> ";",
           "header" -> "true",
-          "timestampFormat" -> "yyyy-MM-dd HH:mm:ss",
+          "timestampFormat" -> "yyyy-MM-dd HH:mm:ss"
         )
       )
       .csv(FileToolbox.getResourcePath(this, "/DM-7638-active-audience/scores-sample.csv"))
       .selectExpr(
         "uid",
         "cast(score_raw as double) as score_raw",
-        "cast(score as double) as expected",
+        "cast(score as double) as expected"
       )
 
     val eq = new estimator.ScoreEqualizerEstimator()
@@ -186,7 +186,7 @@ class ScoreEqualizerTest
           ("b", 0.7, Some(3.14), Some(0.27968233)),
           ("c", 13.0, None, None),
           ("d", 17.0, Some(Double.NaN), None),
-          ("e", 27.0, Some(15.0), Some(0.4982242)),
+          ("e", 27.0, Some(15.0), Some(0.4982242))
         )
       )
       .toDF("uid", "score_raw_train", "score_raw", "expected")
@@ -218,7 +218,7 @@ class ScoreEqualizerTest
           ("d", 17.0, 28.0, 1.0),
           ("e", 27.0, 15.0, 1.0),
           ("aa", 14.0, 1.0, 0.0),
-          ("bb", 0.03, 1.0, 0.0),
+          ("bb", 0.03, 1.0, 0.0)
         )
       )
       .toDF("uid", "score_raw_train", "score_raw", "expected")
@@ -251,7 +251,7 @@ class ScoreEqualizerTest
           ("e", 27.0, 15.0, 0.43634),
           ("aa", 7.0, 0.0, 0.0),
           ("bb", 27.0, 0.0, 0.0),
-          ("cc", 1.0, 0.0, 0.0),
+          ("cc", 1.0, 0.0, 0.0)
         )
       )
       .toDF("uid", "score_raw_train", "score_raw", "expected")
@@ -278,7 +278,7 @@ class ScoreEqualizerTest
       train = "99, 55, 1, 2, 3, 73, 95, 91, 97",
       score_raw = "0.1, 3.14, 26, 28, 15, 33, 90, 80, 7",
       expected =
-        "0.0, 0.223051, 0.292044, 0.293951, 0.272982, 0.297835, 0.544477, 0.478477, 0.243779",
+        "0.0, 0.223051, 0.292044, 0.293951, 0.272982, 0.297835, 0.544477, 0.478477, 0.243779"
     )
 
     val eq = new estimator.ScoreEqualizerEstimator()
@@ -305,7 +305,7 @@ class ScoreEqualizerTest
         Map(
           "sep" -> ";",
           "header" -> "true",
-          "timestampFormat" -> "yyyy-MM-dd HH:mm:ss",
+          "timestampFormat" -> "yyyy-MM-dd HH:mm:ss"
         )
       )
       .schema("uid STRING, score_raw DOUBLE, score DOUBLE")
@@ -313,7 +313,7 @@ class ScoreEqualizerTest
       .selectExpr(
         "uid",
         "cast(score_raw as double) as score_raw",
-        "cast(score as double) as expected",
+        "cast(score as double) as expected"
       )
 
     val eq = new estimator.ScoreEqualizerEstimator()
@@ -362,7 +362,7 @@ class ScoreEqualizerTest
           ("a", "OK", None, 0.1, None),
           ("b", "OK", Some(Double.NaN), 3.14, None),
           ("c", "VK", Some(Double.NaN), 26.0, None),
-          ("d", "VK", None, 28.0, None),
+          ("d", "VK", None, 28.0, None)
         )
       )
       .toDF("uid", "uid_type", "score_raw_train", "score_raw", "expected")
@@ -398,7 +398,7 @@ class ScoreEqualizerTest
             ("b", "OK", 0.7, 3.14, 0.27968233),
             ("c", "OK", 13.0, 26.0, 0.74796144),
             ("d", "OK", 17.0, 28.0, 1.0),
-            ("e", "OK", 27.0, 15.0, 0.4982242),
+            ("e", "OK", 27.0, 15.0, 0.4982242)
           )
         )
         .toDF("uid", "uid_type", "score_raw_train", "score_raw", "expected")
@@ -407,7 +407,7 @@ class ScoreEqualizerTest
         train = "99, 55, 1, 2, 3, 73, 95, 91, 97",
         score_raw = "0.1, 3.14, 26, 28, 15, 33, 90, 80, 7",
         expected =
-          "0.0, 0.223051, 0.292044, 0.293951, 0.272982, 0.297835, 0.544477, 0.478477, 0.243779",
+          "0.0, 0.223051, 0.292044, 0.293951, 0.272982, 0.297835, 0.544477, 0.478477, 0.243779"
       ).withColumn("uid_type", sf.lit("VK"))
         .select("uid", "uid_type", "score_raw_train", "score_raw", "expected")
 
@@ -441,7 +441,7 @@ class ScoreEqualizerTest
             ("b", "OK", "foo", 0.7, 3.14, 0.27968233),
             ("c", "OK", "foo", 13.0, 26.0, 0.74796144),
             ("d", "OK", "foo", 17.0, 28.0, 1.0),
-            ("e", "OK", "foo", 27.0, 15.0, 0.4982242),
+            ("e", "OK", "foo", 27.0, 15.0, 0.4982242)
           )
         )
         .toDF("uid", "uid_type", "category", "score_raw_train", "score_raw", "expected")
@@ -450,40 +450,40 @@ class ScoreEqualizerTest
         train = "99, 55, 1, 2, 3, 73, 95, 91, 97",
         score_raw = "0.1, 3.14, 26, 28, 15, 33, 90, 80, 7",
         expected =
-          "0.0, 0.223051, 0.292044, 0.293951, 0.272982, 0.297835, 0.544477, 0.478477, 0.243779",
+          "0.0, 0.223051, 0.292044, 0.293951, 0.272982, 0.297835, 0.544477, 0.478477, 0.243779"
       ).selectExpr(
         "uid",
         "'VK' as uid_type",
         "'bar' as category",
         "score_raw_train",
         "score_raw",
-        "expected",
+        "expected"
       )
 
       val df3 = buildDF(
         train = "19, 25, 31, 42, 53, 63, 75, 81, 97",
         score_raw = "0.1, 3.14, 26, 28, 15, 33, 90, 80, 7",
-        expected = "0.0, 0.0, 0.130266, 0.170497, 0.0, 0.246967, 0.816186, 0.763845, 0.0",
+        expected = "0.0, 0.0, 0.130266, 0.170497, 0.0, 0.246967, 0.816186, 0.763845, 0.0"
       ).selectExpr(
         "uid",
         "'OK' as uid_type",
         "'bar' as category",
         "score_raw_train",
         "score_raw",
-        "expected",
+        "expected"
       )
 
       val df4 = buildDF(
         train = "91, 52, 13, 24, 35, 76, 97, 98, 99",
         score_raw = "0.1, 3.14, 26, 28, 15, 33, 90, 80, 7",
-        expected = "0, 0, 0.131936, 0.153365, 0.006922, 0.204792, 0.544612, 0.467587, 0",
+        expected = "0, 0, 0.131936, 0.153365, 0.006922, 0.204792, 0.544612, 0.467587, 0"
       ).selectExpr(
         "uid",
         "'VK' as uid_type",
         "'foo' as category",
         "score_raw_train",
         "score_raw",
-        "expected",
+        "expected"
       )
 
       df1 union df2 union df3 union df4
@@ -516,7 +516,7 @@ class ScoreEqualizerTest
             ("b", "OK", "foo", "a1", 0.7, 3.14, 0.27968233),
             ("c", "OK", "foo", "a1", 13.0, 26.0, 0.74796144),
             ("d", "OK", "foo", "a1", 17.0, 28.0, 1.0),
-            ("e", "OK", "foo", "a1", 27.0, 15.0, 0.4982242),
+            ("e", "OK", "foo", "a1", 27.0, 15.0, 0.4982242)
           )
         )
         .toDF(
@@ -526,14 +526,14 @@ class ScoreEqualizerTest
           "audience_name",
           "score_raw_train",
           "score_raw",
-          "expected",
+          "expected"
         )
 
       val df2 = buildDF(
         train = "99, 55, 1, 2, 3, 73, 95, 91, 97",
         score_raw = "0.1, 3.14, 26, 28, 15, 33, 90, 80, 7",
         expected =
-          "0.0, 0.223051, 0.292044, 0.293951, 0.272982, 0.297835, 0.544477, 0.478477, 0.243779",
+          "0.0, 0.223051, 0.292044, 0.293951, 0.272982, 0.297835, 0.544477, 0.478477, 0.243779"
       ).selectExpr(
         "uid",
         "'VK' as uid_type",
@@ -541,13 +541,13 @@ class ScoreEqualizerTest
         "'a1' as audience_name",
         "score_raw_train",
         "score_raw",
-        "expected",
+        "expected"
       )
 
       val df3 = buildDF(
         train = "19, 25, 31, 42, 53, 63, 75, 81, 97",
         score_raw = "0.1, 3.14, 26, 28, 15, 33, 90, 80, 7",
-        expected = "0.0, 0.0, 0.130266, 0.170497, 0.0, 0.246967, 0.816186, 0.763845, 0.0",
+        expected = "0.0, 0.0, 0.130266, 0.170497, 0.0, 0.246967, 0.816186, 0.763845, 0.0"
       ).selectExpr(
         "uid",
         "'OK' as uid_type",
@@ -555,13 +555,13 @@ class ScoreEqualizerTest
         "'a1' as audience_name",
         "score_raw_train",
         "score_raw",
-        "expected",
+        "expected"
       )
 
       val df4 = buildDF(
         train = "91, 52, 13, 24, 35, 76, 97, 98, 99",
         score_raw = "0.1, 3.14, 26, 28, 15, 33, 90, 80, 7",
-        expected = "0, 0, 0.131936, 0.153365, 0.006922, 0.204792, 0.544612, 0.467587, 0",
+        expected = "0, 0, 0.131936, 0.153365, 0.006922, 0.204792, 0.544612, 0.467587, 0"
       ).selectExpr(
         "uid",
         "'VK' as uid_type",
@@ -569,14 +569,14 @@ class ScoreEqualizerTest
         "'a1' as audience_name",
         "score_raw_train",
         "score_raw",
-        "expected",
+        "expected"
       )
 
       val df5 = buildDF(
         train = "1, 5.2, 1.3, 2.4, 3.5, 7.6, 9.7, 9.8, 9.9, 0.33",
         score_raw = "0.1, 3.14, 2.6, 2.8, 1.5, 3.3, 9.0, 0.8, 7.1, 0.1",
         expected =
-          "0, 0.370273, 0.318738, 0.338083, 0.227467, 0.384274, 0.641999, 0.057494, 0.57888, 0",
+          "0, 0.370273, 0.318738, 0.338083, 0.227467, 0.384274, 0.641999, 0.057494, 0.57888, 0"
       ).selectExpr(
         "uid",
         "'VK' as uid_type",
@@ -584,7 +584,7 @@ class ScoreEqualizerTest
         "'a2' as audience_name",
         "score_raw_train",
         "score_raw",
-        "expected",
+        "expected"
       )
 
       df1 union df2 union df3 union df4 union df5
@@ -631,7 +631,7 @@ class ScoreEqualizerTest
           ("b", None, None, Some(1), 0.7, 3.14, 0.002252295870821873),
           ("c", None, Some("foo"), None, 13.0, 26.0, 1.0),
           ("d", None, None, None, 17.0, 28.0, 1.0),
-          ("e", Some("OK"), Some("foo"), Some(1), 27.0, 15.0, 0.499192817215795),
+          ("e", Some("OK"), Some("foo"), Some(1), 27.0, 15.0, 0.499192817215795)
         )
       )
       .toDF(
@@ -641,7 +641,7 @@ class ScoreEqualizerTest
         "audience_name",
         "score_raw_train",
         "score_raw",
-        "expected",
+        "expected"
       )
 
     val eq = new estimator.ScoreEqualizerEstimator()
@@ -670,7 +670,7 @@ class ScoreEqualizerTest
           ("b", "OK", "foo", "a1", 0.7, 3.14, 0.27968233),
           ("c", "OK", "foo", "a1", 13.0, 26.0, 0.74796144),
           ("d", "OK", "foo", "a1", 17.0, 28.0, 1.0),
-          ("e", "OK", "foo", "a1", 27.0, 15.0, 0.4982242),
+          ("e", "OK", "foo", "a1", 27.0, 15.0, 0.4982242)
         )
       )
       .toDF(
@@ -680,7 +680,7 @@ class ScoreEqualizerTest
         "audience_name",
         "score_raw_train",
         "score_raw",
-        "expected",
+        "expected"
       )
 
     val eq = new estimator.ScoreEqualizerEstimator()
@@ -703,7 +703,7 @@ class ScoreEqualizerTest
           ("c", "VK", "foo", "a1", 13.0, 26.0, 0.74796144),
           ("d", "VK", "foo", "a1", 17.0, 28.0, 1.0),
           ("d", "VK", "foo", "a1", 19.0, 28.0, 1.0),
-          ("d", "VK", "foo", "a1", 20.0, 28.0, 1.0),
+          ("d", "VK", "foo", "a1", 20.0, 28.0, 1.0)
         )
       )
       .toDF(
@@ -713,7 +713,7 @@ class ScoreEqualizerTest
         "audience_name",
         "score_raw_train",
         "score_raw",
-        "expected",
+        "expected"
       )
       .repartition(2, $"uid_type")
 
@@ -1026,7 +1026,7 @@ class ScoreEqualizerTest
       actual.schema,
       expected
         .schema
-        .add(StructField("score", DataTypes.DoubleType)),
+        .add(StructField("score", DataTypes.DoubleType))
     )
 
     assert(actual.count === expected.count)
@@ -1037,7 +1037,7 @@ class ScoreEqualizerTest
       actual.drop("expected"),
       expected.withColumnRenamed("expected", "score"),
       accuracy = accuracy,
-      unpersist = true,
+      unpersist = true
     )
   }
 }
@@ -1048,7 +1048,7 @@ object ScoreEqualizerTest extends should.Matchers {
   def createMassiveInputDF(
     spark: SparkSession,
     partsNum: Int,
-    scoresNum: Int,
+    scoresNum: Int
   ): DataFrame = {
     // part, score_raw
 
@@ -1077,7 +1077,7 @@ object ScoreEqualizerTest extends should.Matchers {
         // transform valid score to null if no fitted model, part B
         InputRow("B", "a", "", "", "1", "null"),
         InputRow("B", "b", "", "null", "2", "null"),
-        InputRow("B", "c", "", "nan", "3", "null"),
+        InputRow("B", "c", "", "nan", "3", "null")
       )
     )
     // part, uid, uid_type, score_train, score_raw, expected
@@ -1088,7 +1088,7 @@ object ScoreEqualizerTest extends should.Matchers {
     uid_type: Option[String],
     score_train: Option[Double],
     score_raw: Option[Double],
-    expected: Option[Double],
+    expected: Option[Double]
   )
   object InputRow {
     import ColumnValueParser._
@@ -1099,7 +1099,7 @@ object ScoreEqualizerTest extends should.Matchers {
       uid_type: String,
       score_train: String,
       score_raw: String,
-      expected: String,
+      expected: String
     ): InputRow =
       InputRow(
         part = part,
@@ -1107,7 +1107,7 @@ object ScoreEqualizerTest extends should.Matchers {
         uid_type = parseStr(uid_type),
         score_train = parseDouble(score_train),
         score_raw = parseDouble(score_raw),
-        expected = parseDouble(expected),
+        expected = parseDouble(expected)
       )
 
     def apply(row: String): InputRow = row.split(",").map(_.trim).toList match {
@@ -1118,7 +1118,7 @@ object ScoreEqualizerTest extends should.Matchers {
           uid_type = None,
           score_train = None,
           score_raw = parseDouble(score),
-          expected = None,
+          expected = None
         )
       case _ => sys.error(s"Only 2-items CSV supported, got `${row}`")
     }
@@ -1151,7 +1151,7 @@ object ScoreEqualizerTest extends should.Matchers {
   def buildDF(
     train: String,
     score_raw: String,
-    expected: String,
+    expected: String
   )(implicit
     spark: SparkSession
   ): DataFrame = {

@@ -2,10 +2,10 @@ import Dependencies._
 import Dependencies.{ io => dio } // conflict with sbt.io
 import MyUtil._
 
-// Spark 2.4; Scala 2.12: it was production setup for our projects (2019 .. 2023)
+// Spark 2.4; Scala 2.11: it was production setup for our projects (2019 .. 2023)
 
 ThisBuild / organization := "com.github.vasnake"
-ThisBuild / scalaVersion := "2.12.19"
+ThisBuild / scalaVersion := "2.11.12" // "2.12.19"
 ThisBuild / fork := true // do we really need this in global scope?
 
 // project
@@ -205,13 +205,12 @@ lazy val `spark-apps` =
 // settings
 
 lazy val sparkSettings = {
-  /** {{{
-    *
-    * > If your testing Spark SQL CodeGen make sure to set SPARK_TESTING=true
-    * SPARK_TESTING=yes ./build/sbt clean +compile +test -DsparkVersion=$SPARK_VERSION
-    *
-    * }}}
-    */
+  /* {{{
+
+     > If your testing Spark SQL CodeGen make sure to set SPARK_TESTING=true
+     SPARK_TESTING=yes ./build/sbt clean +compile +test -DsparkVersion=$SPARK_VERSION
+
+    }}} */
 
   lazy val dependencies = Seq(
     libraryDependencies ++= (org.apache.spark.sparkModules ++ Seq(
@@ -343,13 +342,13 @@ lazy val commonDependencies = Seq(
     // main dependencies
   ),
   libraryDependencies ++= Seq(
-    org.scalatest.scalatest,
-    com.eed3si9n.expecty.expecty,
-    org.scalacheck.scalacheck,
-    org.scalameta.`munit-scalacheck`,
-    org.scalameta.munit,
-    org.typelevel.`discipline-munit`,
-    tf.tofu.`derevo-scalacheck`,
     com.`storm-enroute`.scalameter,
+    org.scalatest.scalatest,
+    // org.scalacheck.scalacheck,
+    // com.eed3si9n.expecty.expecty,
+    // org.scalameta.`munit-scalacheck`,
+    // org.scalameta.munit,
+    // org.typelevel.`discipline-munit`,
+    // tf.tofu.`derevo-scalacheck`,
   ).map(_ % Test),
 )

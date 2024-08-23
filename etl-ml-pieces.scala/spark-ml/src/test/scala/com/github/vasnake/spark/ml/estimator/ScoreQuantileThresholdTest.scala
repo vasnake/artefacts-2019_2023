@@ -123,7 +123,7 @@ class ScoreQuantileThresholdTest
         Seq(
           ("a", Some(Double.NaN), Some(0), Some(Double.NaN)),
           ("b", None, None, None),
-          ("c", Some(Double.NaN), Some(0), Some(Double.NaN)),
+          ("c", Some(Double.NaN), Some(0), Some(Double.NaN))
         )
       )
       .toDF("uid", "score", "expected_index", "expected_rank")
@@ -285,18 +285,18 @@ class ScoreQuantileThresholdTest
         input
           .schema
           .add(StructField("c", DataTypes.StringType))
-          .add(StructField("r", DataTypes.DoubleType)),
+          .add(StructField("r", DataTypes.DoubleType))
       )
 
       compareSchemas(
         model.setOutputCol("c").setRankCol("").transformSchema(input.schema),
-        input.schema.add(StructField("c", DataTypes.StringType)),
+        input.schema.add(StructField("c", DataTypes.StringType))
       )
 
       assert(intercept[IllegalArgumentException] {
         compareSchemas(
           model.setOutputCol("").setRankCol("r").transformSchema(input.schema),
-          input.schema.add(StructField("r", DataTypes.DoubleType)),
+          input.schema.add(StructField("r", DataTypes.DoubleType))
         )
       }.getMessage.contains("""requirement failed: Output column name can't be empty"""))
 
@@ -308,7 +308,7 @@ class ScoreQuantileThresholdTest
           .setOutputCol("c")
           .setRankCol("r")
           .transform(input.drop("expected_index", "expected_rank")),
-        input.withColumnRenamed("expected_index", "c").withColumnRenamed("expected_rank", "r"),
+        input.withColumnRenamed("expected_index", "c").withColumnRenamed("expected_rank", "r")
       )
 
       assert(intercept[IllegalArgumentException] {
@@ -317,7 +317,7 @@ class ScoreQuantileThresholdTest
             .setOutputCol("")
             .setRankCol("r")
             .transform(input.drop("expected_index", "expected_rank")),
-          input.drop("expected_index").withColumnRenamed("expected_rank", "r"),
+          input.drop("expected_index").withColumnRenamed("expected_rank", "r")
         )
       }.getMessage.contains("""requirement failed: Output column name can't be empty"""))
 
@@ -326,7 +326,7 @@ class ScoreQuantileThresholdTest
           .setOutputCol("c")
           .setRankCol("")
           .transform(input.drop("expected_index", "expected_rank")),
-        input.withColumnRenamed("expected_index", "c").drop("expected_rank"),
+        input.withColumnRenamed("expected_index", "c").drop("expected_rank")
       )
     }
 
@@ -548,7 +548,7 @@ class ScoreQuantileThresholdTest
       expected
         .schema
         .add(StructField("class_index", DataTypes.StringType))
-        .add(StructField("rank", DataTypes.DoubleType)),
+        .add(StructField("rank", DataTypes.DoubleType))
     )
 
     assert(actual.count === expected.count)
@@ -562,7 +562,7 @@ class ScoreQuantileThresholdTest
         .withColumnRenamed("expected_rank", "rank")
         .withColumnRenamed("expected_index", "class_index"),
       accuracy = accuracy,
-      unpersist = true,
+      unpersist = true
     )
   }
 }
@@ -635,7 +635,7 @@ object ScoreQuantileThresholdTest extends should.Matchers {
         // transform: null => (null, null), nan => (null, null), part N
         InputRow("N", "a", "null", "0.3", "0.1", "1", "1"),
         InputRow("N", "b", "null", "0.7", "null", "null", "null"),
-        InputRow("N", "c", "null", "17", "nan", "null", "null"),
+        InputRow("N", "c", "null", "17", "nan", "null", "null")
       )
     )
     // part, uid, uid_type, score_train, score, expected_index, expected_rank
@@ -647,7 +647,7 @@ object ScoreQuantileThresholdTest extends should.Matchers {
     score_train: Option[Double],
     score: Option[Double],
     expected_index: Option[String],
-    expected_rank: Option[Double],
+    expected_rank: Option[Double]
   )
 
   object InputRow {
@@ -660,7 +660,7 @@ object ScoreQuantileThresholdTest extends should.Matchers {
       score_train: String,
       score: String,
       expected_index: String,
-      expected_rank: String,
+      expected_rank: String
     ): InputRow =
       InputRow(
         part = part,
@@ -669,7 +669,7 @@ object ScoreQuantileThresholdTest extends should.Matchers {
         score_train = parseDouble(score_train),
         score = parseDouble(score),
         expected_index = parseStr(expected_index),
-        expected_rank = parseDouble(expected_rank),
+        expected_rank = parseDouble(expected_rank)
       )
 
     def apply(
@@ -677,7 +677,7 @@ object ScoreQuantileThresholdTest extends should.Matchers {
       uid: String,
       score: String,
       expected_index: String,
-      expected_rank: String,
+      expected_rank: String
     ): InputRow =
       InputRow(
         part = part,
@@ -686,7 +686,7 @@ object ScoreQuantileThresholdTest extends should.Matchers {
         score_train = None,
         score = parseDouble(score),
         expected_index = parseStr(expected_index),
-        expected_rank = parseDouble(expected_rank),
+        expected_rank = parseDouble(expected_rank)
       )
   }
 
@@ -697,7 +697,7 @@ object ScoreQuantileThresholdTest extends should.Matchers {
     x: Array[Option[Double]],
     prior: Array[Double],
     class_index: Array[Option[Double]],
-    rank: Array[Option[Double]],
+    rank: Array[Option[Double]]
   ) {
     override def toString: String =
       s"_ReferenceData(\nx=${c2s(x)},\nclass_index=${c2s(class_index)},\nrank=${c2s(rank)},\nprior=${c2s(prior)})"
@@ -707,11 +707,11 @@ object ScoreQuantileThresholdTest extends should.Matchers {
     x: Array[Double],
     prior: Array[Double],
     class_index: Array[String],
-    rank: Array[Double],
+    rank: Array[Double]
   ) {
     require(
       x.length == class_index.length && x.length == rank.length,
-      "in/out vectors must be the same size",
+      "in/out vectors must be the same size"
     )
 
     override def toString: String =
@@ -757,7 +757,7 @@ object ScoreQuantileThresholdTest extends should.Matchers {
       x = o2d(_refdata.x),
       prior = _refdata.prior,
       class_index = o2s(_refdata.class_index),
-      rank = o2d(_refdata.rank),
+      rank = o2d(_refdata.rank)
     )
 
   }

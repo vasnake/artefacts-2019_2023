@@ -21,7 +21,7 @@ object JoinExpressionParser {
   case class Tree(
     left: Expression,
     right: Expression,
-    joinOp: String,
+    joinOp: String
   ) extends Expression
 
   def apply(rule: String): Expression = {
@@ -47,7 +47,7 @@ object JoinExpressionParser {
     @scala.annotation.tailrec
     private def makeTree(
       left: Expression,
-      rest: List[String ~ Expression],
+      rest: List[String ~ Expression]
     ): Expression =
       rest match {
         case Nil => left

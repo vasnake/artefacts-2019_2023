@@ -19,7 +19,7 @@ trait DataFrameHelpers extends should.Matchers {
     df: DataFrame,
     message: String = "",
     nrows: Int = 100,
-    force: Boolean = false,
+    force: Boolean = false
   ): Unit =
     if (debugMode || force) {
       val _df = df.persist(newLevel = StorageLevel.MEMORY_ONLY)
@@ -51,7 +51,7 @@ trait DataFrameHelpers extends should.Matchers {
   def compareSchemas(
     actual: StructType,
     expected: StructType,
-    checkNull: Boolean = false,
+    checkNull: Boolean = false
   ): Unit = {
     assert(actual.length === expected.length)
 
@@ -75,7 +75,7 @@ trait DataFrameHelpers extends should.Matchers {
     checkSchemaNull: Boolean = false,
     accuracy: Int = 7,
     orderby: String = "uid",
-    unpersist: Boolean = false,
+    unpersist: Boolean = false
   ): Assertion = {
 
     compareSchemas(actual.schema, expected.schema, checkSchemaNull)
@@ -127,7 +127,7 @@ trait DataFrameHelpers extends should.Matchers {
     actual: String,
     expected: String,
     accuracy: Int = 7,
-    orderby: String = "uid",
+    orderby: String = "uid"
   )(implicit
     spark: SparkSession
   ): Assertion =
@@ -139,7 +139,7 @@ trait DataFrameHelpers extends should.Matchers {
     actualCol: String,
     expectedCol: String,
     accuracy: Int = 7,
-    orderby: String = "uid",
+    orderby: String = "uid"
   )(implicit
     spark: SparkSession
   ): Assertion = {
@@ -162,7 +162,7 @@ trait DataFrameHelpers extends should.Matchers {
     actualCol: String,
     expectedCol: String,
     accuracy: Int = 7,
-    orderby: String = "uid",
+    orderby: String = "uid"
   )(implicit
     spark: SparkSession
   ): Assertion = {
@@ -192,7 +192,7 @@ trait DataFrameHelpers extends should.Matchers {
     expectedDf: DataFrame,
     actualCol: String,
     expectedCol: String,
-    orderby: String = "uid",
+    orderby: String = "uid"
   )(implicit
     spark: SparkSession
   ): Assertion = {

@@ -13,7 +13,7 @@ import org.apache.spark.sql.catalyst.vasnake.udf.base.GenericAggregate
 case class GenericSum(
   child: Expression,
   mutableAggBufferOffset: Int = 0,
-  inputAggBufferOffset: Int = 0,
+  inputAggBufferOffset: Int = 0
 ) extends GenericAggregate {
   def this(child: Expression) = this(child, 0, 0) // n.b. wanted by registry
 

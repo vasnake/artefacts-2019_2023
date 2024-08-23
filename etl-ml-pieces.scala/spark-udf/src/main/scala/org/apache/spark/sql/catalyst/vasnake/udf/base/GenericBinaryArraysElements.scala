@@ -23,7 +23,7 @@ trait GenericBinaryArraysElements extends ArrayBinaryLike with ComplexTypeMergin
 
     ArrayType(
       elementType, // Lazy value, computed from first argument
-      containsNull = true, // null, inf or nan element produces null element.
+      containsNull = true // null, inf or nan element produces null element.
       // For elements that not FractionalType could be
       // left.dataType.asInstanceOf[ArrayType].containsNull || right.dataType.asInstanceOf[ArrayType].containsNull
     )

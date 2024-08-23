@@ -40,7 +40,7 @@ class PrimitiveStringTest extends AnyFlatSpec with should.Matchers with LocalSpa
           )
         ),
       message = "most_freq, native, short",
-      force = true,
+      force = true
     )
 
     show(
@@ -52,12 +52,12 @@ class PrimitiveStringTest extends AnyFlatSpec with should.Matchers with LocalSpa
               sql.Column("feature").expr,
               indexExpression = sqlfn.lit(0).expr,
               thresholdExpression = sqlfn.lit(null).expr,
-              preferExpression = sqlfn.lit("42").expr,
+              preferExpression = sqlfn.lit("42").expr
             ).toAggregateExpression
           )
         ),
       message = "most_freq, native, full",
-      force = true,
+      force = true
     )
   }
 
@@ -73,11 +73,11 @@ class PrimitiveStringTest extends AnyFlatSpec with should.Matchers with LocalSpa
             sqlfn.col("feature"),
             index = sqlfn.lit(0).expr,
             threshold = sqlfn.lit(0.1).expr,
-            prefer = sqlfn.lit("42").expr,
+            prefer = sqlfn.lit("42").expr
           )
         ),
       message = "gmf, DataFrame API shortcut",
-      force = true,
+      force = true
     )
 
     val output = input.groupBy("part").agg(functions.generic_most_freq("feature"))
@@ -85,7 +85,7 @@ class PrimitiveStringTest extends AnyFlatSpec with should.Matchers with LocalSpa
     show(
       output,
       message = "generic imperative most_freq output, DataFrame API shortcut 2",
-      force = true,
+      force = true
     )
   }
 
@@ -99,7 +99,7 @@ class PrimitiveStringTest extends AnyFlatSpec with should.Matchers with LocalSpa
     show(
       spark.sql("select part, gmf(feature) from features group by part"),
       message = "most_freq, SQL API, short",
-      force = true,
+      force = true
     )
 
     val index = "0"
@@ -110,17 +110,17 @@ class PrimitiveStringTest extends AnyFlatSpec with should.Matchers with LocalSpa
         s"select part, gmf(feature, ${index}, ${threshold}, ${prefer}) from features group by part"
       ),
       message = "most_freq, SQL API, full",
-      force = true,
+      force = true
     )
 
     show(
       input.groupBy("part").agg(sqlfn.expr("gmf(feature)")),
-      message = "generic_most_freq, short expr",
+      message = "generic_most_freq, short expr"
     )
 
     show(
       input.groupBy("part").agg(sqlfn.expr("gmf(feature, 0, 0.1, '42')")),
-      message = "gmf, full expr",
+      message = "gmf, full expr"
     )
   }
 

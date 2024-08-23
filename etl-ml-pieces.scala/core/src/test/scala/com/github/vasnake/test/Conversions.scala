@@ -9,7 +9,7 @@ object Conversions {
   def floatsAreEqual(
     a: Float,
     b: Float,
-    tolerance: Float,
+    tolerance: Float
   ): Boolean =
     (a <= b + tolerance) && (a >= b - tolerance)
 

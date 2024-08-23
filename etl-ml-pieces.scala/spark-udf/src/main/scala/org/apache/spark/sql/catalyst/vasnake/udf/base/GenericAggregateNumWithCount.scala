@@ -80,7 +80,7 @@ abstract class GenericAggregateNumWithCount()
         {
           case (k, v) =>
             updateBuffer(accum, AccImpl.kvOps.decodeKey(k), parseInputElem(map, v))
-        },
+        }
       )
     }
     else // is primitive
@@ -131,7 +131,7 @@ abstract class GenericAggregateNumWithCount()
   @inline protected def updateBuffer(
     accum: Accumulator,
     key: AccImpl.K,
-    value: AccImpl.V,
+    value: AccImpl.V
   ): Unit =
     // If the key doesn't exist yet in the hash map, set its value to defaultValue;
     // otherwise, set its value to mergeValue(oldValue).

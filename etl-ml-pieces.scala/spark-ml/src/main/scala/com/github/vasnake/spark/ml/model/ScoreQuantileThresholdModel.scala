@@ -17,7 +17,7 @@ import org.apache.spark.sql.types.StructType
 
 class ScoreQuantileThresholdModel(
   override val uid: String,
-  val groupsConfig: List[(String, ScoreQuantileThresholdConfig)],
+  val groupsConfig: List[(String, ScoreQuantileThresholdConfig)]
 ) extends Model[ScoreQuantileThresholdModel]
        with MLWritable
        with ScoreQuantileThresholdParams
@@ -62,7 +62,7 @@ class ScoreQuantileThresholdModel(
           outSchema = transformSchema(df.schema), // with validation
           labelColSelected = isDefinedOutputCol,
           rankColSelected = isDefinedRankCol,
-          labels = if (!isDefinedLabels) (1 to getNumClasses).map(_.toString).toArray else getLabels,
+          labels = if (!isDefinedLabels) (1 to getNumClasses).map(_.toString).toArray else getLabels
         )
       )
 
@@ -82,7 +82,7 @@ object ScoreQuantileThresholdModel {
       @inline def makeResultRow(
         row: Row,
         cls: => Any,
-        rank: => Any,
+        rank: => Any
       ): Row =
         if (cfg.labelColSelected && cfg.rankColSelected) Row.fromSeq(row.toSeq :+ cls :+ rank)
         else if (cfg.labelColSelected) Row.fromSeq(row.toSeq :+ cls)
@@ -122,5 +122,5 @@ case class ScoreQuantileThresholdModelConfig(
   outSchema: StructType,
   labelColSelected: Boolean,
   rankColSelected: Boolean,
-  labels: Array[String],
+  labels: Array[String]
 )

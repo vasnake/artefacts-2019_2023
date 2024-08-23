@@ -41,7 +41,7 @@ object ModelConfig {
       predictLength = conf("predict_length").as[Int].fold(decodeErr, v => v),
       classLogPrior = conf("class_log_prior").as[Seq[Double]].fold(decodeErr, v => v.toArray),
       featureLogProb =
-        conf("feature_log_prob").as[Seq[Seq[Double]]].fold(decodeErr, v => v.map(_.toArray).toArray),
+        conf("feature_log_prob").as[Seq[Seq[Double]]].fold(decodeErr, v => v.map(_.toArray).toArray)
     )
   }
 
@@ -61,7 +61,7 @@ object ModelConfig {
             indexJson
               .as[List[Int]]
               .fold(e => sys.error(e.getMessage()), v => (v.map(_.toString).toArray, true)),
-          v => (v.toArray, false),
+          v => (v.toArray, false)
         )
 
       FeaturesGroup(name, index, isArray = isInt)
@@ -80,7 +80,7 @@ object ModelConfig {
       .as[List[Double]]
       .fold(
         fail => sys.error(s"malformed list of floats, err: ${fail.getMessage()}"),
-        lst => lst.toArray,
+        lst => lst.toArray
       )
 
     imputerValues
@@ -113,7 +113,7 @@ object ModelConfig {
         groups = groups,
         idf_diags = diags,
         n_features = numFeatures,
-        transformer_params = paramsMap,
+        transformer_params = paramsMap
       )
     }
 
@@ -126,7 +126,7 @@ object ModelConfig {
       withMean = jMap("with_mean").as[Boolean].fold(fail => sys.error(fail.getMessage()), v => v),
       withStd = jMap("with_std").as[Boolean].fold(fail => sys.error(fail.getMessage()), v => v),
       means = jMap("means").as[Array[Double]].fold(fail => sys.error(fail.getMessage()), v => v),
-      scales = jMap("scales").as[Array[Double]].fold(fail => sys.error(fail.getMessage()), v => v),
+      scales = jMap("scales").as[Array[Double]].fold(fail => sys.error(fail.getMessage()), v => v)
     )
 
     parseConfig(json.asObject.getOrElse(sys.error("object expected")).toMap)
@@ -140,7 +140,7 @@ object ModelConfig {
       maxFeaturesPerSample =
         jMap("max_features_per_sample").as[Int].fold(fail => sys.error(fail.getMessage()), v => v),
       predictLength =
-        jMap("predict_length").as[Int].fold(fail => sys.error(fail.getMessage()), v => v),
+        jMap("predict_length").as[Int].fold(fail => sys.error(fail.getMessage()), v => v)
     )
 
     parseConfig(json.asObject.getOrElse(sys.error("object expected")).toMap)
@@ -153,7 +153,7 @@ object ModelConfig {
         jMap("input_length").as[Int].fold(fail => sys.error(fail.getMessage()), v => v),
       predictLength =
         jMap("predict_length").as[Int].fold(fail => sys.error(fail.getMessage()), v => v),
-      pmmlDump = jMap("pmml_dump").as[String].fold(fail => sys.error(fail.getMessage()), v => v),
+      pmmlDump = jMap("pmml_dump").as[String].fold(fail => sys.error(fail.getMessage()), v => v)
     )
 
     parseConfig(json.asObject.getOrElse(sys.error("object expected")).toMap)
@@ -167,7 +167,7 @@ object ModelConfig {
       eps = jMap("eps").as[Double].fold(decodeErr, v => v),
       coefficients =
         jMap("coefficients").as[Seq[Seq[Double]]].fold(decodeErr, v => v.map(_.toArray).toArray),
-      intervals = jMap("intervals").as[Seq[Double]].fold(decodeErr, v => v.toArray),
+      intervals = jMap("intervals").as[Seq[Double]].fold(decodeErr, v => v.toArray)
     )
 
     parseConfig(json.asObject.getOrElse(sys.error("object expected")).toMap)
@@ -233,7 +233,7 @@ object ModelConfig {
       scalerConfig,
       predictorWrapperConfig,
       predictorConfig,
-      equalizerConfig,
+      equalizerConfig
     )
   }
 
@@ -288,7 +288,7 @@ object ModelConfig {
       binarizerConfig,
       predictorWrapperConfig,
       predictorConfig,
-      equalizerConfig,
+      equalizerConfig
     )
   }
 

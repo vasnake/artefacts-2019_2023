@@ -29,7 +29,7 @@ class BinarizerTest extends AnyFlatSpec with should.Matchers {
     val input = Seq(
       Seq(0, 0, 0),
       Seq(0, 0, 0),
-      Seq(0, 0, 0),
+      Seq(0, 0, 0)
     ).map(_.map(_.toDouble).toArray)
 
     val expected = Seq(0, 0, 0).map(_.toFloat)
@@ -47,7 +47,7 @@ class BinarizerTest extends AnyFlatSpec with should.Matchers {
     val input = Seq(
       Seq(1, 1, 1),
       Seq(1, 1, 1),
-      Seq(1, 1, 1),
+      Seq(1, 1, 1)
     ).map(_.map(_.toDouble).toArray)
 
     val expected = Seq(1, 1, 1).map(_.toFloat)
@@ -65,7 +65,7 @@ class BinarizerTest extends AnyFlatSpec with should.Matchers {
     val input = Seq(
       Seq(1, 1, 1),
       Seq(1, 1, 1),
-      Seq(1, 1, 1),
+      Seq(1, 1, 1)
     ).map(_.map(_.toDouble).toArray)
 
     val expected = Seq(0, 0, 0).map(_.toFloat)
@@ -83,13 +83,13 @@ class BinarizerTest extends AnyFlatSpec with should.Matchers {
     val input = Seq(
       Seq(0, 0.5, 1),
       Seq(0.1, 0.4, 0.9),
-      Seq(0.51, 0.49, 0.99),
+      Seq(0.51, 0.49, 0.99)
     ).map(_.map(_.toDouble).toArray)
 
     val expected = Seq(
       Seq(0, 0, 1),
       Seq(0, 0, 1),
-      Seq(1, 0, 1),
+      Seq(1, 0, 1)
     ).map(_.map(_.toFloat))
 
     val transformer = Binarizer(BinarizerConfig(threshold = 0.5f))

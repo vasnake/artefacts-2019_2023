@@ -31,7 +31,7 @@ object Joiner {
   def joinDatasets(
     datasets: Map[String, DataFrame],
     joinRule: JoinExpressionEvaluator[String],
-    checkpointService: Option[CheckpointService] = None,
+    checkpointService: Option[CheckpointService] = None
   ): DataFrame = {
 
     logger.info(s"Join rule: ${joinRule}")
@@ -60,7 +60,7 @@ object Joiner {
       tree: JE,
       catalog: String => DF,
       keys: Seq[String],
-      checkpoint: Option[DF => DF] = None,
+      checkpoint: Option[DF => DF] = None
     ): DF =
       tree.eval[DF] {
         case (left, right, join) =>

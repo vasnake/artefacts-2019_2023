@@ -461,13 +461,13 @@ class NEPriorClassProbaTest
     show(
       input.selectExpr(
         "uid",
-        "aggregate(probs, cast(0 as double), (acc, x) -> acc + cast(x as double)) as sum",
+        "aggregate(probs, cast(0 as double), (acc, x) -> acc + cast(x as double)) as sum"
       ),
-      "aggregate",
+      "aggregate"
     )
     check(
       expr = "aggregate(probs, cast(0 as double), (acc, x) -> acc + cast(x as double)) = 0",
-      expected = "b1,g,h".split(','),
+      expected = "b1,g,h".split(',')
     )
 
     // one valid record
@@ -476,7 +476,7 @@ class NEPriorClassProbaTest
         "size(probs) = 3 and " +
         "not exists(probs, x -> isnull(x) or isnan(x) or x < 0) and " +
         "exists(probs, x -> x > 0)",
-      expected = Seq("i"),
+      expected = Seq("i")
     )
 
     import spark.implicits._
@@ -511,7 +511,7 @@ class NEPriorClassProbaTest
   private def assertVectors(
     actual: Iterable[Double],
     expected: Iterable[Double],
-    accuracy: Int = 7,
+    accuracy: Int = 7
   ): Assertion = {
     val a = actual.toList
     val e = expected.toList
@@ -526,7 +526,7 @@ class NEPriorClassProbaTest
       actual.schema,
       expected
         .schema
-        .add(StructField("probs_aligned", DataTypes.createArrayType(DataTypes.DoubleType))),
+        .add(StructField("probs_aligned", DataTypes.createArrayType(DataTypes.DoubleType)))
     )
 
     assert(actual.count === expected.count)
@@ -536,14 +536,14 @@ class NEPriorClassProbaTest
       expected,
       "probs_aligned",
       "expected_probs_aligned",
-      accuracy = accuracy,
+      accuracy = accuracy
     )
 
     compareDataframes(
       actual.drop("expected_probs_aligned"),
       expected.withColumnRenamed("expected_probs_aligned", "probs_aligned"),
       accuracy = accuracy,
-      unpersist = true,
+      unpersist = true
     )
   }
 }
@@ -628,7 +628,7 @@ object NEPriorClassProbaTest {
         InputRow("e", "M", "33, 44, 5", "0.333333, 0.333333, 0.333333"),
         InputRow("f", "M", "111, 222, 333", "0.044843, 0.06726457, 0.88789"),
         InputRow("g", "M", "0, 6, 0", "0, 1, 0"),
-        InputRow("h", "M", "33.3, 44.4, 43.21", "0.094659, 0.094659, 0.81068"),
+        InputRow("h", "M", "33.3, 44.4, 43.21", "0.094659, 0.094659, 0.81068")
       )
     )
     // uid, part, probs, expected_probs_aligned
@@ -637,20 +637,20 @@ object NEPriorClassProbaTest {
     uid: String,
     part: String,
     probs: Option[Array[Option[Double]]],
-    expected_probs_aligned: Option[Array[Option[Double]]],
+    expected_probs_aligned: Option[Array[Option[Double]]]
   )
   object InputRow {
     def apply(
       uid: String,
       part: String,
       probs: String,
-      expected_probs_aligned: String,
+      expected_probs_aligned: String
     ): InputRow =
       InputRow(
         uid,
         part,
         probs = parseArrayDouble(probs),
-        expected_probs_aligned = parseArrayDouble(expected_probs_aligned),
+        expected_probs_aligned = parseArrayDouble(expected_probs_aligned)
       )
   }
 
@@ -670,15 +670,15 @@ object NEPriorClassProbaTest {
     xs: Array[Array[Double]],
     prior: Array[Double],
     probs: Array[Array[Double]],
-    aligner: Array[Double],
+    aligner: Array[Double]
   ) {
     require(
       xs.length == probs.length && xs.head.length == prior.length,
-      "In/out data shapes must be equal. [1]",
+      "In/out data shapes must be equal. [1]"
     )
     require(
       xs.indices.forall(i => xs(i).length == probs(i).length),
-      "In/out data shapes must be equal. [2]",
+      "In/out data shapes must be equal. [2]"
     )
 
     def toDataFrame(
@@ -691,7 +691,7 @@ object NEPriorClassProbaTest {
             ReferenceRow(
               uid = s"uid_${i}",
               xs = xs(i),
-              probs = probs(i),
+              probs = probs(i)
             )
           )
       )
@@ -700,6 +700,6 @@ object NEPriorClassProbaTest {
   case class ReferenceRow(
     uid: String,
     xs: Array[Double],
-    probs: Array[Double],
+    probs: Array[Double]
   )
 }

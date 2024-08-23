@@ -23,7 +23,7 @@ case class EtlConfig(
   matching: Option[MatchingConfig],
   table_join_rule: Option[String],
   shuffle_partitions: Int,
-  write_partitions: Option[Int],
+  write_partitions: Option[Int]
 ) {
   // TODO: add `normalize` method for checking and cleaning empty optional parameters (Some(emptyParam) => None)
   def getWritePartitions: Int = write_partitions.getOrElse(shuffle_partitions)
@@ -54,7 +54,7 @@ case class EtlConfig(
 
 case class MatchingConfig(
   uid_types_input: List[String], // TODO: deprecated, all partitions info should be in table.partitions
-  table: TableConfig,
+  table: TableConfig
 ) {
   override def toString: String =
     s"""MatchingConfig(
@@ -72,7 +72,7 @@ case class MatchingConfig(
 case class SourceConfig(
   names: List[String],
   tables: List[TableConfig],
-  join_rule: Option[String],
+  join_rule: Option[String]
 ) {
   override def toString: String =
     s"""SourceConfig(
@@ -108,7 +108,7 @@ case class TableConfig(
   alias: Option[String], // TODO: should be mandatory, not optional
   features: Option[List[String]],
   uid_imitation: Option[UidImitationConfig],
-  where: Option[String],
+  where: Option[String]
 ) {
   override def toString: String =
     s"""TableConfig(
@@ -162,7 +162,7 @@ case class DomainConfig(
   cast_type: Option[String],
   features: Option[List[String]],
   agg: Option[Map[String, AggregationConfig]],
-  source: SourceConfig,
+  source: SourceConfig
 ) {
   override def toString: String =
     s"""DomainConfig(
@@ -197,7 +197,7 @@ case class DomainConfig(
 case class AggregationStageConfig(
   name: String,
   kind: String,
-  parameters: Map[String, String],
+  parameters: Map[String, String]
 ) {
   override def toString: String =
     s"""AggregationStageConfig(
@@ -214,7 +214,7 @@ case class AggregationStageConfig(
   */
 case class AggregationConfig(
   pipeline: List[String],
-  stages: Map[String, AggregationStageConfig],
+  stages: Map[String, AggregationStageConfig]
 ) {
   override def toString: String =
     s"""AggregationConfig(

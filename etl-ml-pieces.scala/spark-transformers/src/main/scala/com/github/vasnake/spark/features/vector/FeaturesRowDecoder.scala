@@ -52,13 +52,13 @@ trait CollectionColumnDecoder {
   protected def writeFeatures(
     from: Row,
     to: Array[Double],
-    startIdx: Int,
+    startIdx: Int
   ): Int
 
   def updateFeaturesVector(
     vec: Array[Double],
     row: Row,
-    startIdx: Int,
+    startIdx: Int
   ): Int =
     if (row.isNullAt(fieldIndex)) {
       var idx: Int = startIdx
@@ -81,7 +81,7 @@ object CollectionColumnDecoder {
   def apply(
     colName: String,
     schema: StructType,
-    featuresIndices: Array[String],
+    featuresIndices: Array[String]
   ): CollectionColumnDecoder = {
     val fieldIndex = schema.fieldIndex(colName)
 
@@ -94,7 +94,7 @@ object CollectionColumnDecoder {
           mapFieldDefaults.nullField,
           mapFieldDefaults.noFeatureKey.toFloat,
           mapFieldDefaults.nullFeature.toFloat,
-          x => x,
+          x => x
         )
 
       case MapType(DataTypes.StringType, DataTypes.DoubleType, _) =>
@@ -104,7 +104,7 @@ object CollectionColumnDecoder {
           mapFieldDefaults.nullField,
           mapFieldDefaults.noFeatureKey,
           mapFieldDefaults.nullFeature,
-          identity,
+          identity
         )
 
       case ArrayType(DataTypes.FloatType, _) =>
@@ -114,7 +114,7 @@ object CollectionColumnDecoder {
           arrayFieldDefaults.nullField,
           arrayFieldDefaults.noFeatureKey.toFloat,
           arrayFieldDefaults.nullFeature.toFloat,
-          x => x,
+          x => x
         )
 
       case ArrayType(DataTypes.DoubleType, _) =>
@@ -124,7 +124,7 @@ object CollectionColumnDecoder {
           arrayFieldDefaults.nullField,
           arrayFieldDefaults.noFeatureKey,
           arrayFieldDefaults.nullFeature,
-          identity,
+          identity
         )
 
       case x =>
@@ -142,12 +142,12 @@ case class MapColumnDecoder[@specialized(Float, Double) T](
   featureValueIfFieldIsNull: Double,
   featureValueIfNoKey: T,
   featureValueIfValueIsNull: T,
-  toDouble: T => Double,
+  toDouble: T => Double
 ) extends CollectionColumnDecoder {
   override protected def writeFeatures(
     row: Row,
     vec: Array[Double],
-    startIdx: Int,
+    startIdx: Int
   ): Int = {
     val field = row.getAs[Map[String, Any]](fieldIndex)
     var idx: Int = startIdx
@@ -173,12 +173,12 @@ case class ArrayColumnDecoder[@specialized(Float, Double) T](
   featureValueIfFieldIsNull: Double,
   featureValueIfNoKey: T,
   featureValueIfValueIsNull: T,
-  toDouble: T => Double,
+  toDouble: T => Double
 ) extends CollectionColumnDecoder {
   override protected def writeFeatures(
     row: Row,
     vec: Array[Double],
-    startIdx: Int,
+    startIdx: Int
   ): Int = {
     val field = row.getAs[mutable.WrappedArray[Any]](fieldIndex)
     var idx: Int = startIdx
@@ -200,5 +200,5 @@ case class ArrayColumnDecoder[@specialized(Float, Double) T](
 case class FieldDefaults(
   nullField: Double,
   noFeatureKey: Double,
-  nullFeature: Double,
+  nullFeature: Double
 )

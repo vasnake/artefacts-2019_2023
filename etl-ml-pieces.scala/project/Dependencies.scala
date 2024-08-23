@@ -5,9 +5,9 @@ object Dependencies {
     object circe {
       // https://mvnrepository.com/artifact/io.circe/circe-core
       // libraryDependencies += "io.circe" %% "circe-core" % "0.14.9"
-      val `circe-core` = "io.circe" %% "circe-core" % "0.14.9"
-      val `circe-generic` = "io.circe" %% "circe-generic" % "0.14.9"
-      val `circe-parser` = "io.circe" %% "circe-parser" % "0.14.9"
+      val `circe-core` = "io.circe" %% "circe-core" % "0.12.0-M3"
+      val `circe-generic` = "io.circe" %% "circe-generic" % "0.12.0-M3"
+      val `circe-parser` = "io.circe" %% "circe-parser" % "0.12.0-M3"
     }
   }
 
@@ -62,11 +62,11 @@ object Dependencies {
 
       // https://mvnrepository.com/artifact/org.json4s/json4s-jackson
       // libraryDependencies += "org.json4s" %% "json4s-jackson" % "4.0.7"
-      val `json4s-jackson` = "org.json4s" %% "json4s-jackson" % "4.0.7"
+      val `json4s-jackson` = "org.json4s" %% "json4s-jackson" % "3.5.3"
 
       // https://mvnrepository.com/artifact/org.json4s/json4s-ast
       // libraryDependencies += "org.json4s" %% "json4s-ast" % "4.0.7"
-      val `json4s-ast` = "org.json4s" %% "json4s-ast" % "4.0.7"
+      val `json4s-ast` = "org.json4s" %% "json4s-ast" % "3.5.3"
       // other (than 3.5.3 for spark 2.4.8) versions lead to errors like this:
       // 24/08/09 11:46:23 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
       // [info] com.github.vasnake.spark.features.vector.FeaturesRowDecoderTest *** ABORTED ***
@@ -110,8 +110,7 @@ object Dependencies {
       object modules {
         // https://mvnrepository.com/artifact/org.scala-lang.modules/scala-parser-combinators
         // libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "2.4.0"
-        val `scala-parser-combinators` =
-          "org.scala-lang.modules" %% "scala-parser-combinators" % "2.4.0"
+        val `scala-parser-combinators` = "org.scala-lang.modules" %% "scala-parser-combinators" % "2.2.0"
       }
     }
 

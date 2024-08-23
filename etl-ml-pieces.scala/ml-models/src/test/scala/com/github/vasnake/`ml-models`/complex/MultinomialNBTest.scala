@@ -19,7 +19,7 @@ class MultinomialNBTest extends AnyFlatSpec with should.Matchers {
       featuresLength = 1,
       predictLength = 1,
       classLogPrior = Array(1f),
-      featureLogProb = Seq(Array(2d)),
+      featureLogProb = Seq(Array(2d))
     )
     val estimator = MultinomialNB(config)
   }
@@ -29,7 +29,7 @@ class MultinomialNBTest extends AnyFlatSpec with should.Matchers {
       featuresLength = 2,
       predictLength = 1,
       classLogPrior = Array(1f),
-      featureLogProb = Seq(Array(2d, 3d)),
+      featureLogProb = Seq(Array(2d, 3d))
     )
     val estimator = MultinomialNB(config)
     assertThrows[IllegalArgumentException] {
@@ -46,8 +46,8 @@ class MultinomialNBTest extends AnyFlatSpec with should.Matchers {
         Array(-3.2188758248682006, -3.2188758248682006, -3.2188758248682006, -0.8209805520698301,
           -0.8209805520698301),
         Array(-1.700409690639827, -1.3109449238781037, -1.3109449238781037, -1.700409690639827,
-          -2.3470368555648795),
-      ).map(_.map(_.toDouble)),
+          -2.3470368555648795)
+      ).map(_.map(_.toDouble))
     )
     val estimator = MultinomialNB(config)
 
@@ -62,7 +62,7 @@ class MultinomialNBTest extends AnyFlatSpec with should.Matchers {
       featuresLength = 3,
       predictLength = 1,
       classLogPrior = Array(1f),
-      featureLogProb = Seq(Array(1d, 2d)),
+      featureLogProb = Seq(Array(1d, 2d))
     )
     assertThrows[IllegalArgumentException] {
       val estimator = MultinomialNB(config)
@@ -74,7 +74,7 @@ class MultinomialNBTest extends AnyFlatSpec with should.Matchers {
       featuresLength = 3,
       predictLength = 2,
       classLogPrior = Array(1f),
-      featureLogProb = Seq(Array(1d, 2d, 3d), Array(1d, 2d, 3d)),
+      featureLogProb = Seq(Array(1d, 2d, 3d), Array(1d, 2d, 3d))
     )
     assertThrows[IllegalArgumentException] {
       val estimator = MultinomialNB(config1)
@@ -83,7 +83,7 @@ class MultinomialNBTest extends AnyFlatSpec with should.Matchers {
       featuresLength = 3,
       predictLength = 2,
       classLogPrior = Array(1f, 2f),
-      featureLogProb = Seq(Array(1d, 2d, 3d)),
+      featureLogProb = Seq(Array(1d, 2d, 3d))
     )
     assertThrows[IllegalArgumentException] {
       val estimator = MultinomialNB(config2)
@@ -97,7 +97,7 @@ object MultinomialNBTest {
     Seq(0, 1, 0, 1, 0),
     Seq(0, 0, 1, 1, 0),
     Seq(1, 1, 0, 0, 1),
-    Seq(1, 0, 0, 0, 1),
+    Seq(1, 0, 0, 0, 1)
   ).map(_.map(_.toFloat).toArray)
 
   val expected: Seq[Seq[Float]] = Seq(
@@ -105,12 +105,12 @@ object MultinomialNBTest {
     Seq(0.192481, 0.807519),
     Seq(0.192481, 0.807519),
     Seq(0.090643, 0.909357),
-    Seq(0.401823, 0.598177),
+    Seq(0.401823, 0.598177)
   ).map(_.map(_.toFloat))
 
   def floatsAreEqual(
     a: Float,
-    b: Float,
+    b: Float
   )(implicit
     tolerance: Float
   ): Boolean =

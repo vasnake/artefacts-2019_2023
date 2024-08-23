@@ -8,7 +8,7 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.catalyst.vasnake.udf.functions.{
   registerAs => _registerCatalyst,
-  registerJava => _registerJava,
+  registerJava => _registerJava
 }
 import org.apache.spark.sql.catalyst.vasnake.udf.{ functions => _catalystFuncs }
 
@@ -53,7 +53,7 @@ object catalog extends Logging {
     name: String,
     alias: String,
     spark: SparkSession,
-    overrideIfExists: Boolean = true,
+    overrideIfExists: Boolean = true
   ): Unit = {
     logDebug(s"Registering UDF `${name}` as `$alias` override=$overrideIfExists")
 
@@ -91,7 +91,7 @@ object catalog extends Logging {
         // cp: class path
         hiveFuncs.get(name).map(cp => () => registerHive(cp)),
         javaFuncs.get(name).map(cp => () => registerJava(cp)),
-        catalystFuncs.get(name).map(_ => () => registerCatalyst()),
+        catalystFuncs.get(name).map(_ => () => registerCatalyst())
       ).flatten
 
       Try {
@@ -147,7 +147,7 @@ object catalog extends Logging {
     "uid64" -> "com.github.vasnake.spark.udf.`java-api`.Uid64UDF",
     "map_join" -> "com.github.vasnake.spark.udf.`java-api`.MapJoinUDF",
     "uid2user" -> "com.github.vasnake.spark.udf.`java-api`.export.Uid2UserUDF",
-    "html_unescape" -> "com.github.vasnake.spark.udf.`java-api`.HtmlUnescapeUDF",
+    "html_unescape" -> "com.github.vasnake.spark.udf.`java-api`.HtmlUnescapeUDF"
   )
 
   // name -> alias

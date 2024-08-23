@@ -26,7 +26,7 @@ import org.apache.spark.sql.catalyst.vasnake.udf.base.GenericBinaryArraysElement
       > SELECT _FUNC_(array(1, 2, 3), array(4, 5, 6));
        [4, 10, 18]
   """,
-  since = "0.1.0",
+  since = "0.1.0"
 )
 case class GenericVectorCooMul(left: Expression, right: Expression)
     extends GenericBinaryArraysElements {

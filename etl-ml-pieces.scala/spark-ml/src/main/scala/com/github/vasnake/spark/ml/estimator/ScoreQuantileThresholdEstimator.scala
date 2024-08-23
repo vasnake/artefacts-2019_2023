@@ -54,7 +54,7 @@ class ScoreQuantileThresholdEstimator(override val uid: String)
           inputColName = getInputCol,
           inputCastType = "double",
           validInputExpr = "score is not null and not isnan(score)",
-          cacheFunction = cacheFunction,
+          cacheFunction = cacheFunction
         )
 
         // Dataset[(group, score)], cached
@@ -96,7 +96,7 @@ object ScoreQuantileThresholdEstimator {
     val fitOnGroup: (String, Iterator[(String, Double)]) => (
       String,
       String,
-      Option[models.ScoreQuantileThresholdConfig],
+      Option[models.ScoreQuantileThresholdConfig]
     ) =
       (group, rows) => {
         val res = fit(rows.map(_._2), prior)
@@ -124,7 +124,7 @@ object ScoreQuantileThresholdEstimator {
       msg,
       Some(
         models.ScoreQuantileThreshold.fit(xs, prior)
-      ),
+      )
     )
   } match {
     case Success(res) => res

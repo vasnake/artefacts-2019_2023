@@ -29,13 +29,13 @@ trait NEPriorClassProbaParams
     require(isDefinedPriorValues, "Prior values must be defined")
     require(
       isValidPriorValues(getPriorValues),
-      "Prior values size must be > 1 and min value must be > 0",
+      "Prior values size must be > 1 and min value must be > 0"
     )
   }
 
   setDefault(
     sampleSize -> 100000,
     groupColumns -> Array.empty[String],
-    cacheSettings -> "cache",
+    cacheSettings -> "cache"
   )
 }

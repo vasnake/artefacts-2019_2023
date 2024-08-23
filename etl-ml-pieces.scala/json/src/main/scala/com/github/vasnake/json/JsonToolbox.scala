@@ -2,7 +2,7 @@
   */
 package com.github.vasnake.json
 
-// TODO: do you really need two libs?
+// TODO: do you really need both?
 import io.circe._
 import org.json4s._
 
@@ -24,7 +24,7 @@ object JsonToolbox {
     val parsed = parse(text)
     assert(
       parsed.isRight,
-      s"json parser failed: '${parsed.fold(failure => failure.getMessage(), json => "really?")}'",
+      s"json parser failed: '${parsed.fold(failure => failure.getMessage(), json => "really?")}'"
     )
 
     parsed.fold(_ => Json.Null, j => j)
@@ -42,7 +42,7 @@ object JsonToolbox {
       .as[String]
       .fold(
         e => None, // sys.error(s"can't find item '${key}' in json: ${e.getMessage}"),
-        x => Some(x),
+        x => Some(x)
       )
 
   def readObject[T](
@@ -50,22 +50,18 @@ object JsonToolbox {
   )(implicit
     m: Manifest[T]
   ): T = {
-    import org.json4s.jackson.JsonMethods._
-
     implicit val formats: DefaultFormats = DefaultFormats
 
-    parse(json).extract[T]
+    jackson.JsonMethods.parse(json).extract[T]
   }
 
   def writeObject[T <: AnyRef](obj: T, format: TextFormatting = JsonToolbox.Compact): String = {
-    import org.json4s.jackson.Serialization
-    import org.json4s.jackson.Serialization.{ write, writePretty }
-
+    import jackson.Serialization
     implicit val formats: Formats = Serialization.formats(NoTypeHints)
 
     format match {
-      case JsonToolbox.Pretty => writePretty(obj)
-      case _ => write(obj)
+      case JsonToolbox.Pretty => Serialization.writePretty(obj)
+      case _ => Serialization.write(obj)
     }
   }
 

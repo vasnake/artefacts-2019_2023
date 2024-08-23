@@ -70,12 +70,12 @@ class MapDecimalTest extends AnyFlatSpec with should.Matchers with LocalSpark wi
     sumAndCheck2(
       input,
       "Map(2021-05-12 12:34:55.0 -> 5.000)",
-      "MapType(TimestampType,DecimalType(4,3),true)",
+      "MapType(TimestampType,DecimalType(4,3),true)"
     )
     avgAndCheck2(
       input,
       "Map(2021-05-12 12:34:55.0 -> 2.500)",
-      "MapType(TimestampType,DecimalType(4,3),true)",
+      "MapType(TimestampType,DecimalType(4,3),true)"
     )
   }
 }

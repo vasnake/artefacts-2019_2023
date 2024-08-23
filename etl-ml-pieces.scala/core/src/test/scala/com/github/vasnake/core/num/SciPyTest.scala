@@ -20,7 +20,7 @@ class SciPyTest extends AnyFlatSpec with should.Matchers {
       Array(0.0, 0.0, 0.2, 0.4, 0.6, 0.8, 1.0),
       Array(0.0, 0.0, 0.38202461, 0.4358122, 0.70150493, 0.8, 1.0),
       Array(0.0, 0.19387529, 0.28986194, 0.55945233, 0.6, 1.0, 1.0),
-      Array(0.0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.0),
+      Array(0.0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.0)
     )
 
     def _check(a: Array[Double], e: Array[Double]) = {

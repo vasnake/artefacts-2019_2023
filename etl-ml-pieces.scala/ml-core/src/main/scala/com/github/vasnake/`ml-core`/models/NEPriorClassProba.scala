@@ -38,7 +38,7 @@ object NEPriorClassProba {
   def fit(
     probs: Iterator[Array[Double]],
     numClasses: Int,
-    priorValues: Array[Double],
+    priorValues: Array[Double]
   ): (String, Option[Array[Double]]) = Try {
     // normalize prior
     // normalize probs
@@ -48,7 +48,7 @@ object NEPriorClassProba {
 
     require(
       priorValues.length == numClasses,
-      "Prior values count must be equal to number of classes",
+      "Prior values count must be equal to number of classes"
     )
     require(priorValues.min > 0, "Prior values mast be positive")
 
@@ -125,7 +125,7 @@ object NEPriorClassProba {
     lr_decay: Double,
     momentum: Double,
     max_iter: Int = 1000,
-    eps: Double = 1e-8,
+    eps: Double = 1e-8
   ): (Array[Double], Double) = {
     val n_rows = rows.length
 
@@ -208,7 +208,7 @@ object NEPriorClassProba {
   @inline def mul(
     xs: Array[Double],
     ys: Array[Double],
-    res: Array[Double],
+    res: Array[Double]
   ): Unit = {
     assert(xs.length == ys.length && xs.length == res.length)
     var i = 0
@@ -221,7 +221,7 @@ object NEPriorClassProba {
   @inline def mul(
     xs: Array[Double],
     y: Double,
-    res: Array[Double],
+    res: Array[Double]
   ): Unit = {
     assert(xs.length == res.length)
     var i = 0
@@ -234,7 +234,7 @@ object NEPriorClassProba {
   @inline def sum(
     xs: Array[Double],
     ys: Array[Double],
-    res: Array[Double],
+    res: Array[Double]
   ): Unit = {
     assert(xs.length == ys.length && xs.length == res.length)
     var i = 0
@@ -247,7 +247,7 @@ object NEPriorClassProba {
   @inline def div(
     xs: Array[Double],
     y: Double,
-    res: Array[Double],
+    res: Array[Double]
   ): Unit = {
     assert(xs.length == res.length)
     var i = 0

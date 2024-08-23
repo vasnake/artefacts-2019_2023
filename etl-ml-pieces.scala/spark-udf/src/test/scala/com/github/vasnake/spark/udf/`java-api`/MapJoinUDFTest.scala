@@ -15,13 +15,13 @@ class MapJoinUDFTest extends AnyFlatSpec with should.Matchers {
       "b" -> null,
       "c" -> Float.NaN,
       "d" -> Float.NegativeInfinity,
-      "e" -> Float.PositiveInfinity,
+      "e" -> Float.PositiveInfinity
     )
 
     val actual = udf.call(
       feature = inpData,
       itemsSep = ",",
-      kvSep = ":",
+      kvSep = ":"
     )
 
     assert(actual.split(",").sorted.mkString(",") === "a:3.14,b:null,c:null,d:null,e:null")

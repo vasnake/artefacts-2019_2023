@@ -19,7 +19,7 @@ class GroupedFeaturesTfidfTest extends AnyFlatSpec with should.Matchers {
       groups = Seq(Seq(0, 2), Seq(1, 3)).map(_.toArray).toArray,
       idf_diags = Seq(Seq(1.0, 1.51082), Seq(1.22314, 1.0)).map(_.toArray).toArray,
       n_features = 4,
-      transformer_params = defaultTransformerParams,
+      transformer_params = defaultTransformerParams
     )
     val transformer = GroupedFeaturesTfidfTransformer(config)
     assert(transformer.config.n_features === 4)
@@ -31,7 +31,7 @@ class GroupedFeaturesTfidfTest extends AnyFlatSpec with should.Matchers {
       groups = Array.empty,
       idf_diags = Array.empty,
       n_features = 3,
-      transformer_params = defaultTransformerParams,
+      transformer_params = defaultTransformerParams
     )
     val input = defaultInput.map(_.toDouble.toArray)
     val transformer = GroupedFeaturesTfidfTransformer(config)
@@ -54,7 +54,7 @@ class GroupedFeaturesTfidfTest extends AnyFlatSpec with should.Matchers {
       groups = Seq(Seq(0, 1, 2)).map(_.toArray).toArray,
       idf_diags = Seq(Seq(1f, 1f, 1f).toDouble).map(_.toArray).toArray,
       n_features = 3,
-      transformer_params = defaultTransformerParams,
+      transformer_params = defaultTransformerParams
     )
     val input = defaultInput.map(_.toDouble.toArray)
     val expected = input.map(vec => vec.map(x => x / 10f).toSeq.toFloat)
@@ -77,7 +77,7 @@ class GroupedFeaturesTfidfTest extends AnyFlatSpec with should.Matchers {
       groups = Seq(Seq(0, 2)).map(_.toArray).toArray,
       idf_diags = Seq(Seq(1f, 1f).toDouble).map(_.toArray).toArray,
       n_features = 3,
-      transformer_params = defaultTransformerParams,
+      transformer_params = defaultTransformerParams
     )
     val input = defaultInput.map(_.toDouble.toArray)
     val expected = defaultExpected
@@ -100,7 +100,7 @@ class GroupedFeaturesTfidfTest extends AnyFlatSpec with should.Matchers {
       groups = Seq(Seq(0, 2), Seq(1, 3)).map(_.toArray).toArray,
       idf_diags = Seq(Seq(1f, 1.510826f).toDouble, Seq(1f, 1f).toDouble).map(_.toArray).toArray,
       n_features = 4,
-      transformer_params = defaultTransformerParams,
+      transformer_params = defaultTransformerParams
     )
     val input = Seq(Array(2f, 6f, 14f, 10f).map(_.toDouble))
     val expected = Seq(Seq(0.086387f, 0.375f, 0.913613f, 0.625f))
@@ -123,7 +123,7 @@ class GroupedFeaturesTfidfTest extends AnyFlatSpec with should.Matchers {
       groups = Seq(Seq(0, 2), Seq(1, 3)).map(_.toArray).toArray,
       idf_diags = Seq(Seq(1f, 1.510826f).toDouble, Seq(1f, 1f).toDouble).map(_.toArray).toArray,
       n_features = 4,
-      transformer_params = defaultTransformerParams,
+      transformer_params = defaultTransformerParams
     )
     val input = Seq(Array(1f, 2f, 3f).map(_.toDouble))
     val transformer = GroupedFeaturesTfidfTransformer(config)
@@ -145,7 +145,7 @@ object GroupedFeaturesTfidfTransformerTest {
     "norm" -> "l1",
     "smooth_idf" -> "true",
     "sublinear_tf" -> "false",
-    "use_idf" -> "true",
+    "use_idf" -> "true"
   )
 
   val defaultInput = Seq(
@@ -153,7 +153,7 @@ object GroupedFeaturesTfidfTransformerTest {
     Seq(6f, 2f, 2f),
     Seq(1f, 6f, 3f),
     Seq(7f, 2f, 1f),
-    Seq(2f, 5f, 3f),
+    Seq(2f, 5f, 3f)
   )
 
   val defaultExpected = Seq(
@@ -161,6 +161,6 @@ object GroupedFeaturesTfidfTransformerTest {
     Seq(0.75f, 2f, 0.25f),
     Seq(0.25f, 6f, 0.75f),
     Seq(0.875f, 2f, 0.125f),
-    Seq(0.4f, 5f, 0.6f),
+    Seq(0.4f, 5f, 0.6f)
   )
 }

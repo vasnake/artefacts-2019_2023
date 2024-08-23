@@ -26,7 +26,7 @@ class MapValuesOrderedUDF
       .foreach(i =>
         res.update(
           i,
-          norm(kvs.getOrElse(keys(i), null)),
+          norm(kvs.getOrElse(keys(i), null))
         )
       )
 

@@ -9,7 +9,7 @@ sealed trait JoinExpressionEvaluator[T] {
     op: (B, B, String) => B
   )(implicit
     conv: String => T,
-    ev: T => B,
+    ev: T => B
   ): B
 }
 
@@ -18,7 +18,7 @@ final case class SingleItemJoin[T](item: T) extends JoinExpressionEvaluator[T] {
     op: (B, B, String) => B
   )(implicit
     conv: String => T,
-    ev: T => B,
+    ev: T => B
   ): B =
     ev(item)
 }
@@ -28,7 +28,7 @@ final case class TreeJoin[T](tree: Tree) extends JoinExpressionEvaluator[T] {
     joinOp: (B, B, String) => B
   )(implicit
     dir: String => T,
-    ev: T => B,
+    ev: T => B
   ): B =
     tree match {
       case Tree(left: Node, right: Node, jo) => joinOp(dir(left.name), dir(right.name), jo)
@@ -40,7 +40,7 @@ final case class TreeJoin[T](tree: Tree) extends JoinExpressionEvaluator[T] {
         joinOp(
           TreeJoin[T](left).eval(joinOp)(dir, ev),
           TreeJoin[T](right).eval(joinOp)(dir, ev),
-          jo,
+          jo
         )
     }
 }

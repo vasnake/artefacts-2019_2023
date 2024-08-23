@@ -31,7 +31,7 @@ trait SparkApp extends App {
         throw new IllegalArgumentException(
           s"Wrong parameters, count: (${wrong.length});\n" + s"${wrong.map(s => s"`${s}`").mkString("\n")}"
         )
-      },
+      }
     )
 
     // spark-submit conf, local master by default

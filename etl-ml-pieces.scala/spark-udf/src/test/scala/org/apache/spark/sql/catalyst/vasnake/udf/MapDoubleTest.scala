@@ -102,7 +102,7 @@ class MapDoubleTest extends AnyFlatSpec with should.Matchers with LocalSpark wit
     show(
       input.groupBy("part").agg(expr("gavg(cast(feature as map<string,float>))")),
       message = "avg result",
-      force = true,
+      force = true
     )
 
   }

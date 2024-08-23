@@ -16,7 +16,7 @@ class SQLHiveWriter(spark: => SparkSession) extends SQLPartitionsWriterI with Lo
     dbName: String,
     tableName: String,
     partitionColumnsNames: Seq[String],
-    schema: StructType,
+    schema: StructType
   ): Try[String] = Try {
     logInfo(s"createTableDDL, db: `${dbName}`, table: `$tableName`, parts: [${partitionColumnsNames
         .mkString(",")}], schema: ${schema.simpleString}")
@@ -53,7 +53,7 @@ class SQLHiveWriter(spark: => SparkSession) extends SQLPartitionsWriterI with Lo
     dbName: String,
     tableName: String,
     partition: Map[String, String],
-    df: DataFrame,
+    df: DataFrame
   ): Try[String] = Try {
     logDebug(s"insertStaticPartDML, db: `${dbName}`, table: `$tableName`, parts: [${partition
         .mkString(", ")}], df.schema: ${df.schema.simpleString}")
@@ -74,7 +74,7 @@ class SQLHiveWriter(spark: => SparkSession) extends SQLPartitionsWriterI with Lo
     partition: Map[String, String],
     df: DataFrame,
     hiveParts: Seq[String],
-    hiveCols: Seq[String],
+    hiveCols: Seq[String]
   ): Try[String] = Try {
 
     logInfo(

@@ -14,7 +14,7 @@ case class PMMLEstimatorConfig(
   featuresLength: Int,
   predictLength: Int,
   fileName: String = "",
-  pmmlDump: String = "",
+  pmmlDump: String = ""
 )
 
 case class SGDClassifier(config: PMMLEstimatorConfig) extends PMMLEstimator { // TODO: rename to PMMLModel
@@ -38,7 +38,7 @@ case class SGDClassifier(config: PMMLEstimatorConfig) extends PMMLEstimator { //
       s"""SGDClassifier: loaded pmml model properties not matched with declared config:
          | ${model} numClasses ${model.numClasses}, inputNames ${model.inputFields.length} ${model.inputNames.mkString(",")},
          | clsf|regr (${model.isClassification}| ${model.isRegression});
-         | ${config} """.stripMargin,
+         | ${config} """.stripMargin
     )
 
     estimator = model
@@ -51,13 +51,13 @@ case class SGDClassifier(config: PMMLEstimatorConfig) extends PMMLEstimator { //
     require(ready, "PMML estimator not initialized")
     require(
       features.length > 0 && features.length == config.featuresLength,
-      s"wrong features vector size, features.length: ${features.length}, config.featuresLength: ${config.featuresLength}",
+      s"wrong features vector size, features.length: ${features.length}, config.featuresLength: ${config.featuresLength}"
     )
 
     val estimation = estimator.predict(featuresSelector.transform(features))
     require(
       estimation.length == config.predictLength,
-      s"wrong predicted vector size, result.length: ${estimation.length}, config.predictLength: ${config.predictLength}",
+      s"wrong predicted vector size, result.length: ${estimation.length}, config.predictLength: ${config.predictLength}"
     )
 
     // this conversion takes less than 2% of job time

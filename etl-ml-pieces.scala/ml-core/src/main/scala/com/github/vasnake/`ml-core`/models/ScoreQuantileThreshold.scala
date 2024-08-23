@@ -81,5 +81,5 @@ object ScoreQuantileThreshold {
   */
 case class ScoreQuantileThresholdConfig(
   thresholds: Array[Double],
-  intervals: Map[Int, (Double, Double, Double)],
+  intervals: Map[Int, (Double, Double, Double)]
 )

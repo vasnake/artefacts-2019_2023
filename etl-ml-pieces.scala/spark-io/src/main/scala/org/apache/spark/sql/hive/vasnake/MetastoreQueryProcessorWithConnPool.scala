@@ -16,7 +16,7 @@ import org.apache.spark.sql.internal.StaticSQLConf._
   */
 class MetastoreQueryProcessorWithConnPool(
   spark: SparkSession,
-  poolSize: Int,
+  poolSize: Int
 ) extends CustomLogging {
   // convenient pool wrapper
   import MetastoreQueryProcessorWithConnPool._
@@ -24,11 +24,11 @@ class MetastoreQueryProcessorWithConnPool(
   require(poolSize > 1, "Pool size must be at least 2")
   require(
     !isDerby(spark),
-    "org.apache.derby can't be used in connections pool, set pool size to 1 for using vanilla externalCatalog",
+    "org.apache.derby can't be used in connections pool, set pool size to 1 for using vanilla externalCatalog"
   )
   require(
     isHive(spark),
-    "spark.sql.catalogImplementation must be 'hive' for using connections pool, set pool size to 1 for using vanilla externalCatalog",
+    "spark.sql.catalogImplementation must be 'hive' for using connections pool, set pool size to 1 for using vanilla externalCatalog"
   )
 
   preparePool(math.min(METASTORE_CONNECTIONS_POOL_SIZE_MAX, poolSize), spark)
@@ -87,7 +87,7 @@ class MetastoreQueryProcessorWithConnPool(
               withSafeClose(
                 // one query on one connection
                 fun = _runQuery(idx, catalog),
-                close = HiveExternalCatalog.closeConnection(catalog),
+                close = HiveExternalCatalog.closeConnection(catalog)
               )
           }
       else
@@ -101,7 +101,7 @@ class MetastoreQueryProcessorWithConnPool(
                 // sequence of queries on one connection
                 fun = sliceIndices(numQueriesPerConn, reminder, catIdx, queries.length)
                   .flatMap(idx => _runQuery(idx, catalog)),
-                close = HiveExternalCatalog.closeConnection(catalog),
+                close = HiveExternalCatalog.closeConnection(catalog)
               )
           }
 
@@ -142,7 +142,7 @@ object MetastoreQueryProcessorWithConnPool extends CustomLogging {
   def preparePool(poolSize: Int, spark: SparkSession): Unit = {
     require(
       poolSize <= METASTORE_CONNECTIONS_POOL_SIZE_MAX,
-      s"Pool max size cannot be greater than ${METASTORE_CONNECTIONS_POOL_SIZE_MAX}",
+      s"Pool max size cannot be greater than ${METASTORE_CONNECTIONS_POOL_SIZE_MAX}"
     )
 
     if (connections.length >= poolSize)
@@ -176,11 +176,11 @@ object MetastoreQueryProcessorWithConnPool extends CustomLogging {
     numItems: Int,
     reminder: Int,
     sliceIdx: Int,
-    totalItems: Int,
+    totalItems: Int
   ): Seq[Int] = {
     assert(
       numItems > 0 && reminder >= 0 && totalItems >= numItems && sliceIdx >= 0 && (sliceIdx * numItems + reminder) < totalItems,
-      "Inconsistent sliceIndices parameters",
+      "Inconsistent sliceIndices parameters"
     )
 
     val start = sliceIdx * numItems

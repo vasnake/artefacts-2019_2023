@@ -22,7 +22,7 @@ class LalTfidfScaledSgdcTest extends AnyFlatSpec with should.Matchers {
           "norm" -> "l1",
           "smooth_idf" -> "true",
           "sublinear_tf" -> "false",
-          "use_idf" -> "true",
+          "use_idf" -> "true"
         )
       )
 
@@ -30,13 +30,13 @@ class LalTfidfScaledSgdcTest extends AnyFlatSpec with should.Matchers {
       val predictorWrapperConfig = PredictorWrapperConfig(
         minFeaturesPerSample = 1,
         maxFeaturesPerSample = 10000,
-        predictLength = 2,
+        predictLength = 2
       )
 
       val predictorConfig = PMMLEstimatorConfig(
         featuresLength = 4,
         predictLength = 3,
-        fileName = FileToolbox.getResourcePath(this, "/sgd_classifier.pmml"),
+        fileName = FileToolbox.getResourcePath(this, "/sgd_classifier.pmml")
       )
 
       val equalizerConfig = SBGroupedTransformerConfig(groups = Map.empty)
@@ -47,7 +47,7 @@ class LalTfidfScaledSgdcTest extends AnyFlatSpec with should.Matchers {
         scalerConfig,
         predictorWrapperConfig,
         predictorConfig,
-        equalizerConfig,
+        equalizerConfig
       )
     }
 

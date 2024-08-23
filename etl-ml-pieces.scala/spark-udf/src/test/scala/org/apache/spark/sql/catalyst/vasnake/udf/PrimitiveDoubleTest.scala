@@ -41,7 +41,7 @@ class PrimitiveDoubleTest extends AnyFlatSpec with should.Matchers with LocalSpa
     show(
       spark.sql("select part, generic_sum(feature) from features group by part"),
       message = "generic_sum output, SQL API",
-      force = true,
+      force = true
     )
   }
 

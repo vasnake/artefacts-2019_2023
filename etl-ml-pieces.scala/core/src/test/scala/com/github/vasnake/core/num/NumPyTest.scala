@@ -15,7 +15,7 @@ class NumPyTest extends AnyFlatSpec with should.Matchers {
       expected: Array[Int],
       start: Int,
       stop: Int,
-      step: Int,
+      step: Int
     ) = assert(
       slice(xs.map(_.toDouble), start, stop, step).map(_.toInt).mkString(",") === expected.mkString(
         ","

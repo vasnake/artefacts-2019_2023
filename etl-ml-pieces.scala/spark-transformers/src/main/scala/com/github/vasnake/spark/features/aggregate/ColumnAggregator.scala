@@ -21,7 +21,7 @@ case class UidFieldAggregator(colIdx: Int) extends ColumnAggregator {
 case class ScalarFieldAggregator(
   colIdx: Int,
   colStruct: StructField,
-  pipelines: SetOfNamedPipelines,
+  pipelines: SetOfNamedPipelines
 ) extends ColumnAggregator {
   def apply(rows: Seq[Row]): Any = {
     val agg = pipelines.features.getOrElse(colStruct.name, pipelines.default).copy()
@@ -44,7 +44,7 @@ case class ScalarFieldAggregator(
 case class ArrayFieldAggregator(
   colIdx: Int,
   colStruct: StructField,
-  aggPipelines: SetOfNamedPipelines,
+  aggPipelines: SetOfNamedPipelines
 ) extends ColumnAggregator {
   def apply(rows: Seq[Row]): Any = {
     // apply pipeline for each feature, return array
@@ -85,7 +85,7 @@ case class ArrayFieldAggregator(
 case class MapFieldAggregator(
   colIdx: Int,
   colStruct: StructField,
-  aggPipelines: SetOfNamedPipelines,
+  aggPipelines: SetOfNamedPipelines
 ) extends ColumnAggregator {
   def apply(rows: Seq[Row]): Any = {
     // apply pipeline for each feature, return map
@@ -132,7 +132,7 @@ case class MapFieldAggregator(
 
 case class SetOfNamedPipelines(
   default: AggregationPipeline,
-  features: Map[String, AggregationPipeline],
+  features: Map[String, AggregationPipeline]
 ) {
   def copy(): SetOfNamedPipelines =
     SetOfNamedPipelines(default.copy(), features.map(kv => kv._1 -> kv._2.copy()))

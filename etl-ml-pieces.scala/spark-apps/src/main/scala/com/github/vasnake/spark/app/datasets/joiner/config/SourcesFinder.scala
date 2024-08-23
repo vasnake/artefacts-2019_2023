@@ -54,5 +54,5 @@ case class MatchingTableRow(
   uid1: String,
   uid2: String,
   uid1_type: String,
-  uid2_type: String,
+  uid2_type: String
 )

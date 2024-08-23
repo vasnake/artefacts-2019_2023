@@ -30,7 +30,7 @@ case class BaseLineModel(description: Map[String, String]) extends ComplexMLMode
       Array(0.5), // raw scores array
       Array(0.5), // equalized scores array
       audienceName, // project id (target)
-      "positive", // category
+      "positive" // category
     )
 
   override def groupedFeatures: GroupedFeatures = GroupedFeatures(groups = Seq.empty)

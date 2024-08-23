@@ -36,7 +36,7 @@ trait ColumnCodec {
   def encodeValue(value: NumericAccumulator.V): Any
   def encodeValue(
     buffer: NumericAccumulator,
-    key: NumericAccumulator.K = NumericAccumulator.PRIMITIVE_KEY,
+    key: NumericAccumulator.K = NumericAccumulator.PRIMITIVE_KEY
   ): Any = encodeValue(buffer(key))
 
   def decodeMap(m: Any): MapData = m match {
@@ -133,7 +133,7 @@ case class MapColumnCodec(override val keyType: DataType, override val valueType
         ByteType,
         LongType,
         ShortType,
-        DecimalType,
+        DecimalType
       ).exists(_.acceptsType(valueType))
   )
     throw new IllegalArgumentException(s"Map codec: unknown value type: `${valueType}`")
@@ -150,7 +150,7 @@ case class MapColumnCodec(override val keyType: DataType, override val valueType
         BooleanType,
         DateType,
         TimestampType,
-        StringType,
+        StringType
       ).exists(_.acceptsType(keyType))
   )
     throw new IllegalArgumentException(s"Map codec: unknown key type: `${keyType}`")
@@ -175,13 +175,13 @@ case class MapColumnCodec(override val keyType: DataType, override val valueType
 
   override def encodeValue(
     buffer: NumericAccumulator,
-    key: NumericAccumulator.K = NumericAccumulator.PRIMITIVE_KEY,
+    key: NumericAccumulator.K = NumericAccumulator.PRIMITIVE_KEY
   ): Any =
     ArrayBasedMapData(
       buffer.itemsIterator,
       size = buffer.size,
       keyConverter = keyConverter,
-      valueConverter = valConverter,
+      valueConverter = valConverter
     )
 
   def encodeValue(value: NumericAccumulator.V): Any = ???
@@ -196,7 +196,7 @@ case class ArrayColumnCodec(override val valueType: DataType) extends ColumnCode
         ByteType,
         LongType,
         ShortType,
-        DecimalType,
+        DecimalType
       ).exists(_.acceptsType(valueType))
   )
     throw new IllegalArgumentException(s"Array codec: unknown value type: `${valueType}`")

@@ -15,7 +15,7 @@ trait Checks extends DataFrameHelpers {
     (
       expected,
       colname,
-      msg,
+      msg
     ) => withUnpersist(assertResult(colname, resultColumnType, msg)(_, expected))
 
   def check2: (String, String, String, String) => DataFrame => Assertion =
@@ -23,7 +23,7 @@ trait Checks extends DataFrameHelpers {
       expectedData,
       expectedType,
       colname,
-      msg,
+      msg
     ) => withUnpersist(assertResult(colname, expectedType, msg)(_, expectedData))
 
   val sumAndCheck: (DataFrame, String) => Assertion =
@@ -54,7 +54,7 @@ trait Checks extends DataFrameHelpers {
     (
       input,
       expectedData,
-      expectedType,
+      expectedType
     ) =>
       check2(expectedData, expectedType, "sum", "sum output")(
         cache(input.groupBy("part").agg(generic_sum("feature") as "sum"))
@@ -64,7 +64,7 @@ trait Checks extends DataFrameHelpers {
     (
       input,
       expectedData,
-      expectedType,
+      expectedType
     ) =>
       check2(expectedData, expectedType, "avg", "avg output")(
         cache(input.groupBy("part").agg(generic_avg("feature") as "avg"))
@@ -77,7 +77,7 @@ trait Checks extends DataFrameHelpers {
     (
       input,
       expectedData,
-      expectedType,
+      expectedType
     ) =>
       check2(expectedData, expectedType, "mfq", "mfq output")(
         cache(input.groupBy("part").agg(generic_most_freq("feature") as "mfq"))
@@ -86,10 +86,10 @@ trait Checks extends DataFrameHelpers {
   def assertResult(
     colname: String,
     coltype: String,
-    msg: String,
+    msg: String
   )(
     actual: DataFrame,
-    expected: String,
+    expected: String
   ): Assertion = {
     show(actual, msg)
     assert(actual.schema(colname).toString() === s"StructField(${colname},${coltype},true)")
@@ -101,7 +101,7 @@ trait Checks extends DataFrameHelpers {
     expected: String,
     index: String = "null",
     threshold: String = "null",
-    prefer: String = "null",
+    prefer: String = "null"
   ): Assertion = {
     import functions.generic_most_freq
 

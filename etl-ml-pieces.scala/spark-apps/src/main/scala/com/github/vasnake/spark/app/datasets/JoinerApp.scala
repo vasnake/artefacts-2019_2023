@@ -106,7 +106,7 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
   private def buildTempPath(prefix: String): String =
     FileToolbox.joinPath(
       getSparkConfParameterValue(HDFS_TMP_DIR_KEY, HDFS_TMP_DIR_DEFAULT),
-      s"${prefix}__${etlCfg.table}__dt=${etlCfg.dt}__uid_type=${etlCfg.uid_type}",
+      s"${prefix}__${etlCfg.table}__dt=${etlCfg.dt}__uid_type=${etlCfg.uid_type}"
     )
 
   private def createTargetTable(): Unit = {
@@ -140,7 +140,7 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
     EtlFeatures.createEmptyTable(
       df,
       fqTableName,
-      partitionColumnsNames = Seq(DT_COL_NAME, UID_TYPE_COL_NAME),
+      partitionColumnsNames = Seq(DT_COL_NAME, UID_TYPE_COL_NAME)
     )
   }
 
@@ -158,7 +158,7 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
         df,
         stagingHdfsDir,
         minTargetRows,
-        etlCfg.getWritePartitions,
+        etlCfg.getWritePartitions
       )
       fixedDF <- Try(addMissingColumns(persistedDF, spark.read.table(fqTableName).schema)) // it's fast, shouldn't worry about speed
       _ <- Try(EtlFeatures.writePartitionToTable(fixedDF, fqTableName, partition))
@@ -166,14 +166,14 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
 
     escalateError(
       res,
-      exception => logger.fatal(s"Saving result failed: ${exception.getMessage}", exception),
+      exception => logger.fatal(s"Saving result failed: ${exception.getMessage}", exception)
     )
   }
 
   // TODO: check for special cases: (join_rule is empty or contains single name) and domains list size == 1
   private def tableJoinRule = parseJoinRule(
     etlCfg.table_join_rule.getOrElse("").trim,
-    etlCfg.domains.head.name,
+    etlCfg.domains.head.name
   )
 
   private def partitionJoinRule = parseJoinRule(
@@ -183,7 +183,7 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
         etlCfg.table_join_rule.getOrElse("")
       )
       .trim,
-    etlCfg.domains.head.name,
+    etlCfg.domains.head.name
   )
 
   private def joinDomainsNoCheckpoints(joinRule: JoinExpressionEvaluator[String]): DataFrame =
@@ -194,12 +194,12 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
     // use partition join rule to join domains; see `targetDF`
     joinDomains(
       joinRule,
-      checkpointService = Some(new IntervalCheckpointService(checkpointInterval, checkpointHdfsDir)),
+      checkpointService = Some(new IntervalCheckpointService(checkpointInterval, checkpointHdfsDir))
     )
 
   private def joinDomains(
     joinRule: JoinExpressionEvaluator[String],
-    checkpointService: Option[CheckpointService],
+    checkpointService: Option[CheckpointService]
   ): DataFrame = {
     // select domains and their order
     // load domain sources
@@ -278,7 +278,7 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
     logger.debug(s"Found source definition `${sourceConfig}`.\nPreparing source DF ...")
     resultWithLog(
       EtlFeatures.prepareSource(source, sourceConfig),
-      logger.debug(s"source ready"),
+      logger.debug(s"source ready")
     )
   }
 
@@ -302,7 +302,7 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
     logger.debug(s"Building domain `${domain}` source from sources: `${sources}` ...")
     resultWithLog(
       EtlFeatures.makeDomainSource(domainConfig(domain), sources),
-      logger.debug("domain source created."),
+      logger.debug("domain source created.")
     )
   }
 
@@ -323,7 +323,7 @@ object JoinerApp extends SparkSubmitApp(CmdLineParams) {
 
     resultWithLog(
       EtlFeatures.buildDomain(cfg, source),
-      logger.debug(s"domain `${name}` built."),
+      logger.debug(s"domain `${name}` built.")
     )
   }
 
@@ -404,7 +404,7 @@ object CmdLineParams {
   @Parameter(
     names = Array("--etl-config"),
     required = true,
-    description = "Job config, json text encoded base64",
+    description = "Job config, json text encoded base64"
   )
   var etl_config: String = _
 
@@ -414,14 +414,14 @@ object CmdLineParams {
   @Parameter(
     names = Array("--min-target-rows"),
     required = false,
-    description = "Min. acceptable amount of rows in target",
+    description = "Min. acceptable amount of rows in target"
   )
   var min_target_rows: Long = EtlFeatures.MIN_TARGET_ROWS_DEFAULT
 
   @Parameter(
     names = Array("--checkpoint-interval"),
     required = false,
-    description = "Number of joins before checkpoint",
+    description = "Number of joins before checkpoint"
   )
   var checkpoint_interval: Int = EtlFeatures.CHECKPOINT_INTERVAL_DEFAULT
 

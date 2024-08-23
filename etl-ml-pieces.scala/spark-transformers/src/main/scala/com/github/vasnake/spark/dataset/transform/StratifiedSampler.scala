@@ -38,7 +38,7 @@ object StratifiedSampler extends GroupingColumnsServices with CustomLogging {
     inputColName: String = "score",
     inputCastType: String = "double",
     validInputExpr: String = "score is not null and not isnan(score)",
-    cacheFunction: Option[DataFrame => DataFrame],
+    cacheFunction: Option[DataFrame => DataFrame]
   )
   // TODO: make it more generic: list of grouping columns, list of data columns, cacheService(persist, unpersist).
   // TODO: debug performance issues.
@@ -55,7 +55,7 @@ object StratifiedSampler extends GroupingColumnsServices with CustomLogging {
           dataset.toDF(),
           cfg.groupColumnsList,
           cfg.inputColName,
-          cfg.inputCastType,
+          cfg.inputCastType
         )
         // cut off old names from execution plan, bad for performance
         val group_score = dataset.sparkSession.createDataFrame(df.rdd, df.schema)
@@ -99,7 +99,7 @@ object StratifiedSampler extends GroupingColumnsServices with CustomLogging {
         ds = group_score,
         group_size = group_count,
         sampleSize = cfg.sampleSize,
-        seed = cfg.sampleRandomSeed,
+        seed = cfg.sampleRandomSeed
       )
     }.cache() // group_score_sample cached
 
@@ -114,7 +114,7 @@ object StratifiedSampler extends GroupingColumnsServices with CustomLogging {
     dataset: DataFrame,
     groupColumnsList: Seq[String],
     inputColName: String,
-    inputCastType: String,
+    inputCastType: String
   ): DataFrame =
     addTempGroupingColumn(dataset, groupColumnsList)
       .selectExpr(TEMP_GROUP_COLUMN, s"cast(${inputColName} as ${inputCastType})") // TODO: cast should be optional
@@ -124,7 +124,7 @@ object StratifiedSampler extends GroupingColumnsServices with CustomLogging {
     ds: DataFrame,
     group_size: Array[(String, Long)],
     sampleSize: Long,
-    seed: Double = Double.NaN,
+    seed: Double = Double.NaN
   ): DataFrame = {
 
     val maxRows: Double = sampleSize.toDouble
@@ -160,7 +160,7 @@ trait GroupingColumnsServices {
   def addTempGroupingColumn(
     dataset: Dataset[_],
     groupingColumns: Seq[String],
-    groupColname: String = TEMP_GROUP_COLUMN,
+    groupColname: String = TEMP_GROUP_COLUMN
   ): DataFrame = {
     import org.apache.spark.sql.{ functions => sf }
 
@@ -171,7 +171,7 @@ trait GroupingColumnsServices {
         (sf.lit('g') +: groupingColumns.map(colname =>
           sf.coalesce(sf.col(colname), sf.lit('-')).cast(DataTypes.StringType)
         )): _*
-      ),
+      )
     )
   }
 

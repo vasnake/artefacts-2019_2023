@@ -102,7 +102,7 @@ object Fixtures {
         InputRow("M", "h", "1", "", ""),
         InputRow("M", "i", "4.2", "", ""),
         InputRow("M", "j", "42", "", ""),
-        InputRow("M", "k", "null", "", ""),
+        InputRow("M", "k", "null", "", "")
       )
     )
     // part, uid, feature, feature_list, feature_map
@@ -115,21 +115,21 @@ object Fixtures {
       uid: String,
       feature: String,
       feature_list: String,
-      feature_map: String,
+      feature_map: String
     ): _Row =
       _Row(
         part,
         uid,
         feature = parseDouble(feature),
         feature_list = parseArrayDouble(feature_list),
-        feature_map = parseMapDouble(feature_map),
+        feature_map = parseMapDouble(feature_map)
       )
     case class _Row(
       part: String,
       uid: String,
       feature: Option[Double],
       feature_list: Option[Array[Option[Double]]],
-      feature_map: Option[Map[Option[String], Option[Double]]],
+      feature_map: Option[Map[Option[String], Option[Double]]]
     )
   }
 
@@ -159,17 +159,17 @@ object Fixtures {
 
     def date_int: DataFrame = map[String, Int, java.sql.Date, Int](
       k => Try(java.sql.Date.valueOf(k)).getOrElse(java.sql.Date.valueOf("2021-05-12")),
-      v => v,
+      v => v
     )
     def time_int: DataFrame = map[String, Int, java.sql.Timestamp, Int](
       k =>
         Try(java.sql.Timestamp.valueOf(k))
           .getOrElse(java.sql.Timestamp.valueOf("2021-05-12 12:34:55")),
-      v => v,
+      v => v
     )
     def date_decimal: DataFrame = map[String, sql.types.Decimal, java.sql.Date, sql.types.Decimal](
       k => Try(java.sql.Date.valueOf(k)).getOrElse(java.sql.Date.valueOf("2021-05-12")),
-      v => v.toPrecision(4, 3),
+      v => v.toPrecision(4, 3)
     ).selectExpr("part", "uid", "cast(feature as map<date, decimal(4,3)>) as feature")
 
     def time_decimal: DataFrame =
@@ -177,15 +177,15 @@ object Fixtures {
         k =>
           Try(java.sql.Timestamp.valueOf(k))
             .getOrElse(java.sql.Timestamp.valueOf("2021-05-12 12:34:55")),
-        v => v.toPrecision(4, 3),
+        v => v.toPrecision(4, 3)
       ).selectExpr("part", "uid", "cast(feature as map<timestamp, decimal(4,3)>) as feature")
 
     def map[IK, IV, OK, OV](
       keyTransform: IK => OK,
-      valueTransform: IV => OV,
+      valueTransform: IV => OV
     )(implicit
       ie: Encoder[(String, String, Map[IK, Option[IV]])],
-      oe: Encoder[(String, String, Map[OK, Option[OV]])],
+      oe: Encoder[(String, String, Map[OK, Option[OV]])]
     ): DataFrame =
       df.where(filter)
         .as[(String, String, Map[IK, Option[IV]])]

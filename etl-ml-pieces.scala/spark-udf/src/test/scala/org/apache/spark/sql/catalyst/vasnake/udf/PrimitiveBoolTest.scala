@@ -18,7 +18,7 @@ class PrimitiveBoolTest extends AnyFlatSpec with should.Matchers with LocalSpark
       .selectExpr(
         "part",
         "uid",
-        "cast(if(feature in (null, 'NaN', 'Infinity', '-Infinity'), null, feature) as boolean) as feature",
+        "cast(if(feature in (null, 'NaN', 'Infinity', '-Infinity'), null, feature) as boolean) as feature"
       )
       .repartition(4)
   )
@@ -39,7 +39,7 @@ class PrimitiveBoolTest extends AnyFlatSpec with should.Matchers with LocalSpark
     show(
       cache(spark.sql("select part, generic_most_freq(feature) from features group by part")),
       message = "most_freq, SQL API, short",
-      force = true,
+      force = true
     )
 
     val rnd = "cast(0 as int)"
@@ -52,7 +52,7 @@ class PrimitiveBoolTest extends AnyFlatSpec with should.Matchers with LocalSpark
         )
       ),
       message = "most_freq, SQL API, full",
-      force = true,
+      force = true
     )
 
     // DataFrame API
@@ -73,7 +73,7 @@ class PrimitiveBoolTest extends AnyFlatSpec with should.Matchers with LocalSpark
             sql.Column("feature").expr,
             indexExpression = sqlfn.lit(0).cast("int").expr,
             thresholdExpression = sqlfn.lit(null).cast("float").expr,
-            preferExpression = sqlfn.lit(false).expr,
+            preferExpression = sqlfn.lit(false).expr
           ).toAggregateExpression
         )
       )
@@ -86,17 +86,17 @@ class PrimitiveBoolTest extends AnyFlatSpec with should.Matchers with LocalSpark
     show(
       cache(output),
       message = "generic imperative most_freq output, DataFrame API shortcut",
-      force = true,
+      force = true
     )
 
     show(
       cache(input.groupBy("part").agg(sqlfn.expr("generic_most_freq(feature)"))),
-      message = "generic_most_freq, expr",
+      message = "generic_most_freq, expr"
     )
 
     show(
       cache(input.groupBy("part").agg(sqlfn.expr("gmf(feature, 0, null, false)"))),
-      message = "gmf, expr",
+      message = "gmf, expr"
     )
   }
 

@@ -64,7 +64,7 @@ class MapLongTest extends AnyFlatSpec with should.Matchers with LocalSpark with 
     avgAndCheck2(
       input,
       s"Map(1.0 -> ${7 / 2}, 2.0 -> ${5 / 2})",
-      "MapType(DoubleType,LongType,true)",
+      "MapType(DoubleType,LongType,true)"
     )
   }
 
@@ -75,7 +75,7 @@ class MapLongTest extends AnyFlatSpec with should.Matchers with LocalSpark with 
     avgAndCheck2(
       input,
       s"Map(1.0 -> ${7 / 2}, 2.0 -> ${5 / 2})",
-      "MapType(FloatType,LongType,true)",
+      "MapType(FloatType,LongType,true)"
     )
   }
 }

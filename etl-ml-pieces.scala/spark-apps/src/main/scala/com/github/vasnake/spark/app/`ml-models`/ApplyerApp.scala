@@ -68,7 +68,7 @@ object CmdLineParams {
   @Parameter(
     names = Array("--transformer-config"),
     required = true,
-    description = "Job config, base64-encoded json text",
+    description = "Job config, base64-encoded json text"
   )
   var transformer_config: String = _ // models_list, keep_columns_list, source_load_path, target_write_path
 
@@ -86,7 +86,7 @@ case class ApplyerConfig(
   sourcePath: String,
   targetPath: String,
   models: String,
-  keepColumns: String,
+  keepColumns: String
 )
 
 object ApplyerConfig {

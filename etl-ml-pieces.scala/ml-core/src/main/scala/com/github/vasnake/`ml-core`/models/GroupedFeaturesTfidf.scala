@@ -18,7 +18,7 @@ case class GroupedFeaturesTfidfTransformer(config: GroupedFeaturesTfidfTransform
       ds.length == gs.length && gs.zip(ds).forall(gd => gd._1.length == gd._2.length)
     }
     else true,
-    "Shape for groups and idf_diags must be the same",
+    "Shape for groups and idf_diags must be the same"
   )
 
   import GroupedFeaturesTfidfTransformerConfig._
@@ -34,7 +34,7 @@ case class GroupedFeaturesTfidfTransformer(config: GroupedFeaturesTfidfTransform
   def transform(input: Array[Double]): Unit = {
     require(
       input.length == config.n_features,
-      s"Transforming vector size must be the same size as training sample vectors: '${config.n_features}'",
+      s"Transforming vector size must be the same size as training sample vectors: '${config.n_features}'"
     )
 
     if (config.groups.nonEmpty) {
@@ -89,7 +89,7 @@ case class GroupedFeaturesTfidfTransformerConfig(
   groups: Array[Array[Int]] = Array.empty,
   idf_diags: Array[Array[Double]] = Array.empty,
   n_features: Int = 0,
-  transformer_params: Map[String, String] = Map.empty,
+  transformer_params: Map[String, String] = Map.empty
 )
 
 object GroupedFeaturesTfidfTransformerConfig {

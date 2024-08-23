@@ -15,14 +15,14 @@ class MapValuesOrderedUDFTest extends AnyFlatSpec with should.Matchers {
       "c" -> Float.NaN,
       "a" -> 3.14f,
       "d" -> Float.NegativeInfinity,
-      "e" -> Float.PositiveInfinity,
+      "e" -> Float.PositiveInfinity
     )
 
     val keysOrder = Array("a", "b", "c", "d", "e")
 
     val actual = udf.call(
       kvs = inputData,
-      keys = keysOrder,
+      keys = keysOrder
     )
 
     assert(actual.map(x => s"${x}").toList === List("3.14", "null", "null", "null", "null"))

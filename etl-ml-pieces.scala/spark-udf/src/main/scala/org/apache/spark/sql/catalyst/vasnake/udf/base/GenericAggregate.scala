@@ -81,7 +81,7 @@ abstract class GenericAggregate()
         {
           case (k, v) =>
             updateBuffer(buffer, NumericAccumulator.keyValue(k), parseInputElem(map, v))
-        },
+        }
       )
     }
     else // primitive
@@ -120,7 +120,7 @@ abstract class GenericAggregate()
   @inline protected def updateBuffer(
     buffer: NumericAccumulator,
     key: NumericAccumulator.K,
-    value: NumericAccumulator.V,
+    value: NumericAccumulator.V
   ): Unit =
     buffer.changeValue(key, value, combineItems(_, value))
 

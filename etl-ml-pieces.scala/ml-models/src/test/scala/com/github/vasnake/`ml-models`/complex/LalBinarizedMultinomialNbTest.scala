@@ -20,14 +20,14 @@ class LalBinarizedMultinomialNbTest extends AnyFlatSpec with should.Matchers {
       val predictorWrapperConfig = PredictorWrapperConfig(
         minFeaturesPerSample = 1,
         maxFeaturesPerSample = 10000,
-        predictLength = 2,
+        predictLength = 2
       )
 
       val predictorConfig = MultinomialNBConfig(
         featuresLength = 1,
         predictLength = 2,
         classLogPrior = Array(0f, 0f),
-        featureLogProb = Array(Array(0d), Array(0d)),
+        featureLogProb = Array(Array(0d), Array(0d))
       )
 
       val equalizerConfig = SBGroupedTransformerConfig(groups = Map.empty)
@@ -37,7 +37,7 @@ class LalBinarizedMultinomialNbTest extends AnyFlatSpec with should.Matchers {
         binarizerConfig,
         predictorWrapperConfig,
         predictorConfig,
-        equalizerConfig,
+        equalizerConfig
       )
     }
 
@@ -47,7 +47,7 @@ class LalBinarizedMultinomialNbTest extends AnyFlatSpec with should.Matchers {
       config,
       groupedFeatures,
       audienceName = "bar",
-      equalizerSelector = "",
+      equalizerSelector = ""
     )
     assert(model.isOK === true)
   }

@@ -27,7 +27,7 @@ import org.apache.spark.sql.catalyst.vasnake.udf.base.GenericBinaryArraysElement
       > SELECT _FUNC_(array(1, 2, 3, 4), array(5, 6));
        [17, 39]
   """,
-  since = "0.1.0",
+  since = "0.1.0"
 )
 case class GenericVectorMatMul(left: Expression, right: Expression)
     extends GenericBinaryArraysElements {
@@ -59,7 +59,7 @@ case class GenericVectorMatMul(left: Expression, right: Expression)
   private def matmat(
     matA: ArrayData,
     matB: ArrayData,
-    size: Int,
+    size: Int
   ): ArrayData = {
     val res = new Array[Any](matA.numElements())
 
@@ -89,7 +89,7 @@ case class GenericVectorMatMul(left: Expression, right: Expression)
     matB: ArrayData,
     rowIdx: Int,
     colIdx: Int,
-    size: Int,
+    size: Int
   ): Any = {
     var res: jDouble = 0
     var i: Int = 0
@@ -98,7 +98,7 @@ case class GenericVectorMatMul(left: Expression, right: Expression)
       res = safeDotAcc(
         matA.get((rowIdx * size) + i, elementType),
         matB.get(colIdx + (size * i), elementType),
-        res,
+        res
       )
       i += 1
     }
@@ -110,7 +110,7 @@ case class GenericVectorMatMul(left: Expression, right: Expression)
   private def dot(
     mat: ArrayData,
     matRowIdx: Int,
-    vec: ArrayData,
+    vec: ArrayData
   ): Any = {
     val startIdx = matRowIdx * vec.numElements()
     // def unsafe = vec.indices.map(i => mat(startIdx + i) * vec(i)).sum
@@ -122,7 +122,7 @@ case class GenericVectorMatMul(left: Expression, right: Expression)
       res = safeDotAcc(
         mat.get(startIdx + i, elementType),
         vec.get(i, elementType),
-        res,
+        res
       )
       i += 1
     }
@@ -134,7 +134,7 @@ case class GenericVectorMatMul(left: Expression, right: Expression)
   private def safeDotAcc(
     _a: Any,
     _b: Any,
-    acc: jDouble,
+    acc: jDouble
   ): jDouble = (_a, _b) match { // optimizations needed
     case (a, b) if a == null || b == null => null // acc check must be in caller
     case (a, b) =>

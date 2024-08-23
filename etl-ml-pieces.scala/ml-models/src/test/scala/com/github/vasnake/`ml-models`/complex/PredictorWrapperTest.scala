@@ -20,7 +20,7 @@ class PredictorWrapperTest extends AnyFlatSpec with should.Matchers {
     val config = PredictorWrapperConfig(
       minFeaturesPerSample = 1,
       maxFeaturesPerSample = 3,
-      predictLength = 2,
+      predictLength = 2
     )
     val predictor = DummyPredictor(predictLength = 2)
     val wrapper = PredictorWrapper(predictor, config)
@@ -33,11 +33,11 @@ class PredictorWrapperTest extends AnyFlatSpec with should.Matchers {
   it should "produce nan values according to min-max parameters" in {
     val expected: Seq[Seq[Float]] = Seq(
       Seq(nan, nan),
-      Seq(nan, nan),
+      Seq(nan, nan)
     ) ++ Seq(
       Seq(0.5, 0.5),
       Seq(0.5, 0.5),
-      Seq(0.5, 0.5),
+      Seq(0.5, 0.5)
     ).map(_.map(_.toFloat))
 
     val predictor = DummyPredictor(predictLength = 2)
@@ -57,18 +57,18 @@ class PredictorWrapperTest extends AnyFlatSpec with should.Matchers {
   it should "produce reference predictions using SGDClassifier" in {
     val expected: Seq[Seq[Float]] = Seq(
       Seq(nan, nan, nan),
-      Seq(nan, nan, nan),
+      Seq(nan, nan, nan)
     ) ++ Seq(
       Seq(0.332482, 0.334245, 0.333273),
       Seq(0.331098, 0.333233, 0.335669),
-      Seq(0.324599, 0.334442, 0.340959),
+      Seq(0.324599, 0.334442, 0.340959)
     ).map(_.map(_.toFloat))
 
     val predictor = {
       val config = PMMLEstimatorConfig(
         featuresLength = 4,
         predictLength = 3,
-        fileName = FileToolbox.getResourcePath(this, "/sgd_classifier.pmml"),
+        fileName = FileToolbox.getResourcePath(this, "/sgd_classifier.pmml")
       )
       SGDClassifier(config)
     }
@@ -77,7 +77,7 @@ class PredictorWrapperTest extends AnyFlatSpec with should.Matchers {
       val config = PredictorWrapperConfig(
         minFeaturesPerSample = 1,
         maxFeaturesPerSample = 3,
-        predictLength = 3,
+        predictLength = 3
       )
       predictor.init()
       PredictorWrapper(predictor, config)
@@ -98,14 +98,14 @@ object PredictorWrapperTest {
     Seq(2, 3, 4, 5), // features-per-sample > max
     Seq(6, 0, 0, 0), // features-per-sample between min and max
     Seq(7, 0, 8, 0),
-    Seq(0, 9, 8, 7),
+    Seq(0, 9, 8, 7)
   ).map(_.map(_.toFloat).toArray)
 
   val nan: Float = Float.NaN
 
   def floatsAreEqual(
     a: Float,
-    b: Float,
+    b: Float
   )(implicit
     tolerance: Float
   ): Boolean =

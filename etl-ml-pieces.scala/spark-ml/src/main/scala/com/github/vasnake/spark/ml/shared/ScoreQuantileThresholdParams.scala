@@ -38,18 +38,18 @@ trait ScoreQuantileThresholdParams
     require(isDefinedPriorValues, "Prior values must be defined")
     require(
       isValidPriorValues(getPriorValues),
-      "Prior values size must be > 1 and min value must be > 0",
+      "Prior values size must be > 1 and min value must be > 0"
     )
     require(
       !isDefinedLabels ||
       (getLabels.length == getNumClasses && getLabels.toSet.size == getNumClasses),
-      "Labels must be empty or it's size must be = numClasses",
+      "Labels must be empty or it's size must be = numClasses"
     )
   }
 
   setDefault(
     groupColumns -> Array.empty[String],
     sampleSize -> 100000,
-    cacheSettings -> "cache",
+    cacheSettings -> "cache"
   )
 }

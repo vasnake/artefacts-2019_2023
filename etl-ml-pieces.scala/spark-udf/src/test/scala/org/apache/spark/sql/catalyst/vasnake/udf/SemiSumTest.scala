@@ -21,7 +21,7 @@ class SemiSumTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
       funcName = "generic_semisum",
       targetName = "generic_semisum",
       spark,
-      overrideIfExists = true,
+      overrideIfExists = true
     )
   }
 
@@ -41,10 +41,10 @@ class SemiSumTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
           .sql(
             s"select cast(array(${a1}) as array<$elementType>) as a1, cast(array(${a2}) as array<$elementType>) as a2"
           )
-          .select(generic_semisum("a1", "a2").alias(colName)),
+          .select(generic_semisum("a1", "a2").alias(colName))
       ),
       ("SQL API, aliased function", spark.sql(s"select semisum(${params}) as $colName")),
-      ("SQL API, native func.name", spark.sql(s"select generic_semisum(${params}) as $colName")),
+      ("SQL API, native func.name", spark.sql(s"select generic_semisum(${params}) as $colName"))
     ).foreach {
       case (msg, df) =>
         show(df, msg)
@@ -138,7 +138,7 @@ class SemiSumTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
           "3",
           af(PINF, 2, NINF, 4, PINF, 6),
           af(1, PINF, 3, NINF, NINF, 66),
-          af(None, None, None, None, None, 36),
+          af(None, None, None, None, None, 36)
         ),
 
         // item is nan
@@ -146,7 +146,7 @@ class SemiSumTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
           "4",
           af(NAN, 2, NAN, None, NAN, PINF, NAN, 8),
           af(1, NAN, NAN, NAN, None, NAN, NINF, 88),
-          af(None, None, None, None, None, None, None, 48),
+          af(None, None, None, None, None, None, None, 48)
         ),
 
         // both arguments are empty
@@ -159,7 +159,7 @@ class SemiSumTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
 
         // different size
         ("9", af(1, 2), af(1, 2, 3), None),
-        ("10", af(1, 2, 3), af(1, 2), None),
+        ("10", af(1, 2, 3), af(1, 2), None)
       )
     )
       .persist(StorageLevel.DISK_ONLY) // N.B. codegen ON switch here

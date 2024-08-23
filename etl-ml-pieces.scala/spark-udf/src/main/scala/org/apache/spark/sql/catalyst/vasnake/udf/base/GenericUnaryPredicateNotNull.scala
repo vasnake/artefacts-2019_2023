@@ -33,7 +33,7 @@ trait GenericUnaryPredicateNotNull
         ${CodeGenerator.javaType(dataType)} ${ev.value} = ${CodeGenerator.defaultValue(dataType)};
         ${ev.value} = ${eval.isNull} ? (boolean) $javaOnNullInput : (boolean) ${javaNullSafeEval(eval.value)};
       """,
-      isNull = FalseLiteral,
+      isNull = FalseLiteral
     )
   }
 

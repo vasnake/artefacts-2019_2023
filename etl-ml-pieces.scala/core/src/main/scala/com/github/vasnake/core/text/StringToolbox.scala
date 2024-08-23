@@ -103,7 +103,7 @@ object StringToolbox {
       def loop(
         text: String,
         sep: String,
-        acc: Seq[String],
+        acc: Seq[String]
       ): Seq[String] = {
         val idx = text.indexOf(sep)
         if (idx < 0) acc :+ text.trim
@@ -142,14 +142,14 @@ object StringToolbox {
       // TODO: add tests
       new String(
         Base64.getDecoder.decode(src.map(mapping.map)),
-        StandardCharsets.UTF_8,
+        StandardCharsets.UTF_8
       )
 
     def b64Encode(): String =
       // TODO: add tests
       new String(
         Base64.getEncoder.encode(src.getBytes(StandardCharsets.UTF_8)),
-        StandardCharsets.UTF_8,
+        StandardCharsets.UTF_8
       )
   } // RichString
 

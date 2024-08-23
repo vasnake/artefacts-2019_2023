@@ -19,7 +19,7 @@ case class DataFrameBucketsStats(
   partitionColumnsNames: Seq[String] = Seq.empty,
   partitionColumnsIndices: Seq[Int] = Seq.empty,
   dataFramePartitions: Seq[HashMap[String, String]] = Seq.empty,
-  dataFramePartitionsStats: HashMap[String, DataFrameBuckets] = HashMap.empty,
+  dataFramePartitionsStats: HashMap[String, DataFrameBuckets] = HashMap.empty
 ) {
   // N.B. HashMap serializable, Map is not (not always, anyway)
   override def toString: String = {
@@ -51,7 +51,7 @@ case class DataFrameBucketsStats(
         val updatedItem = partKey -> DataFrameBuckets(
           rowsCount = counts.rowsCount,
           bucketsCount = fm.ceil(counts.rowsCount.toDouble / maxRowsPerBucket.toDouble).toInt,
-          firstBucket = totalBuckets,
+          firstBucket = totalBuckets
         )
 
         totalBuckets += updatedItem._2.bucketsCount
@@ -72,7 +72,7 @@ object DataFrameBucketsStats {
   def apply(
     partitionColumns: Seq[String],
     df: DataFrame,
-    maxRowsPerBucket: Int,
+    maxRowsPerBucket: Int
   ): DataFrameBucketsStats = {
 
     val countColumnName: String = s"""${"a" * df.schema.fieldNames.map(_.length).max}_count"""
@@ -88,7 +88,7 @@ object DataFrameBucketsStats {
 
     require(
       partitionsWithRowsCount.forall(_.values.forall(Option(_).isDefined)),
-      s"NULL in partition columns is not allowed, got: ${partitionsWithRowsCount.mkString("; ")}",
+      s"NULL in partition columns is not allowed, got: ${partitionsWithRowsCount.mkString("; ")}"
     )
 
     if (partitionsWithRowsCount.isEmpty) new DataFrameBucketsStats() // empty stats from empty dataframe
@@ -109,7 +109,7 @@ object DataFrameBucketsStats {
             )
           )
           .toMap
-          .toHashMap,
+          .toHashMap
       ).setupBuckets(maxRowsPerBucket)
   }
 
@@ -151,7 +151,7 @@ object DataFrameBucketsStats {
 case class DataFrameBuckets(
   rowsCount: Long = -1L, // min valid value = 1
   bucketsCount: Int = -1, // min valid value = 1
-  firstBucket: Int = -1, // min valid value = 0
+  firstBucket: Int = -1 // min valid value = 0
 ) {
   override def toString: String =
     s"DataFrameBuckets(rowsCount=${rowsCount}, bucketsCount=${bucketsCount}, firstBucket=${firstBucket})"

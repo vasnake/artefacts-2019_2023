@@ -1,7 +1,5 @@
 # Spark/Scala modules (mainly)
 
-WIP
-
 Collection of some interesting bits and pieces from my projects.
 
 Spark 2.4.8; Scala 2.12.19; sbt 1.10.0; java 1.8 (migration to Spark 3 is WIP)
@@ -104,7 +102,7 @@ Each ML model transform an input features vector to a score value, so that each 
 
 ### spark-ml
 
-Three spark.ml estimators + models. All three support stratification and sampling inside stratas.
+Three spark.ml (estimator + model). All three support stratification and sampling inside stratas.
 
 `com.github.vasnake.spark.ml.estimator.ScoreEqualizerEstimator` + `com.github.vasnake.spark.ml.model.ScoreEqualizerModel`
 Used for fixing values distribution.
@@ -117,25 +115,25 @@ Used for transforming regression scores to class labels, keeping class distribut
 
 ### spark-udf
 
-Before using mentioned here UDF/UDAF in your session you have to register them: `com.github.vasnake.spark.udf.catalog.registerAll(spark)`
+Before using mentioned here UDF/UDAF in your spark session you have to register them: `com.github.vasnake.spark.udf.catalog.registerAll(spark)`
 
 The set of generic SQL UDAF functions: `gavg, gsum, gmin, gmax, most_freq`.
 Supported data types: primitive numeric types, arrays of primitive numeric types, and maps
 with keys: `float`, `double`, `int`, `byte`, `long`, `short`, `bool`, `date`, `timestamp`, `string`;
-and values: `float`, `double`, `int`, `byte`, `long`, `short`, `decimal`.
+and values: `float`, `double`, `int`, `byte`, `long`, `short`, `decimal`
 - org.apache.spark.sql.catalyst.vasnake.udf.GenericMin
 - org.apache.spark.sql.catalyst.vasnake.udf.GenericMax
 - org.apache.spark.sql.catalyst.vasnake.udf.GenericSum
 - org.apache.spark.sql.catalyst.vasnake.udf.GenericAvg
 - org.apache.spark.sql.catalyst.vasnake.udf.GenericMostFreq
 
-The set of vector/matrix UDF
+The set of generic vector/matrix UDF
 - org.apache.spark.sql.catalyst.vasnake.udf.GenericVectorCooMul
 - org.apache.spark.sql.catalyst.vasnake.udf.GenericVectorSemiSum
 - org.apache.spark.sql.catalyst.vasnake.udf.GenericVectorSemiDiff
 - org.apache.spark.sql.catalyst.vasnake.udf.GenericVectorMatMul
 
-Two generic functions, complementary to stock `isnan`
+Two generic functions, complementary to `isnan` from stdlib
 - org.apache.spark.sql.catalyst.vasnake.udf.GenericIsInf
 - org.apache.spark.sql.catalyst.vasnake.udf.GenericIsFinite
 

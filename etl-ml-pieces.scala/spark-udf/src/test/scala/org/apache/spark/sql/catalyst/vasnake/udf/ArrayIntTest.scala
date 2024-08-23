@@ -16,7 +16,7 @@ class ArrayIntTest extends AnyFlatSpec with should.Matchers with LocalSpark with
       .selectExpr(
         "part",
         "uid",
-        "transform(feature_list, _x -> if(_x in (null, 'NaN', 'Infinity', '-Infinity'), null, _x)) as feature_list",
+        "transform(feature_list, _x -> if(_x in (null, 'NaN', 'Infinity', '-Infinity'), null, _x)) as feature_list"
       )
       .selectExpr("part", "uid", "cast(feature_list as array<int>) as feature")
       .orderBy("uid")

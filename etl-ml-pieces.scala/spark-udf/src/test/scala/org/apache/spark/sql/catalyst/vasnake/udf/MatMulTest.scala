@@ -20,7 +20,7 @@ class MatMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
       funcName = "generic_matmul",
       targetName = "generic_matmul",
       spark,
-      overrideIfExists = true,
+      overrideIfExists = true
     )
   }
 
@@ -40,10 +40,10 @@ class MatMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
           .sql(
             s"select cast(array(${a1}) as array<$elementType>) as a1, cast(array(${a2}) as array<$elementType>) as a2"
           )
-          .select(generic_matmul("a1", "a2").alias(colName)),
+          .select(generic_matmul("a1", "a2").alias(colName))
       ),
       ("SQL API, aliased function", spark.sql(s"select matmul(${params}) as $colName")),
-      ("SQL API, native func.name", spark.sql(s"select generic_matmul(${params}) as $colName")),
+      ("SQL API, native func.name", spark.sql(s"select generic_matmul(${params}) as $colName"))
     ).foreach {
       case (msg, df) =>
         show(df, msg)
@@ -157,7 +157,7 @@ class MatMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
 
         // different size
         ("6.1", af(1, 2, 3), af(4, 5, 6), None),
-        ("6.2", af(1, 2, 3, 4), af(5, 6, 7), None),
+        ("6.2", af(1, 2, 3, 4), af(5, 6, 7), None)
       )
     )
       .persist(StorageLevel.DISK_ONLY) // N.B. codegen ON switch here

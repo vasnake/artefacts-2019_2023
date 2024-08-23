@@ -1,6 +1,7 @@
+-XshowSettings:vm
 -XX:MaxMetaspaceSize=1g
 -XX:ReservedCodeCacheSize=1g
--Xms1g
--Xmx4g
--XshowSettings:vm
--Xss4m
+-Xms4g
+-Xmx8g
+-Xss12m
+-Dfile.encoding=UTF-8

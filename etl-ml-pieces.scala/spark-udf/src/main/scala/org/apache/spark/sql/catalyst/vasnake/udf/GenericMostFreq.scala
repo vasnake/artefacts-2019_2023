@@ -20,7 +20,7 @@ case class GenericMostFreq(
   thresholdExpression: Expression,
   preferExpression: Expression,
   mutableAggBufferOffset: Int = 0,
-  inputAggBufferOffset: Int = 0,
+  inputAggBufferOffset: Int = 0
 ) extends GenericCountItems {
   // reference: org.apache.spark.sql.catalyst.expressions.aggregate.Percentile
   def this(child: Expression) =
@@ -30,7 +30,7 @@ case class GenericMostFreq(
     child: Expression,
     indexExpression: Expression,
     thresholdExpression: Expression,
-    preferExpression: Expression,
+    preferExpression: Expression
   ) =
     this(child, indexExpression, thresholdExpression, preferExpression, 0, 0)
 
@@ -73,7 +73,7 @@ case class GenericMostFreq(
           val total: Double = items.map(x => x._2.toLong).sum.toDouble
           assume(
             total > 0 || items.isEmpty,
-            "Require sum of counts > 0 for non empty list of items",
+            "Require sum of counts > 0 for non empty list of items"
           )
 
           items.filter { case (_, count) => count.toDouble / total >= td }
@@ -196,7 +196,7 @@ abstract class GenericCountItems()
   @inline protected def updateBuffer(
     accum: Accumulator,
     key: AccImpl.K,
-    value: AccImpl.V,
+    value: AccImpl.V
   ): Unit =
     // debug(s"updateBuffer enter, key `${key}`, value `${value}`, accum: ${accum}")
 

@@ -24,7 +24,7 @@ class ScoreAudienceTest extends AnyFlatSpec with should.Matchers with SimpleLoca
       "model_type" -> "ScoringCustomLogRegSA",
       "audience_name" -> "p_hmc_660",
       "model_path" -> FileToolbox.getResourcePath(this, "/p_hmc_660.json"),
-      "features_path" -> "",
+      "features_path" -> ""
     )
 
     val transformer = buildTransformer(spark)
@@ -39,7 +39,7 @@ class ScoreAudienceTest extends AnyFlatSpec with should.Matchers with SimpleLoca
       .select(
         ($"score" * 1000) cast "int",
         $"audience_name",
-        $"uid",
+        $"uid"
       )
       .collect
 
@@ -59,7 +59,7 @@ class ScoreAudienceTest extends AnyFlatSpec with should.Matchers with SimpleLoca
     val res = output
       .select(
         ($"score" * 1000) cast "int",
-        $"audience_name",
+        $"audience_name"
       )
       .collect
 
@@ -97,7 +97,7 @@ class ScoreAudienceTest extends AnyFlatSpec with should.Matchers with SimpleLoca
           ("topic_4", 0.9344817462838555f),
           ("topic_5", 0.7174355335110215f),
           ("topic_6", 0.8060563109627388f),
-          ("topic_10", 0.7705491752698755f),
+          ("topic_10", 0.7705491752698755f)
         ),
         v1_groups_all = Map(),
         v2_groups_all = Map(),
@@ -105,8 +105,8 @@ class ScoreAudienceTest extends AnyFlatSpec with should.Matchers with SimpleLoca
           0.9164074522494015f,
           0.5884483607798774f,
           0.12720521573031884f,
-          0.12720521573031884f,
-        ),
+          0.12720521573031884f
+        )
       )
     ).toDF
 
@@ -114,7 +114,7 @@ class ScoreAudienceTest extends AnyFlatSpec with should.Matchers with SimpleLoca
       "model_type" -> "ScoringCustomLogRegSA",
       "audience_name" -> "p_hmc_660",
       "model_path" -> FileToolbox.getResourcePath(this, "/p_hmc_660.json"),
-      "features_path" -> "",
+      "features_path" -> ""
     )
 
     val transformer = buildTransformer(spark)
@@ -125,7 +125,7 @@ class ScoreAudienceTest extends AnyFlatSpec with should.Matchers with SimpleLoca
     val res = output
       .select(
         ($"score" * 1000) cast "int",
-        $"audience_name",
+        $"audience_name"
       )
       .collect
 
@@ -155,7 +155,7 @@ class ScoreAudienceTest extends AnyFlatSpec with should.Matchers with SimpleLoca
     checkScore(
       input = Seq(InputDatasetRow("a", None, None)),
       expected,
-      magn,
+      magn
     )
   }
 
@@ -170,7 +170,7 @@ class ScoreAudienceTest extends AnyFlatSpec with should.Matchers with SimpleLoca
     checkScore(
       input = Seq(InputDatasetRow("a", Some(topics), None)),
       expected,
-      magn,
+      magn
     )
   }
 
@@ -185,14 +185,14 @@ class ScoreAudienceTest extends AnyFlatSpec with should.Matchers with SimpleLoca
     checkScore(
       input = Seq(InputDatasetRow("a", None, Some(allProfs))),
       expected,
-      magn,
+      magn
     )
 
     // only first three values are needed
     checkScore(
       input = Seq(InputDatasetRow("a", None, Some(allProfs.take(3)))),
       expected,
-      magn,
+      magn
     )
   }
 
@@ -207,7 +207,7 @@ class ScoreAudienceTest extends AnyFlatSpec with should.Matchers with SimpleLoca
     checkScore(
       input = Seq(InputDatasetRow("a", Some(topics), Some(allProfs))),
       expected,
-      magn,
+      magn
     )
   }
 
@@ -223,7 +223,7 @@ class ScoreAudienceTest extends AnyFlatSpec with should.Matchers with SimpleLoca
     checkScore(
       input = Seq(InputDatasetRow("a", Some(topics), Some(allProfs))),
       expected,
-      magn,
+      magn
     )
   }
 
@@ -239,7 +239,7 @@ class ScoreAudienceTest extends AnyFlatSpec with should.Matchers with SimpleLoca
     checkScore(
       input = Seq(InputDatasetRow("a", Some(topics), Some(allProfs))),
       expected,
-      magn,
+      magn
     )
   }
 
@@ -255,7 +255,7 @@ class ScoreAudienceTest extends AnyFlatSpec with should.Matchers with SimpleLoca
     checkScore(
       input = Seq(InputDatasetRow("a", Some(topics), Some(allProfs))),
       expected,
-      magn,
+      magn
     )
   }
 
@@ -271,7 +271,7 @@ class ScoreAudienceTest extends AnyFlatSpec with should.Matchers with SimpleLoca
     checkScore(
       input = Seq(InputDatasetRow("a", Some(topics), Some(allProfs))),
       expected,
-      magn,
+      magn
     )
   }
 
@@ -280,7 +280,7 @@ class ScoreAudienceTest extends AnyFlatSpec with should.Matchers with SimpleLoca
     // topics = topics on odd idx set to value from range (0.11 .. 0.99)
     val topics: Map[String, Float] = buildSyntheticTopics(
       step = (0.99 - 0.1) / 200.0,
-      minval = 0.1,
+      minval = 0.1
     )
 
     val allProfs: Array[Float] = Array(0.6f, 0.2f, 0.1f)
@@ -297,11 +297,11 @@ class ScoreAudienceTest extends AnyFlatSpec with should.Matchers with SimpleLoca
               val num = k.split("_").apply(1).toInt
               num % 2 != 0
           }),
-          Some(allProfs),
+          Some(allProfs)
         )
       ),
       expected,
-      magn,
+      magn
     )
 
     // even topics
@@ -314,18 +314,18 @@ class ScoreAudienceTest extends AnyFlatSpec with should.Matchers with SimpleLoca
               val num = k.split("_").apply(1).toInt
               num % 2 == 0
           }),
-          Some(allProfs),
+          Some(allProfs)
         )
       ),
       expected = 9919,
-      magn,
+      magn
     )
   }
 
   def checkScore(
     input: Seq[InputDatasetRow],
     expected: Int,
-    magn: Double,
+    magn: Double
   )(implicit
     spark: SparkSession
   ): Assertion = {
@@ -337,7 +337,7 @@ class ScoreAudienceTest extends AnyFlatSpec with should.Matchers with SimpleLoca
   def checkScore(
     input: DataFrame,
     expected: Int,
-    magn: Double,
+    magn: Double
   )(implicit
     spark: SparkSession
   ): Assertion = {
@@ -359,7 +359,7 @@ object ScoreAudienceTest {
   case class InputDatasetRow(
     uid: String,
     topics_m: Option[Map[String, Float]],
-    all_profiles: Option[Array[Float]],
+    all_profiles: Option[Array[Float]]
   )
 
   val TOPIC_THRESHOLD: Double = 0.1

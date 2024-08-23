@@ -17,7 +17,7 @@ trait ScoreEqualizerParams
     this,
     "numBins",
     "Fit: number of bins for spline interpolator",
-    isValid = ParamValidators.gt(0),
+    isValid = ParamValidators.gt(0)
   )
   def getNumBins: Int = $(numBins)
   def setNumBins(value: Int): this.type = {
@@ -38,7 +38,7 @@ trait ScoreEqualizerParams
     this,
     "minInputSize",
     "Fit: minimum size of train vector",
-    isValid = ParamValidators.gt(0),
+    isValid = ParamValidators.gt(0)
   )
   def getMinInputSize: Int = $(minInputSize)
   def setMinInputSize(value: Int): this.type = {
@@ -53,6 +53,6 @@ trait ScoreEqualizerParams
     noiseValue -> 1e-4,
     epsValue -> 1e-3,
     minInputSize -> 1,
-    cacheSettings -> "cache",
+    cacheSettings -> "cache"
   )
 }

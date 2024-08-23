@@ -49,7 +49,7 @@ class NEPriorClassProbaModel(override val uid: String, val groupsConfig: List[(S
     require(getNumClasses > 1, s"Number of classes must be > 1, got `${getNumClasses}`")
     require(
       groupsConfig.map(_._2).forall(v => v.size == getNumClasses),
-      "Aligner's size must be equal to `numClasses`",
+      "Aligner's size must be equal to `numClasses`"
     )
     if (groupsConfig.isEmpty) logWarning("aligners list is empty, null values will be produced")
 
@@ -68,7 +68,7 @@ class NEPriorClassProbaModel(override val uid: String, val groupsConfig: List[(S
           groupColIndex = df.schema.fieldIndex(tempGroupsColName),
           numClasses = getNumClasses,
           aligners = groupsConfig.map(t => (t._1, t._2.toArray)).toMap,
-          outSchema = transformSchema(df.schema), // with validation
+          outSchema = transformSchema(df.schema) // with validation
         )
       )
 
@@ -104,7 +104,7 @@ object NEPriorClassProbaModel {
   def decodeRow(
     row: Row,
     colIdx: Int,
-    numClasses: Int,
+    numClasses: Int
   ): Option[Array[Double]] = {
     // given row is not null,
     // check for invalid input conditions: (size, null, nan, x < 0, sum == 0)
@@ -159,5 +159,5 @@ case class NEPriorClassProbaConfig(
   groupColIndex: Int,
   numClasses: Int,
   aligners: Map[String, Array[Double]],
-  outSchema: StructType,
+  outSchema: StructType
 )

@@ -13,7 +13,7 @@ trait SamplingModelParams extends Params {
     this,
     "sampleSize",
     "Fit: max number of sample rows for each group",
-    isValid = ParamValidators.gt(0),
+    isValid = ParamValidators.gt(0)
   )
   def getSampleSize: Int = $(sampleSize)
   def setSampleSize(value: Int): this.type = {

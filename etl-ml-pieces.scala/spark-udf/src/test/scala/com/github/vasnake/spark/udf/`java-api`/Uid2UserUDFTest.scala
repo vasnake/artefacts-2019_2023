@@ -23,8 +23,8 @@ class Uid2UserUDFTest extends AnyFlatSpec with should.Matchers {
         ("1234567890", "uid:1234567890"),
         ("-0", "uid:-0"),
         ("9223372036854775807", "uid:9223372036854775807"),
-        ("-9223372036854775808", "uid:-9223372036854775808"),
-      ),
+        ("-9223372036854775808", "uid:-9223372036854775808")
+      )
     )
   }
 
@@ -36,8 +36,8 @@ class Uid2UserUDFTest extends AnyFlatSpec with should.Matchers {
         ("1234567890", "t1id:1234567890"),
         ("-0", "t1id:-0"),
         ("9223372036854775807", "t1id:9223372036854775807"),
-        ("-9223372036854775808", "t1id:-9223372036854775808"),
-      ),
+        ("-9223372036854775808", "t1id:-9223372036854775808")
+      )
     )
   }
 
@@ -49,8 +49,8 @@ class Uid2UserUDFTest extends AnyFlatSpec with should.Matchers {
         ("1234567890", "t2id:1234567890"),
         ("0", "t2id:0"),
         ("9223372036854775807", "t2id:9223372036854775807"),
-        ("-9223372036854775808", "t2id:-9223372036854775808"),
-      ),
+        ("-9223372036854775808", "t2id:-9223372036854775808")
+      )
     )
   }
 
@@ -62,8 +62,8 @@ class Uid2UserUDFTest extends AnyFlatSpec with should.Matchers {
         ("9A8F7B", "t3id:9A8F7B"),
         ("7FFFFFFFFFFFFFFF", "t3id:7FFFFFFFFFFFFFFF"),
         ("-7aaaaaaaaaaaaaaa", "t3id:-7aaaaaaaaaaaaaaa"),
-        ("0", "t3id:0"),
-      ),
+        ("0", "t3id:0")
+      )
     )
   }
 
@@ -73,8 +73,8 @@ class Uid2UserUDFTest extends AnyFlatSpec with should.Matchers {
       "GAID",
       Seq(
         ("B5CD47AA8F6B4534A0675C8C21EFD375", "gaid:b5cd47aa-8f6b-4534-a067-5c8c21efd375"),
-        ("00000000000000000000000000000000", "gaid:00000000-0000-0000-0000-000000000000"),
-      ),
+        ("00000000000000000000000000000000", "gaid:00000000-0000-0000-0000-000000000000")
+      )
     )
   }
 
@@ -84,8 +84,8 @@ class Uid2UserUDFTest extends AnyFlatSpec with should.Matchers {
       "IDFA",
       Seq(
         ("B5CD47AA8F6B4534A0675C8C21EFD375", "idfa:B5CD47AA-8F6B-4534-A067-5C8C21EFD375"),
-        ("ffffffffffffffffffffffffffffffff", "idfa:FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"),
-      ),
+        ("ffffffffffffffffffffffffffffffff", "idfa:FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")
+      )
     )
   }
 
@@ -97,8 +97,8 @@ class Uid2UserUDFTest extends AnyFlatSpec with should.Matchers {
         ("foo@bar.baz", "email:foo@bar.baz"),
         ("a.@b. .c", "email:a.@b. .c"),
         (" a . @ b . . c ", "email: a . @ b . . c "),
-        (" @ . ", "email: @ . "),
-      ),
+        (" @ . ", "email: @ . ")
+      )
     )
   }
 
@@ -109,8 +109,8 @@ class Uid2UserUDFTest extends AnyFlatSpec with should.Matchers {
       Seq(
         ("foo@bar.baz", "mail:foo@bar.baz"),
         ("a@b.c", "mail:a@b.c"),
-        ("a.@b..c", "mail:a.@b..c"),
-      ),
+        ("a.@b..c", "mail:a.@b..c")
+      )
     )
   }
 
@@ -121,8 +121,8 @@ class Uid2UserUDFTest extends AnyFlatSpec with should.Matchers {
       Seq(
         "123BEEF",
         "-",
-        "-9223372036854775809",
-      ),
+        "-9223372036854775809"
+      )
     )
   }
 
@@ -132,8 +132,8 @@ class Uid2UserUDFTest extends AnyFlatSpec with should.Matchers {
       Seq(
         "123BEEF",
         "9223372036854775808",
-        "+",
-      ),
+        "+"
+      )
     )
   }
 
@@ -144,8 +144,8 @@ class Uid2UserUDFTest extends AnyFlatSpec with should.Matchers {
         "123BEEF",
         "",
         "+",
-        "-",
-      ),
+        "-"
+      )
     )
   }
 
@@ -156,8 +156,8 @@ class Uid2UserUDFTest extends AnyFlatSpec with should.Matchers {
         "123XYZ",
         "",
         "-",
-        "FFFFFFFFFFFFFFFF1",
-      ),
+        "FFFFFFFFFFFFFFFF1"
+      )
     )
   }
 
@@ -169,8 +169,8 @@ class Uid2UserUDFTest extends AnyFlatSpec with should.Matchers {
         "123XYZ",
         "Z5CD47AA8F6B4534A0675C8C21EFD375",
         "123456789abcdef9876543210FEDCBAG",
-        "B5CD47AA-8F6B-4534-A067-5C8C21EFD375",
-      ),
+        "B5CD47AA-8F6B-4534-A067-5C8C21EFD375"
+      )
     )
   }
 
@@ -181,8 +181,8 @@ class Uid2UserUDFTest extends AnyFlatSpec with should.Matchers {
       Seq(
         "123XYZ",
         "B5CD47AA8F6B4534A0675C8C21EFD3750",
-        "0123456789abcdef9876543210FEDCBA-",
-      ),
+        "0123456789abcdef9876543210FEDCBA-"
+      )
     )
   }
 
@@ -195,8 +195,8 @@ class Uid2UserUDFTest extends AnyFlatSpec with should.Matchers {
         "@",
         "@.",
         "..",
-        "a.b.c",
-      ),
+        "a.b.c"
+      )
     )
   }
 
@@ -210,8 +210,8 @@ class Uid2UserUDFTest extends AnyFlatSpec with should.Matchers {
         ".@.",
         "a@.b.",
         "a@.b",
-        "a@b",
-      ),
+        "a@b"
+      )
     )
   }
 }

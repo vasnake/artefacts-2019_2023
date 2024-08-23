@@ -12,11 +12,11 @@ case class SBGroupedTransformer // TODO: rename to GroupBasedTransformer
 (
   config: SBGroupedTransformerConfig,
   group: String,
-  transformerFactory: PostprocessorConfig => InplaceTransformer,
+  transformerFactory: PostprocessorConfig => InplaceTransformer
 ) extends InplaceTransformer {
   require(
     group.isEmpty || config.groups.contains(group),
-    s"can't find transformer '${group}'",
+    s"can't find transformer '${group}'"
   )
 
   private val transformer: Option[InplaceTransformer] = {

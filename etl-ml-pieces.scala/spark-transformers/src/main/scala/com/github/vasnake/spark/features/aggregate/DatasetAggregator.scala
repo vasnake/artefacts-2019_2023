@@ -22,7 +22,7 @@ object DatasetAggregator { // TODO: move to com.github.vasnake.spark.dataset.tra
 
   def aggregateColumns(
     df: DataFrame,
-    cfg: Map[String, ColumnsAggregationConfig],
+    cfg: Map[String, ColumnsAggregationConfig]
   )(implicit
     spark: SparkSession
   ): DataFrame = {
@@ -43,7 +43,7 @@ object DatasetAggregator { // TODO: move to com.github.vasnake.spark.dataset.tra
   def reduceRows(
     key: String,
     iter: Iterator[Row],
-    aggregators: Broadcast[DatasetAggregators],
+    aggregators: Broadcast[DatasetAggregators]
   ): Row = {
     val aggs = aggregators.value
     val rows: Seq[Row] = iter.toSeq
@@ -70,14 +70,14 @@ object DatasetAggregator { // TODO: move to com.github.vasnake.spark.dataset.tra
     def aggPipeline(fieldName: String): AggregationPipeline = {
       val cAggCfg: ColumnsAggregationConfig = cfg.getOrElse(
         fieldName,
-        sys.error(s"Can't find `${fieldName}` config in `${cfg}`"),
+        sys.error(s"Can't find `${fieldName}` config in `${cfg}`")
       )
       val apCfg: AggregationPipelineConfig = cAggCfg.getOrElse(
         fieldName,
         cAggCfg.getOrElse(
           DEFAULT_PIPELINE_KEY,
-          sys.error(s"Can't find default config in `${cAggCfg}`"),
-        ),
+          sys.error(s"Can't find default config in `${cAggCfg}`")
+        )
       )
 
       AggregationPipeline(apCfg)
@@ -90,7 +90,7 @@ object DatasetAggregator { // TODO: move to com.github.vasnake.spark.dataset.tra
       val featuresPipelines: Map[String, AggregationPipeline] = {
         val cAggCfg: ColumnsAggregationConfig = cfg.getOrElse(
           groupName,
-          sys.error(s"Can't find `${groupName}` config in `${cfg}`"),
+          sys.error(s"Can't find `${groupName}` config in `${cfg}`")
         )
         cAggCfg
           .keys
@@ -108,7 +108,7 @@ object DatasetAggregator { // TODO: move to com.github.vasnake.spark.dataset.tra
       val featuresPipelines: Map[String, AggregationPipeline] = {
         val cAggCfg: ColumnsAggregationConfig = cfg.getOrElse(
           fieldName,
-          sys.error(s"Can't find `${fieldName}` config in `${cfg}`"),
+          sys.error(s"Can't find `${fieldName}` config in `${cfg}`")
         )
         cAggCfg
           .keys

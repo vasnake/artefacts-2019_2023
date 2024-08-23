@@ -18,7 +18,7 @@ class MapJoinUDF extends UDF3[Map[String, jFloat], String, String, String] {
   override def call(
     feature: Map[String, jFloat],
     itemsSep: String,
-    kvSep: String,
+    kvSep: String
   ): String =
     feature
       .map { case (k, v) => s"$k$kvSep${norm(v)}" }

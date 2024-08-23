@@ -41,7 +41,7 @@ class TableSmartWriter(partitionMethodOrNull: String) extends CustomLogging {
     maxRowsPerBucket: Int,
     overwrite: Boolean,
     raiseOnMissingColumns: Boolean,
-    checkParameterOrNull: String,
+    checkParameterOrNull: String
   ): Unit = {
 
     logInfo(
@@ -61,7 +61,7 @@ class TableSmartWriter(partitionMethodOrNull: String) extends CustomLogging {
     require(maxRowsPerBucket > 0, "Rows/bucket must be `> 0`")
     require(
       checkParameter.forall(!RESERVED_PART_PARAM_NAMES.contains(_)),
-      s"Partition parameter name can't be in reserved names set (${RESERVED_PART_PARAM_NAMES.mkString(", ")})",
+      s"Partition parameter name can't be in reserved names set (${RESERVED_PART_PARAM_NAMES.mkString(", ")})"
     )
 
     val hiveColumns: Seq[CatalogColumn] = spark.catalog.listColumns(database, table).collect()
@@ -73,7 +73,7 @@ class TableSmartWriter(partitionMethodOrNull: String) extends CustomLogging {
     // part. columns in catalog
     require(
       partColumns.forall(_.dataType == "string"),
-      s"Hive table partition columns must be of type `string`, got ${partColumns.mkString(", ")}",
+      s"Hive table partition columns must be of type `string`, got ${partColumns.mkString(", ")}"
     )
 
     // part. columns in DF
@@ -81,7 +81,7 @@ class TableSmartWriter(partitionMethodOrNull: String) extends CustomLogging {
       partColumnNames.forall(
         df.schema(_).dataType.simpleString == DataTypes.StringType.simpleString
       ), // ignore nullability
-      s"Dataframe partition columns must by of type `string`, got ${df.schema.simpleString}",
+      s"Dataframe partition columns must by of type `string`, got ${df.schema.simpleString}"
     )
 
     if (partColumnNames.isEmpty)
@@ -92,13 +92,13 @@ class TableSmartWriter(partitionMethodOrNull: String) extends CustomLogging {
       fixedDF <- fixDataFrameStructure(
         df,
         hiveColumns.map(_.name),
-        recoverMissingCols = !raiseOnMissingColumns,
+        recoverMissingCols = !raiseOnMissingColumns
       )
       (partDF, partStats, bucketingErrorsCount) <- repartitionToBuckets(
         fixedDF,
         partColumnNames,
         maxRowsPerBucket,
-        partitionMethod,
+        partitionMethod
       )
       // remove success flag if present
       _ <- alterPartitionsParameters(
@@ -106,7 +106,7 @@ class TableSmartWriter(partitionMethodOrNull: String) extends CustomLogging {
         table,
         partStats,
         checkParameter.map(name => Map(name -> None)).getOrElse(Map.empty),
-        failIfNotFoundPartitions = false,
+        failIfNotFoundPartitions = false
       )
       // actual insert
       _ <- write(partDF, database, table, overwrite)
@@ -119,7 +119,7 @@ class TableSmartWriter(partitionMethodOrNull: String) extends CustomLogging {
         database,
         table,
         partStats,
-        checkParameter.map(name => Map(name -> Some("true"))).getOrElse(Map.empty),
+        checkParameter.map(name => Map(name -> Some("true"))).getOrElse(Map.empty)
       )
     } yield ()
 
@@ -128,7 +128,7 @@ class TableSmartWriter(partitionMethodOrNull: String) extends CustomLogging {
       case Failure(exception) =>
         logError(
           s"Failed inserting dataframe into Hive table `${database}.${table}`: ${exception.getMessage}",
-          exception,
+          exception
         )
         throw exception
       case _ => logInfo("Dataframe successfully inserted.")
@@ -140,7 +140,7 @@ object TableSmartWriter {
   def fixDataFrameStructure(
     df: DataFrame,
     hiveColumns: Seq[String],
-    recoverMissingCols: Boolean,
+    recoverMissingCols: Boolean
   )(implicit
     log: Logger
   ): Try[DataFrame] = Try {
@@ -165,7 +165,7 @@ object TableSmartWriter {
     df: DataFrame,
     partitionColumnsNames: Seq[String],
     maxRowsPerBucket: Int,
-    partitionMethod: String,
+    partitionMethod: String
   )(implicit
     log: Logger
   ): Try[(DataFrame, Option[DataFrameBucketsStats], LongAccumulator)] = Try {
@@ -213,7 +213,7 @@ object TableSmartWriter {
   def _collectPartitionsStats(
     df: DataFrame,
     partitionColumns: Seq[String],
-    maxRowsPerBucket: Int,
+    maxRowsPerBucket: Int
   )(implicit
     log: Logger
   ): Try[Option[DataFrameBucketsStats]] =
@@ -239,7 +239,7 @@ object TableSmartWriter {
     df: DataFrame,
     partitionsInfo: Option[DataFrameBucketsStats],
     maxRowsPerBucket: Int,
-    errorsCountAccum: LongAccumulator,
+    errorsCountAccum: LongAccumulator
   )(implicit
     log: Logger
   ): Try[DataFrame] = Try {
@@ -287,7 +287,7 @@ object TableSmartWriter {
             partsInfo.dataFramePartitionsStats.values.map(_.bucketsCount).sum,
             partsInfo.dataFramePartitionsStats.map {
               case (k, v) => k -> (v.firstBucket, v.bucketsCount)
-            },
+            }
           )
         )
 
@@ -299,7 +299,7 @@ object TableSmartWriter {
           .createDataFrame(
             bucketedKvRdd
               .mapPartitions(rows => rows.map(row => row._2), preservesPartitioning = true),
-            df.schema,
+            df.schema
           )
         log.info(s"Repartition done. Number of files, expected: ${bucketedKvRdd.getNumPartitions}")
 
@@ -315,7 +315,7 @@ object TableSmartWriter {
     df: DataFrame,
     partitionsInfo: Option[DataFrameBucketsStats],
     maxRowsPerBucket: Int,
-    errorsCountAccum: LongAccumulator,
+    errorsCountAccum: LongAccumulator
   )(implicit
     log: Logger
   ): Try[DataFrame] = Try {
@@ -338,7 +338,7 @@ object TableSmartWriter {
           bucketNumColName,
           _createBucketingUDF(partsInfo, errorsCountAccum, df.sparkSession).apply(
             sqlfn.concat_ws("/", partsInfo.partitionColumnsNames.map(sqlfn.col): _*)
-          ),
+          )
         )
 
         // by-range produces more stable files size than hash; mul-by-2 for eliminating strange effects with files doubling
@@ -358,7 +358,7 @@ object TableSmartWriter {
   def _createBucketingUDF(
     partitionsInfo: DataFrameBucketsStats,
     errorsCountAccum: LongAccumulator,
-    spark: SparkSession,
+    spark: SparkSession
   ): UserDefinedFunction = {
     // N.B. Only stdlib types allowed in broadcast because of the `SQL ADD JAR ...` classloader problem, e.g:
     // java.lang.ClassCastException: com...DataFrameHivePartitionsInfo cannot be cast to com...DataFrameHivePartitionsInfo
@@ -375,7 +375,7 @@ object TableSmartWriter {
           partitionsInfo.dataFramePartitionsStats.map {
             case (k, v) => k -> (v.bucketsCount, v.firstBucket)
           },
-          partitionsInfo.dataFramePartitionsStats.values.map(_.bucketsCount).sum,
+          partitionsInfo.dataFramePartitionsStats.values.map(_.bucketsCount).sum
         )
       )
 
@@ -390,7 +390,7 @@ object TableSmartWriter {
             )
             errorsCountAccum.add(1)
             (bcParams.value._3, 0)
-          },
+          }
         )
 
       firstBucket + bcParams.value._1.nextInt(numBuckets)
@@ -404,10 +404,10 @@ object TableSmartWriter {
     table: String,
     partStats: Option[DataFrameBucketsStats],
     params: Map[String, Option[String]],
-    failIfNotFoundPartitions: Boolean = true,
+    failIfNotFoundPartitions: Boolean = true
   )(implicit
     log: Logger,
-    spark: SparkSession,
+    spark: SparkSession
   ): Try[Unit] = Try {
 
     log.info(
@@ -443,7 +443,7 @@ object TableSmartWriter {
 
           require(
             partitions.length == stats.dataFramePartitions.length || !failIfNotFoundPartitions,
-            s"Number of partitions from metastore must be = ${stats.dataFramePartitions.length}, got (${partitions.length})",
+            s"Number of partitions from metastore must be = ${stats.dataFramePartitions.length}, got (${partitions.length})"
           )
 
           if (partitions.nonEmpty) {
@@ -477,10 +477,10 @@ object TableSmartWriter {
     database: String,
     table: String,
     parts: Seq[Map[String, String]],
-    mqp: Option[MetastoreQueryProcessorWithConnPool],
+    mqp: Option[MetastoreQueryProcessorWithConnPool]
   )(implicit
     log: Logger,
-    spark: SparkSession,
+    spark: SparkSession
   ): Array[CatalogTablePartition] = {
     // split large amount of partitions to chunks to avoid catalyst/metastore hanging or StackOverflow;
     // use an optional pool of connections to speed-up queries processing
@@ -503,10 +503,10 @@ object TableSmartWriter {
     database: String,
     table: String,
     parts: Seq[CatalogTablePartition],
-    mqp: Option[MetastoreQueryProcessorWithConnPool],
+    mqp: Option[MetastoreQueryProcessorWithConnPool]
   )(implicit
     log: Logger,
-    spark: SparkSession,
+    spark: SparkSession
   ): Unit = {
     // split large amount of partitions to chunks to avoid metastore hanging or StackOverflow;
     // use an optional pool of connections to speed-up queries processing
@@ -526,10 +526,10 @@ object TableSmartWriter {
   def _processPartitions[A, B](
     chunks: IndexedSeq[A],
     askCatalogFun: (A, ExternalCatalog) => Seq[B],
-    mqpOpt: Option[MetastoreQueryProcessorWithConnPool],
+    mqpOpt: Option[MetastoreQueryProcessorWithConnPool]
   )(implicit
     log: Logger,
-    spark: SparkSession,
+    spark: SparkSession
   ): Seq[B] = {
     // use an optional pool of connections to speed-up queries processing
 
@@ -573,7 +573,7 @@ object TableSmartWriter {
     df: DataFrame,
     database: String,
     table: String,
-    overwrite: Boolean,
+    overwrite: Boolean
   )(implicit
     log: Logger
   ): Try[Unit] = {
@@ -602,7 +602,7 @@ object TableSmartWriter {
 
   class BucketPartitioner(
     parameters: Broadcast[(Random, Int, Map[String, (Int, Int)])],
-    errorsAccum: LongAccumulator,
+    errorsAccum: LongAccumulator
   ) extends Partitioner {
     // parameters:
     // 1: random
@@ -646,7 +646,7 @@ object TableSmartWriter {
     "totalSize",
     "spark.sql.statistics.totalSize",
     "COLUMN_STATS_ACCURATE",
-    "numRows",
+    "numRows"
   )
 
   val SQL_PARTITIONER: String = "SQL"
@@ -671,21 +671,21 @@ object TableSmartWriter {
       _poolSizeParameterValue(
         spark,
         METASTORE_CONNECTIONS_POOL_SIZE_KEY,
-        METASTORE_CONNECTIONS_POOL_SIZE_DEFAULT,
-      ),
+        METASTORE_CONNECTIONS_POOL_SIZE_DEFAULT
+      )
     )
 
     _poolSize(
       maxSize = param,
       partitionsTotalCount = partitionsTotalCount,
-      chunkSize = math.min(PARTITIONS_LIST_READ_CHUNK_SIZE, PARTITIONS_LIST_WRITE_CHUNK_SIZE),
+      chunkSize = math.min(PARTITIONS_LIST_READ_CHUNK_SIZE, PARTITIONS_LIST_WRITE_CHUNK_SIZE)
     )
   }
 
   private def _poolSizeParameterValue(
     spark: SparkSession,
     key: String,
-    default: Int,
+    default: Int
   ) = Try(
     spark.conf.get(key, default.toString).toInt
   ).getOrElse(default)
@@ -693,12 +693,12 @@ object TableSmartWriter {
   private def _poolSize(
     maxSize: Int,
     partitionsTotalCount: Int,
-    chunkSize: Int,
+    chunkSize: Int
   ) = {
     assert(maxSize > 0, "Pool size must be at least 1")
     val chunksCount = math.max(
       1,
-      math.ceil(partitionsTotalCount.toDouble / chunkSize.toDouble).toInt,
+      math.ceil(partitionsTotalCount.toDouble / chunkSize.toDouble).toInt
     )
 
     math.min(maxSize, chunksCount)
@@ -711,7 +711,7 @@ object TableSmartWriter {
     message: => String = "",
     nrows: Int = 200,
     truncate: Boolean = false,
-    force: Boolean = false,
+    force: Boolean = false
   ): Unit =
     if (DEBUG_MODE || force) {
       if (message.nonEmpty)

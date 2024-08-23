@@ -30,5 +30,5 @@ case class PredictorWrapper(predictor: Estimator, config: PredictorWrapperConfig
 case class PredictorWrapperConfig(
   minFeaturesPerSample: Int,
   maxFeaturesPerSample: Int,
-  predictLength: Int,
+  predictLength: Int
 )

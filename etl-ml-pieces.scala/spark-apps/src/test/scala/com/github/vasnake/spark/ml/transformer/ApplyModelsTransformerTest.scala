@@ -119,7 +119,7 @@ class ApplyModelsTransformerTest extends AnyFlatSpec with should.Matchers with S
       "model_type" -> "ScoringCustomLogRegSA",
       "audience_name" -> "p_hmc_660",
       "model_path" -> FileToolbox.getResourcePath(this, "/p_hmc_660.json"),
-      "features_path" -> "",
+      "features_path" -> ""
     )
 
     val transformer = new ApplyModelsTransformer()
@@ -135,7 +135,7 @@ class ApplyModelsTransformerTest extends AnyFlatSpec with should.Matchers with S
       .select(
         ($"score" * 1000) cast "int",
         $"audience_name",
-        $"uid",
+        $"uid"
       )
       .collect should contain theSameElementsAs Seq(
       (424, "p_hmc_660", "a")
@@ -153,7 +153,7 @@ class ApplyModelsTransformerTest extends AnyFlatSpec with should.Matchers with S
       "equalizer_selector" -> "VKID",
       "model_path" -> "/path/to/file/model.tar.gz",
       "model_repr_path" -> FileToolbox.getResourcePath(this, "/DM-6653/model_repr.json"),
-      "features_path" -> FileToolbox.getResourcePath(this, "/DM-6653/grouped_features.json"),
+      "features_path" -> FileToolbox.getResourcePath(this, "/DM-6653/grouped_features.json")
     )
 
     import scala.language.reflectiveCalls
@@ -168,15 +168,15 @@ class ApplyModelsTransformerTest extends AnyFlatSpec with should.Matchers with S
           topics_m = Map("0" -> 3.0f, "1" -> 4.0f, "2" -> 3.0f, "3" -> 42.0f),
           v1_groups_all = Map(),
           v2_groups_all = Map(),
-          all_profiles = Array(),
+          all_profiles = Array()
         ),
         FeaturesDatasetRow(
           uid = "a1",
           topics_m = Map("0" -> 1.0f, "1" -> 0.0f, "2" -> 7.0f, "3" -> 10.0f),
           v1_groups_all = Map(),
           v2_groups_all = Map(),
-          all_profiles = Array(),
-        ),
+          all_profiles = Array()
+        )
       )
         .toDF
         .select($"uid", $"topics_m" as "0")
@@ -235,11 +235,11 @@ class ApplyModelsTransformerTest extends AnyFlatSpec with should.Matchers with S
         ($"score" * 1000) cast "int",
         ($"scores_raw".getItem(0) * 1000) cast "int",
         $"audience_name",
-        $"uid",
+        $"uid"
       )
       .collect should contain theSameElementsAs Seq(
       (390, 472, "DM-6648_lal", "a0"),
-      (0, 331, "DM-6648_lal", "a1"),
+      (0, 331, "DM-6648_lal", "a1")
     ).toDF.collect()
   }
 
@@ -252,7 +252,7 @@ class ApplyModelsTransformerTest extends AnyFlatSpec with should.Matchers with S
       "equalizer_selector" -> "VKID",
       "model_path" -> "/path/to/file/model.tar.gz",
       "model_repr_path" -> FileToolbox.getResourcePath(this, "/DM-6654/model_repr.json"),
-      "features_path" -> FileToolbox.getResourcePath(this, "/DM-6654/grouped_features.json"),
+      "features_path" -> FileToolbox.getResourcePath(this, "/DM-6654/grouped_features.json")
     )
 
     import scala.language.reflectiveCalls
@@ -267,15 +267,15 @@ class ApplyModelsTransformerTest extends AnyFlatSpec with should.Matchers with S
           topics_m = Map("0" -> 3.0f, "1" -> 4.0f, "2" -> 3.0f, "3" -> 42.0f),
           v1_groups_all = Map(),
           v2_groups_all = Map(),
-          all_profiles = Array(),
+          all_profiles = Array()
         ),
         FeaturesDatasetRow(
           uid = "a1",
           topics_m = Map("0" -> 1.0f, "1" -> 0.0f, "2" -> 7.0f, "3" -> 10.0f),
           v1_groups_all = Map(),
           v2_groups_all = Map(),
-          all_profiles = Array(),
-        ),
+          all_profiles = Array()
+        )
       )
         .toDF
         .select($"uid", $"topics_m" as "one")
@@ -292,7 +292,7 @@ class ApplyModelsTransformerTest extends AnyFlatSpec with should.Matchers with S
           -0.5557588304082495, -0.0008675537358615037, -0.4591643330356885, 0.5170261608432127,
           -0.46840322184867106, -0.008044922190276027, -0.56940394861928, 0.6199288129102266,
           -0.47064040134512786, 0.002275404946861126, -0.5358811001548798, 0.5029683241972684,
-          -0.5155322519874553, 0.00044333591720735477, -0.4629614280940879,
+          -0.5155322519874553, 0.00044333591720735477, -0.4629614280940879
         ).map(_.toFloat)
       )
 
@@ -307,7 +307,7 @@ class ApplyModelsTransformerTest extends AnyFlatSpec with should.Matchers with S
       assert(
         config.predictorConfig.classLogPrior.toSeq.toFloat === Seq(
           -0.6931471805599453f,
-          -0.6931471805599453f,
+          -0.6931471805599453f
         )
       )
       assert(config.predictorConfig.featureLogProb.length === 2)
@@ -345,11 +345,11 @@ class ApplyModelsTransformerTest extends AnyFlatSpec with should.Matchers with S
         ($"score" * 1000) cast "int",
         ($"scores_raw".getItem(0) * 1000) cast "int",
         $"audience_name",
-        $"uid",
+        $"uid"
       )
       .collect should contain theSameElementsAs Seq(
       (0, 803, "DM-6634_lal", "a0"),
-      (0, 887, "DM-6634_lal", "a1"),
+      (0, 887, "DM-6634_lal", "a1")
     ).toDF.collect()
   }
 
@@ -367,7 +367,7 @@ class ApplyModelsTransformerTest extends AnyFlatSpec with should.Matchers with S
         StructField("scores_raw", DataTypes.createArrayType(DataTypes.DoubleType)),
         StructField("scores_trf", DataTypes.createArrayType(DataTypes.DoubleType)),
         StructField("audience_name", DataTypes.StringType),
-        StructField("category", DataTypes.StringType),
+        StructField("category", DataTypes.StringType)
       )
     )
 
@@ -385,7 +385,7 @@ class ApplyModelsTransformerTest extends AnyFlatSpec with should.Matchers with S
     val predictor: Predictor = getSimplePredictor
     val transformer = getTransformer(
       Seq(ScoreAudienceModel("test_model_name", predictor)),
-      keepColumns = Seq("uid", "v1_groups_all"),
+      keepColumns = Seq("uid", "v1_groups_all")
     )
     assert(transformer.initialize() === true)
 
@@ -395,7 +395,7 @@ class ApplyModelsTransformerTest extends AnyFlatSpec with should.Matchers with S
         StructField("scores_raw", DataTypes.createArrayType(DataTypes.DoubleType)),
         StructField("scores_trf", DataTypes.createArrayType(DataTypes.DoubleType)),
         StructField("audience_name", DataTypes.StringType),
-        StructField("category", DataTypes.StringType),
+        StructField("category", DataTypes.StringType)
       )
     )
 
@@ -406,7 +406,7 @@ class ApplyModelsTransformerTest extends AnyFlatSpec with should.Matchers with S
       .map(_.name)
     output.schema.map(_.name) should contain theSameElementsAs Seq(
       "uid",
-      "v1_groups_all",
+      "v1_groups_all"
     ) ++ expected.map(_.name)
   }
 
@@ -427,13 +427,13 @@ class ApplyModelsTransformerTest extends AnyFlatSpec with should.Matchers with S
     val res = output
       .select(
         ($"score" * 1000) cast "int",
-        $"audience_name",
+        $"audience_name"
       )
       .collect
 
     val expected = Seq(
       (474, "m1"),
-      (450, "m2"),
+      (450, "m2")
     ).toDF.collect()
 
     res should contain theSameElementsAs expected
@@ -538,7 +538,7 @@ object ApplyModelsTransformerTest {
       "model_type" -> "dummy",
       "audience_name" -> "p_hmc_660",
       "model_path" -> "/tmp/path/to/model_package",
-      "features_path" -> "/tmp/path/to/grouped_features",
+      "features_path" -> "/tmp/path/to/grouped_features"
     )
     val res = (1 to count) map { num => modelParams.map(kv => (kv._1, s"${kv._2}-$num")) }
 
@@ -551,7 +551,7 @@ object ApplyModelsTransformerTest {
       topics_m = Map("topic_107" -> 0.1f),
       v1_groups_all = Map(),
       v2_groups_all = Map(),
-      all_profiles = Array(0.2f, 0.3f, 0.4f, 0.5f, 0.6f),
+      all_profiles = Array(0.2f, 0.3f, 0.4f, 0.5f, 0.6f)
     )
   )
 
@@ -570,7 +570,7 @@ object ApplyModelsTransformerTest {
     topics_m: Map[String, Float],
     v1_groups_all: Map[String, Double],
     v2_groups_all: Map[String, Double],
-    all_profiles: Array[Float],
+    all_profiles: Array[Float]
   )
 
   case class AudienceDatasetRow(
@@ -579,6 +579,6 @@ object ApplyModelsTransformerTest {
     scores_raw: Array[Double],
     scores_trf: Array[Double],
     audience_name: String,
-    category: String,
+    category: String
   )
 }

@@ -18,7 +18,7 @@ class IsInfTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
       funcName = "generic_isinf",
       targetName = "generic_isinf",
       spark,
-      overrideIfExists = true,
+      overrideIfExists = true
     )
   }
 
@@ -32,13 +32,13 @@ class IsInfTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
         "Dataset API",
         spark
           .sql(s"select float('Infinity') as x")
-          .select(generic_isinf("x").alias(colName)),
+          .select(generic_isinf("x").alias(colName))
       ),
       ("SQL API, aliased function", spark.sql(s"select isinf(double('-Infinity')) as $colName")),
       (
         "SQL API, native func.name",
-        spark.sql(s"select generic_isinf(float('-Infinity')) as $colName"),
-      ),
+        spark.sql(s"select generic_isinf(float('-Infinity')) as $colName")
+      )
     ).foreach {
       case (msg, df) =>
         show(df, msg)
@@ -54,7 +54,7 @@ class IsInfTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
   private def checkType(
     elementType: String,
     value: String = "0",
-    expected: String = "false",
+    expected: String = "false"
   ) = {
     val params = s"cast($value as ${elementType})"
 
@@ -122,7 +122,7 @@ class IsInfTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
       ("b", None),
       ("c", Some(Double.NaN)),
       ("d", Some(Double.NegativeInfinity)),
-      ("e", Some(Double.PositiveInfinity)),
+      ("e", Some(Double.PositiveInfinity))
     ).toDF("uid", "x")
 
     show(df, "source")
@@ -148,7 +148,7 @@ class IsInfTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
       ("b", None),
       ("c", Some(Float.NaN)),
       ("d", Some(Float.NegativeInfinity)),
-      ("e", Some(Float.PositiveInfinity)),
+      ("e", Some(Float.PositiveInfinity))
     )
       .toDF("uid", "x")
       .persist(StorageLevel.DISK_ONLY) // N.B. codegen ON switch here
@@ -161,7 +161,7 @@ class IsInfTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
         "isinf(x)",
         "isinf(float(x))",
         "isinf(double(x))",
-        "isinf(string(x))",
+        "isinf(string(x))"
       )
       .where("uid != 'g'")
       .where("isinf(x)")
@@ -178,7 +178,7 @@ class IsInfTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
     assert(
       actual.orderBy("uid").select("x").collect().map(_.toString().toLowerCase).toList === List(
         "[-infinity]",
-        "[infinity]",
+        "[infinity]"
       )
     )
 

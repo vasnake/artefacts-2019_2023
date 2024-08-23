@@ -19,7 +19,7 @@ class ScalerTest extends AnyFlatSpec with should.Matchers {
       withMean = true,
       withStd = true,
       means = Array(1f, 2f, 3f),
-      scales = Array(4f, 5f, 6f),
+      scales = Array(4f, 5f, 6f)
     )
     val transformer = Scaler(config)
     assert(transformer.config.withMean === true)
@@ -108,7 +108,7 @@ object ScalerTest {
     withMean = true,
     withStd = true,
     means = Array(0.0, 0.370, 200.0, 334.366666).map(_.toDouble),
-    scales = Array(1.0, 0.4469899327, 81.64965809, 470.6753327).map(_.toDouble),
+    scales = Array(1.0, 0.4469899327, 81.64965809, 470.6753327).map(_.toDouble)
   )
 
   def defaultInput: Array[Float] = Seq(7, 5, 0.1, 11).map(_.toFloat).toArray

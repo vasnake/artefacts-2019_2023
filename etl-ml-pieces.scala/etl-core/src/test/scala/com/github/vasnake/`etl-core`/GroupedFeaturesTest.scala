@@ -38,7 +38,7 @@ class GroupedFeaturesTest extends AnyFlatSpec with should.Matchers {
       Seq(
         FeaturesGroup("colname1", Array("idx11", "idx12", "idx13")),
         FeaturesGroup("colname2", Array("idx21", "idx22", "idx23")),
-        FeaturesGroup("colname3", Array("idx31", "idx32", "idx33")),
+        FeaturesGroup("colname3", Array("idx31", "idx32", "idx33"))
       )
     )
 
@@ -65,7 +65,7 @@ class GroupedFeaturesTest extends AnyFlatSpec with should.Matchers {
         "idx23",
         "idx31",
         "idx32",
-        "idx33",
+        "idx33"
       )
     )
   }
@@ -74,7 +74,7 @@ class GroupedFeaturesTest extends AnyFlatSpec with should.Matchers {
     val gfs = GroupedFeatures(
       Seq(
         FeaturesGroup("colname1", Array("idx11", "idx12", "idx11")),
-        FeaturesGroup("colname2", Array("idx22", "idx22", "idx23")),
+        FeaturesGroup("colname2", Array("idx22", "idx22", "idx23"))
       )
     )
 
@@ -95,7 +95,7 @@ class GroupedFeaturesTest extends AnyFlatSpec with should.Matchers {
         "idx11",
         "idx12",
         "idx22",
-        "idx23",
+        "idx23"
       )
     )
   }
@@ -105,14 +105,14 @@ class GroupedFeaturesTest extends AnyFlatSpec with should.Matchers {
       Seq(
         FeaturesGroup("colname1", Array("idx1", "idx2", "idx3")),
         FeaturesGroup("colname2", Array("idx21", "idx22", "idx23")),
-        FeaturesGroup("colname3", Array("idx31", "idx32", "idx33")),
+        FeaturesGroup("colname3", Array("idx31", "idx32", "idx33"))
       )
     )
     val gfs2 = GroupedFeatures(
       Seq(
         FeaturesGroup("colname4", Array("idx1", "idx2", "idx3")),
         FeaturesGroup("colname2", Array("idx21", "idx22", "idx23")),
-        FeaturesGroup("colname3", Array("idx31-2", "idx32", "idx33-2")),
+        FeaturesGroup("colname3", Array("idx31-2", "idx32", "idx33-2"))
       )
     )
 
@@ -132,7 +132,7 @@ class GroupedFeaturesTest extends AnyFlatSpec with should.Matchers {
         "idx31-2",
         "idx32",
         "idx33",
-        "idx33-2",
+        "idx33-2"
       )
     )
     assert(mergedGfs.groupIndices("colname4").get.toSeq === Seq("idx1", "idx2", "idx3"))
@@ -153,7 +153,7 @@ class GroupedFeaturesTest extends AnyFlatSpec with should.Matchers {
         "idx31-2",
         "idx32",
         "idx33",
-        "idx33-2",
+        "idx33-2"
       )
     )
   }
@@ -180,13 +180,13 @@ class GroupedFeaturesTest extends AnyFlatSpec with should.Matchers {
     val mergedGfs = GroupedFeatures(
       Seq(
         FeaturesGroup("colname1", Array("idx11", "idx12", "idx13")),
-        FeaturesGroup("colname2", Array("idx21", "idx22", "idx23")),
+        FeaturesGroup("colname2", Array("idx21", "idx22", "idx23"))
       )
     )
     val gfs = GroupedFeatures(
       Seq(
         FeaturesGroup("colname1", Array("idx11", "idx12", "idx13")),
-        FeaturesGroup("colname2", Array("idx21", "idx22", "idx23")),
+        FeaturesGroup("colname2", Array("idx21", "idx22", "idx23"))
       )
     )
     val expected = Array(0, 1, 2, 3, 4, 5)
@@ -199,13 +199,13 @@ class GroupedFeaturesTest extends AnyFlatSpec with should.Matchers {
     val mergedGfs = GroupedFeatures(
       Seq(
         FeaturesGroup("colname1", Array("idx11", "idx12", "idx13")),
-        FeaturesGroup("colname2", Array("idx21", "idx22", "idx23")),
+        FeaturesGroup("colname2", Array("idx21", "idx22", "idx23"))
       )
     )
     val gfs = GroupedFeatures(
       Seq(
         FeaturesGroup("colname2", Array("idx23", "idx21", "idx22")),
-        FeaturesGroup("colname1", Array("idx11", "idx13", "idx12")),
+        FeaturesGroup("colname1", Array("idx11", "idx13", "idx12"))
       )
     )
     val expected = Array(5, 3, 4, 0, 2, 1)
@@ -218,7 +218,7 @@ class GroupedFeaturesTest extends AnyFlatSpec with should.Matchers {
     val mergedGfs = GroupedFeatures(
       Seq(
         FeaturesGroup("colname1", Array("idx11", "idx12", "idx13")),
-        FeaturesGroup("colname2", Array("idx21", "idx22", "idx23")),
+        FeaturesGroup("colname2", Array("idx21", "idx22", "idx23"))
       )
     )
     val gfs = GroupedFeatures(
@@ -236,7 +236,7 @@ class GroupedFeaturesTest extends AnyFlatSpec with should.Matchers {
     val mergedGfs = GroupedFeatures(
       Seq(
         FeaturesGroup("colname1", Array("idx11", "idx12", "idx13")),
-        FeaturesGroup("colname2", Array("idx21", "idx22", "idx23")),
+        FeaturesGroup("colname2", Array("idx21", "idx22", "idx23"))
       )
     )
     val gfs = GroupedFeatures(
@@ -254,7 +254,7 @@ class GroupedFeaturesTest extends AnyFlatSpec with should.Matchers {
     val mergedGfs = GroupedFeatures(
       Seq(
         FeaturesGroup("colname1", Array("idx11", "idx12", "idx13")),
-        FeaturesGroup("colname2", Array("idx21", "idx22", "idx23")),
+        FeaturesGroup("colname2", Array("idx21", "idx22", "idx23"))
       )
     )
     val gfs = GroupedFeatures(

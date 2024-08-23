@@ -42,14 +42,14 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
         uid = "a",
         topics_m = None,
         groups_all = None,
-        all_profiles = None,
+        all_profiles = None
       )
     ).toDF
 
     val gfs = GroupedFeatures(
       Seq(
         FeaturesGroup("topics_m", Array("topic_1", "topic_2", "topic_3")),
-        FeaturesGroup("all_profiles", Array("0", "1", "2")),
+        FeaturesGroup("all_profiles", Array("0", "1", "2"))
       )
     )
 
@@ -66,7 +66,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val gfs = GroupedFeatures(
       Seq(
         FeaturesGroup("topics_m", Array("topic_11", "topic_12", "topic_13")),
-        FeaturesGroup("all_profiles", Array("10", "11", "12", "13", "14")),
+        FeaturesGroup("all_profiles", Array("10", "11", "12", "13", "14"))
       )
     )
 
@@ -103,7 +103,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val gfs = GroupedFeatures(
       Seq(
         FeaturesGroup("topics_m", Array("topic_1", "topic_2", "topic_3")),
-        FeaturesGroup("all_profiles", Array("0", "1", "2", "3", "4")),
+        FeaturesGroup("all_profiles", Array("0", "1", "2", "3", "4"))
       )
     )
 
@@ -119,7 +119,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val gfs = GroupedFeatures(
       Seq(
         FeaturesGroup("topics_m", Array("topic_3", "topic_1", "topic_2")),
-        FeaturesGroup("all_profiles", Array("3", "1", "2", "0", "4")),
+        FeaturesGroup("all_profiles", Array("3", "1", "2", "0", "4"))
       )
     )
 
@@ -135,7 +135,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val gfs = GroupedFeatures(
       Seq(
         FeaturesGroup("topics_m", Array("topic_3", "topic_1")),
-        FeaturesGroup("all_profiles", Array("3", "1", "1")),
+        FeaturesGroup("all_profiles", Array("3", "1", "1"))
       )
     )
 
@@ -151,13 +151,13 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val gfs1 = GroupedFeatures(
       Seq(
         FeaturesGroup("topics_m", Array("topic_3", "topic_1")),
-        FeaturesGroup("all_profiles", Array("3", "1", "1")),
+        FeaturesGroup("all_profiles", Array("3", "1", "1"))
       )
     )
     val gfs2 = GroupedFeatures(
       Seq(
         FeaturesGroup("topics_m", Array("topic_3", "topic_2")),
-        FeaturesGroup("all_profiles", Array("2", "3")),
+        FeaturesGroup("all_profiles", Array("2", "3"))
       )
     )
     val mergedGfs = GroupedFeatures.mergeGroupedFeatures(Seq(gfs1, gfs2))
@@ -180,13 +180,13 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val gfs1 = GroupedFeatures(
       Seq(
         FeaturesGroup("topics_m", Array("topic_1", "topic_2")),
-        FeaturesGroup("all_profiles", Array(0, 2).map(_.toString)),
+        FeaturesGroup("all_profiles", Array(0, 2).map(_.toString))
       )
     )
     val gfs2 = GroupedFeatures(
       Seq(
         FeaturesGroup("topics_m", Array("topic_3", "topic_1")),
-        FeaturesGroup("all_profiles", Array(2, 1).map(_.toString)),
+        FeaturesGroup("all_profiles", Array(2, 1).map(_.toString))
       )
     )
     val expected1 = Seq(0.1, 0.2, 0.99, 0.97).map(_.toFloat)
@@ -228,21 +228,21 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
       new GenericRowWithSchema(
         Seq(
           Map("topic_1" -> null),
-          mutable.WrappedArray.make(Array(0.1, null)),
+          mutable.WrappedArray.make(Array(0.1, null))
         ),
         StructType(
           Seq(
             StructField("topics_m", MapType(DataTypes.StringType, DataTypes.DoubleType)),
-            StructField("all_profiles", ArrayType(DataTypes.DoubleType)),
+            StructField("all_profiles", ArrayType(DataTypes.DoubleType))
           )
-        ),
+        )
       )
     }
 
     val gfs = GroupedFeatures(
       Seq(
         FeaturesGroup("topics_m", Array("topic_1", "no-topic")),
-        FeaturesGroup("all_profiles", Array(0, 1, 2).map(_.toString)),
+        FeaturesGroup("all_profiles", Array(0, 1, 2).map(_.toString))
       )
     )
     val expected = Seq(nan, 0.0, 0.1, nan, nan).map(_.toFloat)
@@ -262,7 +262,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val gfs = GroupedFeatures(
       Seq(
         FeaturesGroup("topics_m", Array("topic_1", "topic_200", "topic_3")),
-        FeaturesGroup("all_profiles", Array(0, 1, 2).map(_.toString)),
+        FeaturesGroup("all_profiles", Array(0, 1, 2).map(_.toString))
       )
     )
     val expected = Seq(0.1, 0.0, 0.3, nan, nan, nan).map(_.toFloat)
@@ -283,7 +283,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val gfs = GroupedFeatures(
       Seq(
         FeaturesGroup("topics_m", Array("topic_1", "topic_3", "topic_1")),
-        FeaturesGroup("all_profiles", Array(0, 2, 2).map(_.toString)),
+        FeaturesGroup("all_profiles", Array(0, 2, 2).map(_.toString))
       )
     )
     val expected = Seq(0.1, 0.3, 0.1, 0.99, 0.97, 0.97).map(_.toFloat)
@@ -306,7 +306,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val gfs = GroupedFeatures(
       Seq(
         FeaturesGroup("topics_m", Array("topic_2", "topic_1", "topic_3")),
-        FeaturesGroup("all_profiles", Array(3, 0, 2).map(_.toString)),
+        FeaturesGroup("all_profiles", Array(3, 0, 2).map(_.toString))
       )
     )
     val expected = Seq(0.2, 0.1, 0.3, 0.96, 0.99, 0.97).map(_.toFloat)
@@ -330,7 +330,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
         FeaturesGroup("f_map_nullfield", Array("idx")),
         FeaturesGroup("f_array_nullfield", Array("0")),
         FeaturesGroup("f_map_values", Array("no-key", "fnull")),
-        FeaturesGroup("f_array_values", Array("1", "3")), // null, no-key
+        FeaturesGroup("f_array_values", Array("1", "3")) // null, no-key
       )
     )
 
@@ -338,7 +338,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
       "f_map_nullfield" -> FieldDefaults(nullField = 1f, noFeatureKey = 11f, nullFeature = 111f),
       "f_array_nullfield" -> FieldDefaults(nullField = 2f, noFeatureKey = 22f, nullFeature = 222f),
       "f_map_values" -> FieldDefaults(nullField = 33f, noFeatureKey = 3f, nullFeature = 4f),
-      "f_array_values" -> FieldDefaults(nullField = 44f, noFeatureKey = 6f, nullFeature = 5f),
+      "f_array_values" -> FieldDefaults(nullField = 44f, noFeatureKey = 6f, nullFeature = 5f)
     )
 
     val expected = Seq(1, 2, 3, 4, 5, 6).map(_.toFloat)
@@ -361,7 +361,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
           Seq(
             StructField("d_array", ArrayType(DataTypes.DoubleType))
           )
-        ),
+        )
       )
     }
 
@@ -408,7 +408,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val gfs = GroupedFeatures(
       Seq(
         FeaturesGroup("d_map_nullfield", Array("0", "1", "2"), isArray = false),
-        FeaturesGroup("f_map_nullfield", Array("0", "1", "2"), isArray = false),
+        FeaturesGroup("f_map_nullfield", Array("0", "1", "2"), isArray = false)
       )
     )
     val expected: Seq[Float] = for (_ <- 0 to 5) yield 0f
@@ -423,7 +423,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val gfs = GroupedFeatures(
       Seq(
         FeaturesGroup("d_map_values", Array("no-key-0", "no-key-1", "no-key-2"), isArray = false),
-        FeaturesGroup("f_map_values", Array("no-key-0", "no-key-1", "no-key-2"), isArray = false),
+        FeaturesGroup("f_map_values", Array("no-key-0", "no-key-1", "no-key-2"), isArray = false)
       )
     )
     val expected: Seq[Float] = for (_ <- 0 to 5) yield 0f
@@ -438,7 +438,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val gfs = GroupedFeatures(
       Seq(
         FeaturesGroup("d_map_values", Array("fnull", "f42"), isArray = false),
-        FeaturesGroup("f_map_values", Array("fnull", "f42"), isArray = false),
+        FeaturesGroup("f_map_values", Array("fnull", "f42"), isArray = false)
       )
     )
     val expected: Seq[Float] = Seq(Float.NaN, 42f, Float.NaN, 42f)
@@ -453,7 +453,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val gfs = GroupedFeatures(
       Seq(
         FeaturesGroup("d_array_nullfield", Array("0", "1", "2"), isArray = true),
-        FeaturesGroup("f_array_nullfield", Array("0", "1", "2"), isArray = true),
+        FeaturesGroup("f_array_nullfield", Array("0", "1", "2"), isArray = true)
       )
     )
     val expected: Seq[Float] = for (_ <- 0 to 5) yield Float.NaN
@@ -468,7 +468,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val gfs = GroupedFeatures(
       Seq(
         FeaturesGroup("d_array_values", Array("2", "3", "4"), isArray = true),
-        FeaturesGroup("f_array_values", Array("2", "3", "4"), isArray = true),
+        FeaturesGroup("f_array_values", Array("2", "3", "4"), isArray = true)
       )
     )
     val expected: Seq[Float] = for (_ <- 0 to 5) yield Float.NaN
@@ -483,7 +483,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val gfs = GroupedFeatures(
       Seq(
         FeaturesGroup("d_array_values", Array("0", "1"), isArray = true),
-        FeaturesGroup("f_array_values", Array("0", "1"), isArray = true),
+        FeaturesGroup("f_array_values", Array("0", "1"), isArray = true)
       )
     )
     val expected: Seq[Float] = Seq(42.0f, Float.NaN, 42.0f, Float.NaN)
@@ -505,7 +505,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val gfIndex = GroupedFeatures(
       Seq(
         FeaturesGroup("d_map_nullfield", Array("a", "b", "2"), isArray = false),
-        FeaturesGroup("f_map_nullfield", Array("c", "d", "2"), isArray = false),
+        FeaturesGroup("f_map_nullfield", Array("c", "d", "2"), isArray = false)
       )
     )
 
@@ -520,7 +520,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
       val gfIndex = GroupedFeatures(
         Seq(
           FeaturesGroup("d_map_nullfield", Array("a", "b", "2"), isArray = false),
-          FeaturesGroup("f_map_nullfield", Array("c", "d", "2"), isArray = false),
+          FeaturesGroup("f_map_nullfield", Array("c", "d", "2"), isArray = false)
         )
       )
 
@@ -537,13 +537,13 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val gfs1 = GroupedFeatures(
       Seq(
         FeaturesGroup("topics_m", Array("topic_1", "topic_2")),
-        FeaturesGroup("all_profiles", Array(0, 2).map(_.toString)),
+        FeaturesGroup("all_profiles", Array(0, 2).map(_.toString))
       )
     )
     val gfs2 = GroupedFeatures(
       Seq(
         FeaturesGroup("topics_m", Array("topic_3", "topic_1")),
-        FeaturesGroup("all_profiles", Array(2, 1).map(_.toString)),
+        FeaturesGroup("all_profiles", Array(2, 1).map(_.toString))
       )
     )
     val mergedGfs = GroupedFeatures.mergeGroupedFeatures(Seq(gfs1, gfs2))
@@ -556,12 +556,12 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     check(
       GroupedFeatures
         .sliceFeaturesVector(allFeatures, GroupedFeatures.computeFeaturesIndices(mergedGfs, gfs1)),
-      expected1,
+      expected1
     )
     check(
       GroupedFeatures
         .sliceFeaturesVector(allFeatures, GroupedFeatures.computeFeaturesIndices(mergedGfs, gfs2)),
-      expected2,
+      expected2
     )
   }
 
@@ -571,7 +571,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val gfs = GroupedFeatures(
       Seq(
         FeaturesGroup("topics_m", Array("topic_1", "topic_3", "topic_1")),
-        FeaturesGroup("all_profiles", Array(0, 2, 2).map(_.toString)),
+        FeaturesGroup("all_profiles", Array(0, 2, 2).map(_.toString))
       )
     )
     val mergedGfs = GroupedFeatures.mergeGroupedFeatures(Seq(gfs))
@@ -591,7 +591,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val gfs = GroupedFeatures(
       Seq(
         FeaturesGroup("topics_m", Array("topic_2", "topic_1", "topic_3")),
-        FeaturesGroup("all_profiles", Array(3, 0, 2).map(_.toString)),
+        FeaturesGroup("all_profiles", Array(3, 0, 2).map(_.toString))
       )
     )
     val mergedGfs = GroupedFeatures.mergeGroupedFeatures(Seq(gfs))
@@ -611,7 +611,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val gfs = GroupedFeatures(
       Seq(
         FeaturesGroup("topics_m", Array("topic_3", "topic_1", "topic_2")),
-        FeaturesGroup("all_profiles", Array("3", "1", "2", "0", "4")),
+        FeaturesGroup("all_profiles", Array("3", "1", "2", "0", "4"))
       )
     )
     val expected = Seq(0.3, 0.1, 0.2, 0.96, 0.98, 0.97, 0.99, 0.95).map(_.toFloat)
@@ -626,7 +626,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val gfs = GroupedFeatures(
       Seq(
         FeaturesGroup("topics_m", Array("topic_1", "topic_2", "topic_3")),
-        FeaturesGroup("all_profiles", Array("0", "1", "2", "3", "4")),
+        FeaturesGroup("all_profiles", Array("0", "1", "2", "3", "4"))
       )
     )
     val expected = Seq(0.1, 0.2, 0.3, 0.99, 0.98, 0.97, 0.96, 0.95).map(_.toFloat)
@@ -660,7 +660,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val gfs = GroupedFeatures(
       Seq(
         FeaturesGroup("d_map_nullfield", Array("a", "b", "1"), isArray = false),
-        FeaturesGroup("f_map_nullfield", Array("c", "d", "2", "3"), isArray = false),
+        FeaturesGroup("f_map_nullfield", Array("c", "d", "2", "3"), isArray = false)
       )
     )
     val expected: Seq[Float] = for (_ <- 0 to 6) yield 0f
@@ -674,7 +674,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val gfs = GroupedFeatures(
       Seq(
         FeaturesGroup("d_map_values", Array("no-key-0", "no-key-1", "no-key-2"), isArray = false),
-        FeaturesGroup("f_map_values", Array("no-key-0", "no-key-1"), isArray = false),
+        FeaturesGroup("f_map_values", Array("no-key-0", "no-key-1"), isArray = false)
       )
     )
     val expected: Seq[Float] = for (_ <- 0 to 4) yield 0f
@@ -688,7 +688,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val gfs = GroupedFeatures(
       Seq(
         FeaturesGroup("d_map_values", Array("fnull", "f42"), isArray = false),
-        FeaturesGroup("f_map_values", Array("fnull", "f42"), isArray = false),
+        FeaturesGroup("f_map_values", Array("fnull", "f42"), isArray = false)
       )
     )
     val expected: Seq[Float] = Seq(Float.NaN, 42f, Float.NaN, 42f)
@@ -702,7 +702,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val gfs = GroupedFeatures(
       Seq(
         FeaturesGroup("d_array_nullfield", Array("0", "1", "2", "12"), isArray = true),
-        FeaturesGroup("f_array_nullfield", Array("0", "1", "2", "33"), isArray = true),
+        FeaturesGroup("f_array_nullfield", Array("0", "1", "2", "33"), isArray = true)
       )
     )
     val expected: Seq[Float] = for (_ <- 0 to 7) yield Float.NaN
@@ -716,7 +716,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val gfs = GroupedFeatures(
       Seq(
         FeaturesGroup("d_array_values", Array("2", "3", "4", "33"), isArray = true),
-        FeaturesGroup("f_array_values", Array("2", "3", "4", "77"), isArray = true),
+        FeaturesGroup("f_array_values", Array("2", "3", "4", "77"), isArray = true)
       )
     )
     val expected: Seq[Float] = for (_ <- 0 to 7) yield Float.NaN
@@ -730,7 +730,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val gfs = GroupedFeatures(
       Seq(
         FeaturesGroup("d_array_values", Array("0", "1"), isArray = true),
-        FeaturesGroup("f_array_values", Array("0", "1"), isArray = true),
+        FeaturesGroup("f_array_values", Array("0", "1"), isArray = true)
       )
     )
     val expected: Seq[Float] = Seq(42.0f, Float.NaN, 42.0f, Float.NaN)
@@ -760,7 +760,7 @@ object FeaturesRowDecoderTest {
         mutable.WrappedArray.make(Array(42.0, null)),
         null,
         mutable.WrappedArray.make(Array(42.0f, null)),
-        null,
+        null
       ),
       StructType(
         Seq(
@@ -772,9 +772,9 @@ object FeaturesRowDecoderTest {
           StructField("d_array_values", ArrayType(DataTypes.DoubleType)),
           StructField("d_array_nullfield", ArrayType(DataTypes.DoubleType)),
           StructField("f_array_values", ArrayType(DataTypes.FloatType)),
-          StructField("f_array_nullfield", ArrayType(DataTypes.FloatType)),
+          StructField("f_array_nullfield", ArrayType(DataTypes.FloatType))
         )
-      ),
+      )
     )
   }
 
@@ -789,7 +789,7 @@ object FeaturesRowDecoderTest {
   def floatsWithNaNAreEqual(
     a: Float,
     b: Float,
-    tolerance: Float,
+    tolerance: Float
   ): Boolean =
     (a.isNaN && b.isNaN) ||
       ((a <= b + tolerance) && (a >= b - tolerance))
@@ -799,7 +799,7 @@ object FeaturesRowDecoderTest {
       uid = "a",
       topics_m = Some(Map("topic_1" -> 0.1f, "topic_2" -> 0.2f, "topic_3" -> 0.3f)),
       groups_all = Some(Map("1" -> 1.0, "2" -> 2.0, "3" -> 3.0)),
-      all_profiles = Some(Array(0.99f, 0.98f, 0.97f, 0.96f, 0.95f)),
+      all_profiles = Some(Array(0.99f, 0.98f, 0.97f, 0.96f, 0.95f))
     )
   )
 
@@ -807,7 +807,7 @@ object FeaturesRowDecoderTest {
     uid: String,
     topics_m: Option[Map[String, Float]],
     groups_all: Option[Map[String, Double]],
-    all_profiles: Option[Array[Float]],
+    all_profiles: Option[Array[Float]]
   )
 
   def inputDFWithAllVariations(spark: SparkSession): DataFrame = {

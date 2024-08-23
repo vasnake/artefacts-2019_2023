@@ -19,7 +19,7 @@ object TopNRowsApprox {
     df: DataFrame,
     n: Long,
     orderByColumns: Seq[String],
-    ascending: Boolean = false,
+    ascending: Boolean = false
   ): DataFrame = {
     val rankCol: String = "_rank_" + getNewTempColumnName(df)
 
@@ -44,7 +44,7 @@ object TopNRowsApprox {
     df: DataFrame,
     orderByColumns: Seq[String],
     ascending: Boolean,
-    rankColName: String,
+    rankColName: String
   ): DataFrame = {
     val orderColumns =
       if (ascending) orderByColumns map (sf.col(_).asc)
@@ -56,7 +56,7 @@ object TopNRowsApprox {
 
     df.withColumn(
       rankColName,
-      sf.row_number().over(w),
+      sf.row_number().over(w)
     )
   }
 }

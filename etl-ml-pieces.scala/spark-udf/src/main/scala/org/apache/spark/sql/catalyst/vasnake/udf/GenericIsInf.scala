@@ -18,7 +18,7 @@ import org.apache.spark.sql.types._
       > SELECT _FUNC_(cast('Infinity' as double));
        true
   """,
-  since = "0.1.0",
+  since = "0.1.0"
 )
 case class GenericIsInf(child: Expression) extends GenericUnaryPredicateNotNull {
   override def inputTypes: Seq[AbstractDataType] = Seq(TypeCollection(DoubleType, FloatType))

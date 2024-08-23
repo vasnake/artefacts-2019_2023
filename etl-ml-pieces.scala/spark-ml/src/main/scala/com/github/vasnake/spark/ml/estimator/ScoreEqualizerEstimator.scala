@@ -56,7 +56,7 @@ class ScoreEqualizerEstimator(override val uid: String)
           inputColName = getInputCol,
           inputCastType = "double",
           validInputExpr = "score is not null and not isnan(score)",
-          cacheFunction = cacheFunction,
+          cacheFunction = cacheFunction
         )
 
         // Dataset[(group, score)], cached
@@ -108,7 +108,7 @@ object ScoreEqualizerEstimator {
     noiseValue: Double,
     epsValue: Double,
     randomValue: Double,
-    numBins: Int,
+    numBins: Int
   ): Dataset[(String, String, Option[models.ScoreEqualizerConfig])] = {
 
     val spark = group_score.sparkSession
@@ -125,7 +125,7 @@ object ScoreEqualizerEstimator {
             noiseValue,
             epsValue,
             randomValue,
-            numBins,
+            numBins
           )
           (group, msg, eq)
       }
@@ -140,7 +140,7 @@ object ScoreEqualizerEstimator {
     noiseValue: Double,
     epsValue: Double,
     randomValue: Double,
-    numBins: Int,
+    numBins: Int
   ): (String, Option[models.ScoreEqualizerConfig]) =
     models.ScoreEqualizer.fit(scoreRaw, minInputSize, noiseValue, epsValue, randomValue, numBins)
 }

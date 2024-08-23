@@ -32,7 +32,7 @@ trait SQLPartitionsWriterI {
     dbName: String,
     tableName: String,
     partitionColNames: Seq[String],
-    schema: StructType,
+    schema: StructType
   ): Try[String]
 
   /** Execute given SQL expression using `hiveql` dialect.
@@ -61,7 +61,7 @@ trait SQLPartitionsWriterI {
     dbName: String,
     tableName: String,
     partition: Map[String, String],
-    df: DataFrame,
+    df: DataFrame
   ): Try[String]
 
   /** Execute given SQL expression using `hiveql` dialect.

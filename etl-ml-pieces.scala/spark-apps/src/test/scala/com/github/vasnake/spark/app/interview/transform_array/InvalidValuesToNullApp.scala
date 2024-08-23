@@ -28,7 +28,7 @@ object InvalidValuesToNullApp extends Serializable {
             yield
               if (x.isNaN || x.isInfinite) null.asInstanceOf[Float]
               else x,
-        dt = row.dt,
+        dt = row.dt
       )
     }
 
@@ -38,6 +38,6 @@ object InvalidValuesToNullApp extends Serializable {
   case class TableRow(
     uid: String,
     features: Array[Float],
-    dt: String,
+    dt: String
   )
 }

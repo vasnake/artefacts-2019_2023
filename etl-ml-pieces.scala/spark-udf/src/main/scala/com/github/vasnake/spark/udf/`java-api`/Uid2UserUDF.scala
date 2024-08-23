@@ -43,7 +43,7 @@ object Uid2UserUDFImpl {
     "GAID" -> "gaid",
     "IDFA" -> "idfa",
     "EMAIL" -> "email",
-    "MAIL" -> "mail",
+    "MAIL" -> "mail"
   )
 
   private val uidMapping: Map[String, String => String] = Map(
@@ -54,7 +54,7 @@ object Uid2UserUDFImpl {
     "gaid" -> { uid: String => canonicalUUID(uid.toLowerCase) },
     "idfa" -> { uid: String => canonicalUUID(uid.toUpperCase) },
     "email" -> { uid: String => email(uid) },
-    "mail" -> { uid: String => email(uid) },
+    "mail" -> { uid: String => email(uid) }
   ).withDefault(_ => identity)
 
   // Validate and transform. If value is invalid throw an exception
@@ -116,7 +116,7 @@ object Uid2UserUDFImpl {
       compact.forall(c =>
         (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') || (c >= '0' && c <= '9')
       ),
-      s"Invalid chars in UUID string, `${compact}`",
+      s"Invalid chars in UUID string, `${compact}`"
     )
 
     s"${compact.substring(0, 8)}-${compact.substring(8, 12)}-${compact.substring(12, 16)}-${compact

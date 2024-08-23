@@ -18,7 +18,7 @@ class SGDClassifierTest extends AnyFlatSpec with should.Matchers {
     val config = PMMLEstimatorConfig(
       featuresLength = 0,
       predictLength = 0,
-      fileName = "",
+      fileName = ""
     )
     val estimator = SGDClassifier(config)
     assert(estimator.config.fileName === "")
@@ -28,7 +28,7 @@ class SGDClassifierTest extends AnyFlatSpec with should.Matchers {
     val config = PMMLEstimatorConfig(
       featuresLength = 3,
       predictLength = 1,
-      fileName = "test.pmml",
+      fileName = "test.pmml"
     )
     val estimator = SGDClassifier(config)
 
@@ -43,7 +43,7 @@ class SGDClassifierTest extends AnyFlatSpec with should.Matchers {
     val config = PMMLEstimatorConfig(
       featuresLength = 4,
       predictLength = 3,
-      fileName = fpath,
+      fileName = fpath
     )
     val estimator = SGDClassifier(config)
     estimator.init()
@@ -53,7 +53,7 @@ class SGDClassifierTest extends AnyFlatSpec with should.Matchers {
     val config = PMMLEstimatorConfig(
       featuresLength = 4,
       predictLength = 3,
-      fileName = FileToolbox.getResourcePath(this, "/sgd_classifier.pmml"),
+      fileName = FileToolbox.getResourcePath(this, "/sgd_classifier.pmml")
     )
     val estimator = SGDClassifier(config)
     estimator.init()
@@ -70,7 +70,7 @@ class SGDClassifierTest extends AnyFlatSpec with should.Matchers {
     val config = PMMLEstimatorConfig(
       featuresLength = 200,
       predictLength = 2,
-      pmmlDump = sparsePmml,
+      pmmlDump = sparsePmml
     )
 
     val input: Seq[Array[Float]] = sparseInput
@@ -79,7 +79,7 @@ class SGDClassifierTest extends AnyFlatSpec with should.Matchers {
 
     val expected: Seq[Float] = Seq(
       1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0,
-      1.0,
+      1.0
     ).map(_.toFloat)
     assert(expected.length === 20)
 
@@ -94,7 +94,7 @@ class SGDClassifierTest extends AnyFlatSpec with should.Matchers {
     val config = PMMLEstimatorConfig(
       featuresLength = 4,
       predictLength = 3,
-      fileName = FileToolbox.getResourcePath(this, "/sgd_classifier.pmml"),
+      fileName = FileToolbox.getResourcePath(this, "/sgd_classifier.pmml")
     )
     val estimator = SGDClassifier(config)
     estimator.init()
@@ -108,7 +108,7 @@ class SGDClassifierTest extends AnyFlatSpec with should.Matchers {
     val config = PMMLEstimatorConfig(
       featuresLength = 4,
       predictLength = 1,
-      fileName = FileToolbox.getResourcePath(this, "/sgd_classifier.pmml"),
+      fileName = FileToolbox.getResourcePath(this, "/sgd_classifier.pmml")
     )
     val estimator = SGDClassifier(config)
 
@@ -539,7 +539,7 @@ object SGDClassifierTest {
     Seq(2, 3, 4, 5),
     Seq(6, 0, 0, 0),
     Seq(7, 0, 8, 0),
-    Seq(0, 9, 8, 7),
+    Seq(0, 9, 8, 7)
   ).map(_.map(_.toFloat).toArray)
 
   val expected: Seq[Seq[Float]] = Seq(
@@ -547,12 +547,12 @@ object SGDClassifierTest {
     Seq(0.328769, 0.334168, 0.337063),
     Seq(0.332482, 0.334245, 0.333273),
     Seq(0.331098, 0.333233, 0.335669),
-    Seq(0.324599, 0.334442, 0.340959),
+    Seq(0.324599, 0.334442, 0.340959)
   ).map(_.map(_.toFloat))
 
   def floatsAreEqual(
     a: Float,
-    b: Float,
+    b: Float
   )(implicit
     tolerance: Float
   ): Boolean =

@@ -22,7 +22,7 @@ class GroupedTransformerTest extends AnyFlatSpec with should.Matchers {
     val transformer = SBGroupedTransformer(
       config,
       group = "",
-      transformerFactory = { _ => DummyTransformer(0f) },
+      transformerFactory = { _ => DummyTransformer(0f) }
     )
   }
 
@@ -35,7 +35,7 @@ class GroupedTransformerTest extends AnyFlatSpec with should.Matchers {
       val transformer = SBGroupedTransformer(
         config,
         group = "group1",
-        transformerFactory = transformersFactory,
+        transformerFactory = transformersFactory
       )
     }
     assert(ex.getMessage.contains("can't find transformer 'group1'"))
@@ -45,7 +45,7 @@ class GroupedTransformerTest extends AnyFlatSpec with should.Matchers {
     val transformer = SBGroupedTransformer(
       SBGroupedTransformerConfig(groups = Map.empty),
       group = "",
-      transformersFactory,
+      transformersFactory
     )
 
     val ex = intercept[IllegalArgumentException] {
@@ -58,20 +58,20 @@ class GroupedTransformerTest extends AnyFlatSpec with should.Matchers {
     val input: Array[Float] = Array(42f)
     val transformerGroups = Map(
       "group1" -> DummyTransformerConfig(outputValue = 1f),
-      "group2" -> DummyTransformerConfig(outputValue = 2f),
+      "group2" -> DummyTransformerConfig(outputValue = 2f)
     )
 
     Seq(
       // apply each transformer: transformer1, transformer2, no-transformer
       ("group1", 1f),
       ("group2", 2f),
-      ("", 42f),
+      ("", 42f)
     ).foreach {
       case (group, expected) =>
         val transformer = SBGroupedTransformer(
           SBGroupedTransformerConfig(groups = transformerGroups),
           group,
-          transformersFactory,
+          transformersFactory
         )
 
         assert(output(transformer, input) === Seq(expected))
@@ -82,14 +82,14 @@ class GroupedTransformerTest extends AnyFlatSpec with should.Matchers {
     val config = SBGroupedTransformerConfig(
       Map(
         "group1" -> DummyTransformerConfig(outputValue = 1f),
-        "group2" -> DummyTransformerConfig(outputValue = 2f),
+        "group2" -> DummyTransformerConfig(outputValue = 2f)
       )
     )
 
     val transformer = SBGroupedTransformer(
       config,
       "group1",
-      transformersFactory,
+      transformersFactory
     )
 
     val input = Array(0, 1, 2) map tofloat
@@ -129,7 +129,7 @@ object GroupedTransformerTest {
   def floatsAreEqual(
     a: Float,
     b: Float,
-    tolerance: Float,
+    tolerance: Float
   ): Boolean =
     (a.isNaN && b.isNaN) || (
       (a <= b + tolerance) && (a >= b - tolerance)

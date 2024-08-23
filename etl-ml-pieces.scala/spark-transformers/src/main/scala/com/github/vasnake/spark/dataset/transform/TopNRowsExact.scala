@@ -23,7 +23,7 @@ object TopNRowsExact {
     n: Long,
     orderByColumns: Seq[String],
     ascending: Boolean = false,
-    rankFun: GlobalRank = globalRankRDD,
+    rankFun: GlobalRank = globalRankRDD
   ): DataFrame = {
     val rankCol: String = "_rank_" + getNewTempColumnName(df)
     val withRank = rankFun.add(df, orderByColumns, ascending, rankCol)
@@ -43,7 +43,7 @@ object TopNRowsExact {
       df: DataFrame,
       orderByColumns: Seq[String],
       ascending: Boolean,
-      rankColName: String,
+      rankColName: String
     ): DataFrame = {
       import df.sparkSession.implicits._
 
@@ -77,7 +77,7 @@ object TopNRowsExact {
       df: DataFrame,
       orderByColumns: Seq[String],
       ascending: Boolean,
-      rankColName: String,
+      rankColName: String
     ): DataFrame = {
       // sort
       val orderColumns =
@@ -127,11 +127,11 @@ object TopNRowsExact {
         .join(
           statsDF.alias("r"),
           sf.col(s"l.$partIdColumn") === sf.col(s"r.$partIdColumn") + 1,
-          "left",
+          "left"
         )
         .select(
           sf.col(s"l.$partIdColumn").alias(partIdColumn),
-          sf.coalesce(sf.col(s"r.$cumSumMaxRankColumn"), sf.lit(0)).alias(sumFactorColumn),
+          sf.coalesce(sf.col(s"r.$cumSumMaxRankColumn"), sf.lit(0)).alias(sumFactorColumn)
         )
 
       // total_rank = local_rank + sum_factor
@@ -165,7 +165,7 @@ object TopNRowsExact {
       df: DataFrame,
       orderByColumns: Seq[String],
       ascending: Boolean,
-      rankColName: String,
+      rankColName: String
     ): DataFrame
     def isZeroBasedRank: Boolean
   }

@@ -10,7 +10,7 @@ case class LalBinarizedMultinomialNbModelConfig(
   binarizerConfig: BinarizerConfig,
   predictorWrapperConfig: PredictorWrapperConfig,
   predictorConfig: MultinomialNBConfig,
-  equalizerConfig: SBGroupedTransformerConfig,
+  equalizerConfig: SBGroupedTransformerConfig
 )
 
 case class LalBinarizedMultinomialNbModel // TODO: rename to LalBinarizedMultinomialNb
@@ -18,14 +18,14 @@ case class LalBinarizedMultinomialNbModel // TODO: rename to LalBinarizedMultino
   config: LalBinarizedMultinomialNbModelConfig,
   groupedFeatures: GroupedFeatures,
   audienceName: String,
-  equalizerSelector: String,
+  equalizerSelector: String
 ) extends ComplexMLModel {
   private val imputer = Imputer(config.imputerConfig)
   private val binarizer = Binarizer(config.binarizerConfig)
 
   private val predictorWrapper = PredictorWrapper(
     MultinomialNB(config.predictorConfig),
-    config.predictorWrapperConfig,
+    config.predictorWrapperConfig
   )
 
   private val slicer = Slicer(columns = Array(1)) // two target classes, need second one
@@ -33,7 +33,7 @@ case class LalBinarizedMultinomialNbModel // TODO: rename to LalBinarizedMultino
   private val equalizer = SBGroupedTransformer(
     config.equalizerConfig,
     group = equalizerSelector,
-    transformerFactory = cfg => ScoreEqualizer(cfg.asInstanceOf[ScoreEqualizerConfig]),
+    transformerFactory = cfg => ScoreEqualizer(cfg.asInstanceOf[ScoreEqualizerConfig])
   )
 
   // TODO: check stages parameters consistency before deciding that model is OK
@@ -54,7 +54,7 @@ case class LalBinarizedMultinomialNbModel // TODO: rename to LalBinarizedMultino
       scores_raw, // raw scores array
       scores, // equalized scores array
       audienceName, // project id (target)
-      "positive", // category
+      "positive" // category
     )
   }
 

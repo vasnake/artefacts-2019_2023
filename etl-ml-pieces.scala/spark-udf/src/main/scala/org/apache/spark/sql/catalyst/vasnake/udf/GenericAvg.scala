@@ -13,7 +13,7 @@ import org.apache.spark.sql.catalyst.vasnake.udf.base.GenericAggregateNumWithCou
 case class GenericAvg(
   child: Expression,
   mutableAggBufferOffset: Int = 0,
-  inputAggBufferOffset: Int = 0,
+  inputAggBufferOffset: Int = 0
 ) extends GenericAggregateNumWithCount {
   def this(child: Expression) = this(child, 0, 0) // n.b. wanted by registry
 
@@ -37,7 +37,7 @@ case class GenericAvg(
     else
       AccumulatorValue(
         count = x.count + y.count,
-        value = x.value + y.value,
+        value = x.value + y.value
       )
   }
 

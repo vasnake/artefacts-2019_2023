@@ -18,13 +18,13 @@ class IsFiniteTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
       funcName = "generic_isfinite",
       targetName = "generic_isfinite",
       spark,
-      overrideIfExists = true,
+      overrideIfExists = true
     )
     functions.registerAs(
       funcName = "generic_isinf",
       targetName = "generic_isinf",
       spark,
-      overrideIfExists = true,
+      overrideIfExists = true
     )
   }
 
@@ -38,13 +38,13 @@ class IsFiniteTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
         "Dataset API",
         spark
           .sql(s"select float('NaN') as x")
-          .select(generic_isfinite("x").alias(colName)),
+          .select(generic_isfinite("x").alias(colName))
       ),
       ("SQL API, aliased function", spark.sql(s"select isfinite(double(null)) as $colName")),
       (
         "SQL API, native func.name",
-        spark.sql(s"select generic_isfinite(float('Infinity')) as $colName"),
-      ),
+        spark.sql(s"select generic_isfinite(float('Infinity')) as $colName")
+      )
     ).foreach {
       case (msg, df) =>
         show(df, msg)
@@ -60,7 +60,7 @@ class IsFiniteTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
   private def checkType(
     elementType: String,
     value: String = "0",
-    expected: String = "true",
+    expected: String = "true"
   ) = {
     val params = s"cast($value as ${elementType})"
 
@@ -129,7 +129,7 @@ class IsFiniteTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
       ("b", None),
       ("c", Some(Double.NaN)),
       ("d", Some(Double.NegativeInfinity)),
-      ("e", Some(Double.PositiveInfinity)),
+      ("e", Some(Double.PositiveInfinity))
     ).toDF("uid", "x")
 
     show(df, "source")
@@ -158,7 +158,7 @@ class IsFiniteTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
       ("b", None),
       ("c", Some(Double.NaN)),
       ("d", Some(Double.NegativeInfinity)),
-      ("e", Some(Double.PositiveInfinity)),
+      ("e", Some(Double.PositiveInfinity))
     )
       .toDF("uid", "x")
       .persist(StorageLevel.DISK_ONLY) // N.B. codegen ON switch here

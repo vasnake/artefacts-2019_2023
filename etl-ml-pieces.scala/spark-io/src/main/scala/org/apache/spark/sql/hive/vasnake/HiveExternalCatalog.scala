@@ -66,7 +66,7 @@ object HiveExternalCatalog extends CustomLogging {
     val externalCatalog = reflect[ExternalCatalog, SparkConf, Configuration](
       externalCatalogClassName(sparkContext.conf),
       sparkContext.conf,
-      sparkContext.hadoopConfiguration,
+      sparkContext.hadoopConfiguration
     )
 
     // Wrap to provide catalog events
@@ -95,10 +95,10 @@ object HiveExternalCatalog extends CustomLogging {
   private def reflect[T, Arg1 <: AnyRef, Arg2 <: AnyRef](
     className: String,
     ctorArg1: Arg1,
-    ctorArg2: Arg2,
+    ctorArg2: Arg2
   )(implicit
     ctorArgTag1: ClassTag[Arg1],
-    ctorArgTag2: ClassTag[Arg2],
+    ctorArgTag2: ClassTag[Arg2]
   ): T =
     try {
       val clazz = Utils.classForName(className)

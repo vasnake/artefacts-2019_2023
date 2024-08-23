@@ -20,7 +20,7 @@ object NumPy {
   def percentile(
     xs: Array[Double],
     ps: Array[Double],
-    sorted: Boolean = false,
+    sorted: Boolean = false
   ): Array[Double] = {
     // TODO: add tests, make it faster
     // https://github.com/scalanlp/breeze/blob/master/math/src/main/scala/breeze/stats/DescriptiveStats.scala

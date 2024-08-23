@@ -12,7 +12,7 @@ case class ScoreAudienceModel(audienceName: String, predictor: Predictor) extend
     GroupedFeatures(groups =
       Seq(
         FeaturesGroup("all_profiles", Array(0, 1, 2, 2).map(_.toString)),
-        FeaturesGroup("topics_m", topics.toArray),
+        FeaturesGroup("topics_m", topics.toArray)
       )
     )
   }
@@ -44,7 +44,7 @@ case class ScoreAudienceModel(audienceName: String, predictor: Predictor) extend
       null, // scores_raw
       null, // scores_trf
       audienceName, // audience_name
-      "positive", // category
+      "positive" // category
     )
   }
 }
@@ -60,7 +60,7 @@ object Predictor {
   def getScore(
     features: Array[Double],
     topics: Array[(Int, Double)],
-    predictor: Predictor,
+    predictor: Predictor
   ): Double = {
     // if topics.notEmpty: compute tf; extend main features
     val allFeatures: Array[(Int, Double)] = combineFeatures(features, topics, predictor)
@@ -92,7 +92,7 @@ object Predictor {
   private def combineFeatures(
     features: Array[Double],
     topics: Array[(Int, Double)],
-    predictor: Predictor,
+    predictor: Predictor
   ): Array[(Int, Double)] = {
     // tf = (1 + np.log(dv)) * d_idf[di]
     val tf1 = topics.map {
@@ -124,7 +124,7 @@ case class Predictor(
   b: Double,
   d_idf: Array[Double],
   t_idf: Any = None,
-  g_idf: Any = None,
+  g_idf: Any = None
 ) {
   override def toString: String =
     s"Predictor(W=Array(${W.mkString(",")}), b=${b}, d_idf=Array(${d_idf.mkString(",")}), t_idf=${t_idf}, g_idf=${g_idf})"

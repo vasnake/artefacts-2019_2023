@@ -104,7 +104,7 @@ class ApplyModelsTransformer(override val uid: String)
       val cfg = ApplyModelsDistributedConfig(
         featuresFromRow = FeaturesRowDecoder.apply(inputSchema, mergedGFs), // row decoders
         models_featuresIdx = modelObjects.zip(featuresIndices),
-        keepColumnsIndices = keepColsNames.map(inputSchema.fieldIndex),
+        keepColumnsIndices = keepColsNames.map(inputSchema.fieldIndex)
       )
 
       spark.sparkContext.broadcast(cfg)
@@ -187,7 +187,7 @@ object ApplyModelsTransformer extends DefaultParamsReadable[ApplyModelsTransform
     StructField("scores_raw", DataTypes.createArrayType(DataTypes.DoubleType)),
     StructField("scores_trf", DataTypes.createArrayType(DataTypes.DoubleType)),
     StructField("audience_name", DataTypes.StringType),
-    StructField("category", DataTypes.StringType),
+    StructField("category", DataTypes.StringType)
   )
 
   /** Factory
@@ -206,7 +206,7 @@ object ApplyModelsTransformer extends DefaultParamsReadable[ApplyModelsTransform
   def applyModels(
     df: DataFrame,
     outSchema: StructType,
-    broadcasted: Broadcast[ApplyModelsDistributedConfig],
+    broadcasted: Broadcast[ApplyModelsDistributedConfig]
   ): DataFrame =
     df.mapPartitions(
       applyModelsToIter(_, broadcasted)
@@ -214,7 +214,7 @@ object ApplyModelsTransformer extends DefaultParamsReadable[ApplyModelsTransform
 
   private def applyModelsToIter(
     rows: Iterator[Row],
-    broadcasted: Broadcast[ApplyModelsDistributedConfig],
+    broadcasted: Broadcast[ApplyModelsDistributedConfig]
   ): Iterator[Row] =
     rows.flatMap(
       applyModelsToRow(_, broadcasted.value)
@@ -261,7 +261,7 @@ object ApplyModelsTransformer extends DefaultParamsReadable[ApplyModelsTransform
     private def extractModelDescription(text: String): ModelDescription = {
       implicit val sep: Separators = Separators(
         CFG_MODEL_PARAMETERS_SEPARATOR,
-        Some(Separators(CFG_MODEL_KV_SEPARATOR)),
+        Some(Separators(CFG_MODEL_KV_SEPARATOR))
       )
 
       text.parseMap
@@ -349,7 +349,7 @@ object ApplyModelsTransformer extends DefaultParamsReadable[ApplyModelsTransform
 
         FileToolbox.joinPath(
           SparkFiles.get(lastDirName),
-          FileToolbox.getPathBasename(path),
+          FileToolbox.getPathBasename(path)
         )
       }
 
@@ -379,11 +379,11 @@ object ApplyModelsTransformer extends DefaultParamsReadable[ApplyModelsTransform
 
 case class ApplyModelsTransformerConfig(
   models: Seq[ComplexMLModel],
-  keepColumns: Seq[String],
+  keepColumns: Seq[String]
 )
 
 case class ApplyModelsDistributedConfig(
   featuresFromRow: FeaturesRowDecoder,
   models_featuresIdx: Seq[(ComplexMLModel, Array[Int])],
-  keepColumnsIndices: Seq[Int],
+  keepColumnsIndices: Seq[Int]
 )
