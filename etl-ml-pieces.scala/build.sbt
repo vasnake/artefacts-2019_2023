@@ -9,7 +9,9 @@ ThisBuild / scalaVersion := "2.11.12"
 ThisBuild / fork := true // do we really need this in the global scope?
 
 ThisBuild / assembly / assemblyMergeStrategy := {
-  case n if n.contains("holdenkarau") => MergeStrategy.discard
+  case n if n.contains("holdenkarau") => MergeStrategy.discard // never needed
+  case PathList("cats", xs @ _*)      => MergeStrategy.discard // provided
+  case PathList("shapeless", xs @ _*) => MergeStrategy.discard // provided
   case x => (assembly / assemblyMergeStrategy).value(x)
 }
 
@@ -345,7 +347,6 @@ lazy val commonSettings = {
     assemblySettings
   ).reduceLeft(_ ++ _)
 }
-
 
 // dependencies
 
