@@ -26,13 +26,14 @@ fi
 export JAVA_OPTS="${JAVA_OPTS} -Dsbt.log.noformat=true"
 
 pushd "${SBT_PROJECT_DIR}"
-timeout -v -k 5s 30m sbt -v --mem 4096 clean test assembly
+timeout -v -k 5s 30m sbt -v --mem 4096 clean compile test assembly
 #    -k duration
 #   --kill-after=duration
 popd
 
 mkdir -p ${PACKAGES_DIR}
-cp "${SBT_PROJECT_DIR}/target/scala-2.12/*.jar" ${PACKAGES_DIR}
+cp "${SBT_PROJECT_DIR}/target/scala-2.11/*.jar" ${PACKAGES_DIR}
+# target/scala-2.11/etl-ml-pieces-1923-assembly-0.1.0.jar
 
 # debug
 ls -lh ${PACKAGES_DIR}
