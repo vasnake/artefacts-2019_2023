@@ -48,6 +48,7 @@ Other sbt related resources
 - https://scastie.scala-lang.org/
 - https://mvnrepository.com/artifact/org.unbescape/unbescape/1.1.6.RELEASE
 - https://stackoverflow.com/questions/57521738/how-to-solve-sbt-dependency-problem-with-spark-and-whisklabs-docker-it-scala
+- https://github.com/sbt/sbt-assembly
 
 - set envvars for sbt `export JAVA_OPTS="-XX:MaxMetaspaceSize=1G -Xmx4G -XX:+UseParallelGC" JAVA_HOME=$(/usr/libexec/java_home -v 1.8) && sbt -v`
 - set envvars for tests `sbt> set Test/envVars := Map("DEBUG_MODE" -> "true", "SPARK_LOCAL_IP" -> "127.0.0.1")`; `sbt> set Test/logBuffered := false`

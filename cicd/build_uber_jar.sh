@@ -26,7 +26,11 @@ fi
 export JAVA_OPTS="${JAVA_OPTS} -Dsbt.log.noformat=true"
 
 pushd "${SBT_PROJECT_DIR}"
-timeout -v -k 5s 30m sbt -v --mem 4096 clean compile test assembly
+timeout -v -k 5s 10m sbt -v --mem 4096 clean compile test assembly
+# timeout -v -k 5s 3m sbt -v --mem 4096 clean
+# timeout -v -k 5s 5m sbt -v --mem 4096 compile
+# timeout -v -k 5s 10m sbt -v --mem 4096 test
+# timeout -v -k 5s 3m sbt -v --mem 4096 assembly
 #    -k duration
 #   --kill-after=duration
 popd

@@ -8,7 +8,24 @@ Two main categories:
 
 For full description see docs inside.
 
-CI/CD
-- [Build fat-jar for Spark](cicd/build_uber_jar.sh)
+## CI/CD
 
-Cleanup: `find . -depth -type d \( -name target -or -name .bloop -or -name .bsp -or -name .metals -or -name metastore_db \) -exec echo rm -rf {} \;`
+Manual cleanup: `find . -depth -type d \( -name target -or -name .bloop -or -name .bsp -or -name .metals -or -name metastore_db \) -exec echo rm -rf {} \;`
+
+Bash script, [build fat-jar for Spark](cicd/build_uber_jar.sh)
+Example: `bash -xve ./cicd/build_uber_jar.sh ./etl-ml-pieces.scala/ /tmp/workdir/PACKAGES`
+
+Build docker image, contains tools to build uber-jar: `docker buildx build -f cicd/jarbuilder.Dockerfile --tag docker/jarbuilder:0.1.0 .`
+
+Build uber-jar using docker container: ``
+
+```s
+# docker buildx build [OPTIONS] PATH | URL | -
+
+docker buildx build -f cicd/jarbuilder.Dockerfile --tag docker/jarbuilder:0.1.0 .
+
+# => => writing image sha256:d466806deb697cecf5ec011c0b19dc70e7d1c38f2fc34f5f01cf0022aa786ae8
+# => => naming to docker.io/docker/jarbuilder:0.1.0
+
+```
+snippets

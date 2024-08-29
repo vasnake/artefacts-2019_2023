@@ -7,6 +7,7 @@ import MyUtil._
 ThisBuild / organization := "com.github.vasnake"
 ThisBuild / scalaVersion := "2.11.12"
 ThisBuild / fork := true // do we really need this in the global scope?
+ThisBuild / compile / run / fork := true
 
 ThisBuild / assembly / assemblyMergeStrategy := {
   case n if n.contains("holdenkarau") => MergeStrategy.discard // never needed
