@@ -1,7 +1,7 @@
 # java + sbt
 FROM openjdk:8-jdk-alpine
 ENV PATH=/usr/local/sbt/bin:${JAVA_HOME}/bin:${PATH}
-RUN apk add --no-cache wget tar bash shadow coreutils
+RUN apk add --no-cache wget tar bash shadow coreutils ncurses
 RUN usermod --shell /bin/bash root
 
 RUN mkdir -p "/usr/local/sbt" && \
@@ -12,5 +12,5 @@ RUN mkdir -p "/usr/local/sbt" && \
 # invoke dependencies downloading by building project
 RUN --mount=type=bind,source=etl-ml-pieces.scala,target=sbtproject,rw \
     bash -c 'pushd sbtproject && \
-    sbt -v --mem 4096 clean update compile test package assembly && \
+    sbt -v --mem 4096 clean update compile test assembly && \
     popd'
