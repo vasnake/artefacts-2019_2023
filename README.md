@@ -6,6 +6,9 @@ Two main categories:
 - [Spark/Scala stuff](./etl-ml-pieces.scala/readme.md)
 - [Python scripts, modules](./scripts.python/readme.md)
 
+Plus one derivative:
+- [Spark3 Scala stuff](./spark3-pieces.scala/readme.md)
+
 For full description see docs inside.
 
 ## CI/CD

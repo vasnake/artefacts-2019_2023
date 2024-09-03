@@ -38,13 +38,12 @@ Spark.ml wrappers for JVM implementation of estimators and models (see spark.ml 
 - [NEPriorClassProbaTransformer + NEPriorClassProbaTransformerModel](spark_ml/postprocessing.py#NEPriorClassProbaTransformer)
 - [ScoreQuantileThresholdTransformer + ScoreQuantileThresholdTransformerModel](spark_ml/postprocessing.py#ScoreQuantileThresholdTransformer)
 
+ML model inference, first migration steps (to Scala-Apply)
+- [Convert npz file](./simple-pyspark-apps/npz_to_json.py) (from numpy.savez_compressed) to json file
+- [Simple spark job](./simple-pyspark-apps/score_audience.py), apply ML model to test data
+
 ???
 
-- npz_to_json.py (transformers\python_sandbox\README.md)
-Скрипт конвертации моделей (score_audience) из numpy npz в json, для использования в scala-apply.
-
-- integration tests scripts (sh, py)
-- wrappers for spark-scala classes, functions
-- apps: learn, apply, export, join
+- apps: join, learn, apply, export
 
 TODO: all scripts should run successfully, in proper docker container.
