@@ -2,7 +2,9 @@
 
 Collection of some interesting bits and pieces from my projects.
 
-Spark 2.4.8; Scala 2.12.19; sbt 1.10.0; java 1.8 (migration to Spark 3 is WIP)
+Spark 2.4.8; Scala 2.12.19; sbt 1.10.1; java 1.8
+
+[Migration to Spark 3](../spark3-pieces.scala/readme.md)
 
 My local station env (win11 + wsl2)
 ```sh
@@ -57,8 +59,7 @@ Other sbt related resources
 
 ## project modules
 
-TODO: build uber-jar (fat-jar) using sbt-assembly.
-All modules packed to uber-jar and can be used in spark apps.
+All modules packed to uber-jar (`sbt assembly`) and can be used in spark apps.
 For that you should add library to spark session: `spark-submit ... --jars hdfs:/lib/custom-transformers-SNAPSHOT.jar`.
 
 ### hive-udaf-java
