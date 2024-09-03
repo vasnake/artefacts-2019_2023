@@ -17,9 +17,9 @@ object Dependencies {
     }
 
     object holdenkarau {
-      // libraryDependencies += "com.holdenkarau" %% "spark-testing-base" % "2.4.8_1.5.3" % Test
-      val `spark-testing-base` =
-        "com.holdenkarau" %% "spark-testing-base" % s"${org.apache.spark.sparkVersion}_1.5.3" // % Test
+      // libraryDependencies += "com.holdenkarau" %% "spark-testing-base" % "3.5.1_1.5.3" % Test
+      // val `spark-testing-base` = "com.holdenkarau" %% "spark-testing-base" % s"${org.apache.spark.sparkVersion}_1.5.3" // % Test
+      val `spark-testing-base` = "com.holdenkarau" %% "spark-testing-base" % "3.5.1_1.5.3" // % Test
     }
 
     object beust {

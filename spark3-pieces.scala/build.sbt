@@ -25,16 +25,15 @@ lazy val `etl-ml-pieces-1923` =
     .dependsOn(
       Seq(
         core,
-        // common,
-        // text,
-        // `etl-core`,
-        // `ml-core`,
-        // `ml-models`,
-        // json,
-        // `ml-models-json`,
-        // `hive-udaf-java`,
-        // `spark-core`,
-        // `spark-udf`,
+        common,
+        text,
+        json,
+        `etl-core`,
+        `ml-core`,
+        `ml-models`,
+        `ml-models-json`,
+        `spark-core`,
+        `spark-udf`,
         // `spark-io`,
         // `spark-transformers`,
         // `spark-ml`,
@@ -46,16 +45,15 @@ lazy val `etl-ml-pieces-1923` =
     // Aggregation means that running a task on the aggregate project will also run it on the aggregated projects:
     .aggregate(
       core,
-      // common,
-      // text,
-      // `etl-core`,
-      // `ml-core`,
-      // `ml-models`,
-      // json,
-      // `ml-models-json`,
-      // `hive-udaf-java`,
-      // `spark-core`,
-      // `spark-udf`,
+      common,
+      text,
+      json,
+      `etl-core`,
+      `ml-core`,
+      `ml-models`,
+      `ml-models-json`,
+      `spark-core`,
+      `spark-udf`,
       // `spark-io`,
       // `spark-transformers`,
       // `spark-ml`,
@@ -73,97 +71,90 @@ lazy val core =
     .settings(commonSettings)
     .settings(commonDependencies)
 
-// lazy val common =
-//   project
-//     .in(file("common"))
-//     .dependsOn(Seq(core).map(_ % Cctt): _*)
-//     .settings(commonSettings)
-//     .settings(commonDependencies)
-//     .settings(
-//       libraryDependencies ++= Seq(
-//         `commons-io`.`commons-io`,
-//         org.apache.commons.`commons-math3`
-//       )
-//     )
+lazy val common =
+  project
+    .in(file("common"))
+    .dependsOn(Seq(core).map(_ % Cctt): _*)
+    .settings(commonSettings)
+    .settings(commonDependencies)
+    .settings(
+      libraryDependencies ++= Seq(
+        `commons-io`.`commons-io`,
+        org.apache.commons.`commons-math3`
+      )
+    )
 
-// lazy val text =
-//   project
-//     .in(file("text"))
-//     .settings(commonSettings)
-//     .settings(commonDependencies)
-//     .settings(
-//       libraryDependencies ++= Seq(
-//         org.`scala-lang`.modules.`scala-parser-combinators`,
-//         org.unbescape.unbescape
-//       )
-//     )
+lazy val text =
+  project
+    .in(file("text"))
+    .settings(commonSettings)
+    .settings(commonDependencies)
+    .settings(
+      libraryDependencies ++= Seq(
+        org.`scala-lang`.modules.`scala-parser-combinators`,
+        org.unbescape.unbescape
+      )
+    )
 
-// lazy val json =
-//   project
-//     .in(file("json"))
-//     .settings(commonSettings)
-//     .settings(commonDependencies)
-//     .settings(
-//       libraryDependencies ++= Seq(
-//         dio.circe.`circe-core`,
-//         dio.circe.`circe-generic`,
-//         dio.circe.`circe-parser`,
-//         org.json4s.`json4s-jackson`,
-//         org.json4s.`json4s-ast`
-//       )
-//     )
+lazy val json =
+  project
+    .in(file("json"))
+    .settings(commonSettings)
+    .settings(commonDependencies)
+    .settings(
+      libraryDependencies ++= Seq(
+        dio.circe.`circe-core`,
+        dio.circe.`circe-generic`,
+        dio.circe.`circe-parser`,
+        org.json4s.`json4s-jackson`,
+        org.json4s.`json4s-ast`
+      )
+    )
 
-// lazy val `etl-core` =
-//   project
-//     .in(file("etl-core"))
-//     .dependsOn(Seq(core, common).map(_ % Cctt): _*)
-//     .settings(commonSettings)
-//     .settings(commonDependencies)
+lazy val `etl-core` =
+  project
+    .in(file("etl-core"))
+    .dependsOn(Seq(core, common).map(_ % Cctt): _*)
+    .settings(commonSettings)
+    .settings(commonDependencies)
 
-// lazy val `ml-core` =
-//   project
-//     .in(file("ml-core"))
-//     .dependsOn(Seq(core, common).map(_ % Cctt): _*)
-//     .settings(commonSettings)
-//     .settings(commonDependencies)
-//     .settings(libraryDependencies ++= Seq(org.pmml4s.pmml4s))
+lazy val `ml-core` =
+  project
+    .in(file("ml-core"))
+    .dependsOn(Seq(core, common).map(_ % Cctt): _*)
+    .settings(commonSettings)
+    .settings(commonDependencies)
+    .settings(libraryDependencies ++= Seq(org.pmml4s.pmml4s))
 
-// lazy val `ml-models` =
-//   project
-//     .in(file("ml-models"))
-//     .dependsOn(Seq(`etl-core`, `ml-core`).map(_ % Cctt): _*)
-//     .settings(commonSettings)
-//     .settings(commonDependencies)
+lazy val `ml-models` =
+  project
+    .in(file("ml-models"))
+    .dependsOn(Seq(`etl-core`, `ml-core`).map(_ % Cctt): _*)
+    .settings(commonSettings)
+    .settings(commonDependencies)
 
-// lazy val `ml-models-json` =
-//   project
-//     .in(file("ml-models-json"))
-//     .dependsOn(Seq(json, `ml-models`).map(_ % Cctt): _*)
-//     .settings(commonSettings)
-//     .settings(commonDependencies)
+lazy val `ml-models-json` =
+  project
+    .in(file("ml-models-json"))
+    .dependsOn(Seq(json, `ml-models`).map(_ % Cctt): _*)
+    .settings(commonSettings)
+    .settings(commonDependencies)
 
-// lazy val `hive-udaf-java` =
-//   project
-//     .in(file("hive-udaf-java"))
-//     .settings(commonSettings)
-//     .settings(commonDependencies)
-//     .settings(hiveSettings)
+lazy val `spark-core` =
+  project
+    .in(file("spark-core"))
+    .dependsOn(Seq(core, common).map(_ % Cctt): _*)
+    .settings(commonSettings)
+    .settings(commonDependencies)
+    .settings(sparkSettings)
 
-// lazy val `spark-core` =
-//   project
-//     .in(file("spark-core"))
-//     .dependsOn(Seq(core, common).map(_ % Cctt): _*)
-//     .settings(commonSettings)
-//     .settings(commonDependencies)
-//     .settings(sparkSettings)
-
-// lazy val `spark-udf` =
-//   project
-//     .in(file("spark-udf"))
-//     .dependsOn(Seq(core, common, text, `spark-core`).map(_ % Cctt): _*)
-//     .settings(commonSettings)
-//     .settings(commonDependencies)
-//     .settings(sparkSettings)
+lazy val `spark-udf` =
+  project
+    .in(file("spark-udf"))
+    .dependsOn(Seq(core, common, text, `spark-core`).map(_ % Cctt): _*)
+    .settings(commonSettings)
+    .settings(commonDependencies)
+    .settings(sparkSettings)
 
 // lazy val `spark-io` =
 //   project

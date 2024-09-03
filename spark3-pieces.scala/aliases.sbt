@@ -6,7 +6,8 @@ addCommandAlias("ls", "projects")
 addCommandAlias("cd", "project")
 addCommandAlias("root", "cd etl-ml-pieces-1923")
 addCommandAlias("c", "compile")
-addCommandAlias("t", "test")
+addCommandAlias("t", "testQuick")
+addCommandAlias("tt", "test")
 addCommandAlias("r", "reload")
 addCommandAlias(
   "sc", // fmt, fix checks
@@ -30,7 +31,8 @@ onLoadMessage +=
       |│ ${styled("cd")}          │ project           │
       |│ ${styled("root")}        │ cd root           │
       |│ ${styled("c")}           │ compile           │
-      |│ ${styled("t")}           │ test              │
+      |│ ${styled("t")}           │ testQuick         │
+      |│ ${styled("tt")}          │ test              │
       |│ ${styled("r")}           │ reload            │
       |│ ${styled("sc")}          │ sfmt, sfix checks │
       |│ ${styled("sf")}          │ sfix, sfmt        │

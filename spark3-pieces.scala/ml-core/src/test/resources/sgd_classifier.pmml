@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<PMML xmlns="http://www.dmg.org/PMML-4_3" xmlns:data="http://jpmml.org/jpmml-model/InlineTable" version="4.3">
+	<Header>
+		<Application name="JPMML-SkLearn" version="1.5.18"/>
+		<Timestamp>2019-09-24T07:25:41Z</Timestamp>
+	</Header>
+	<MiningBuildTask>
+		<Extension>PMMLPipeline(steps=[('estimator', SGDClassifier(alpha=5e-05, average=False, class_weight=None,
+       early_stopping=False, epsilon=0.1, eta0=1e-05, fit_intercept=True,
+       l1_ratio=0.3, learning_rate='invscaling', loss='log',
+       max_iter=10000, n_iter=None, n_iter_no_change=5, n_jobs=None,
+       penalty='elasticnet', power_t=0.5, random_state=None, shuffle=True,
+       tol=1e-05, validation_fraction=0.1, verbose=0, warm_start=False))])</Extension>
+	</MiningBuildTask>
+	<DataDictionary>
+		<DataField name="y" optype="categorical" dataType="integer">
+			<Value value="0"/>
+			<Value value="1"/>
+			<Value value="2"/>
+		</DataField>
+		<DataField name="x1" optype="continuous" dataType="double"/>
+		<DataField name="x2" optype="continuous" dataType="double"/>
+		<DataField name="x3" optype="continuous" dataType="double"/>
+		<DataField name="x4" optype="continuous" dataType="double"/>
+	</DataDictionary>
+	<MiningModel functionName="classification">
+		<MiningSchema>
+			<MiningField name="y" usageType="target"/>
+			<MiningField name="x1"/>
+			<MiningField name="x2"/>
+			<MiningField name="x3"/>
+			<MiningField name="x4"/>
+		</MiningSchema>
+		<Segmentation multipleModelMethod="modelChain" x-missingPredictionTreatment="returnMissing">
+			<Segment id="1">
+				<True/>
+				<RegressionModel functionName="regression" normalizationMethod="logit">
+					<MiningSchema>
+						<MiningField name="x1"/>
+						<MiningField name="x2"/>
+						<MiningField name="x3"/>
+						<MiningField name="x4"/>
+					</MiningSchema>
+					<Output>
+						<OutputField name="decisionFunction(0)" optype="continuous" dataType="double" isFinalResult="false"/>
+					</Output>
+					<RegressionTable intercept="-2.753696681355363E-4">
+						<NumericPredictor name="x1" coefficient="-0.0011355472678633248"/>
+						<NumericPredictor name="x2" coefficient="-0.0045000685827036235"/>
+						<NumericPredictor name="x3" coefficient="-0.002204493136907108"/>
+						<NumericPredictor name="x4" coefficient="-0.004473665186372861"/>
+					</RegressionTable>
+				</RegressionModel>
+			</Segment>
+			<Segment id="2">
+				<True/>
+				<RegressionModel functionName="regression" normalizationMethod="logit">
+					<MiningSchema>
+						<MiningField name="x1"/>
+						<MiningField name="x2"/>
+						<MiningField name="x3"/>
+						<MiningField name="x4"/>
+					</MiningSchema>
+					<Output>
+						<OutputField name="decisionFunction(1)" optype="continuous" dataType="double" isFinalResult="false"/>
+					</Output>
+					<RegressionTable intercept="-1.5101135905978833E-4">
+						<NumericPredictor name="x1" coefficient="6.191991415885115E-4"/>
+						<NumericPredictor name="x2" coefficient="-6.036665566865704E-4"/>
+						<NumericPredictor name="x3" coefficient="-0.0021396339242887425"/>
+						<NumericPredictor name="x4" coefficient="-0.001210429173073371"/>
+					</RegressionTable>
+				</RegressionModel>
+			</Segment>
+			<Segment id="3">
+				<True/>
+				<RegressionModel functionName="regression" normalizationMethod="logit">
+					<MiningSchema>
+						<MiningField name="x1"/>
+						<MiningField name="x2"/>
+						<MiningField name="x3"/>
+						<MiningField name="x4"/>
+					</MiningSchema>
+					<Output>
+						<OutputField name="decisionFunction(2)" optype="continuous" dataType="double" isFinalResult="false"/>
+					</Output>
+					<RegressionTable intercept="-6.177175654167336E-5">
+						<NumericPredictor name="x1" coefficient="-3.830455155066987E-4"/>
+						<NumericPredictor name="x2" coefficient="2.823518883698648E-4"/>
+						<NumericPredictor name="x3" coefficient="5.374654815365206E-4"/>
+						<NumericPredictor name="x4" coefficient="2.9757461663227043E-5"/>
+					</RegressionTable>
+				</RegressionModel>
+			</Segment>
+			<Segment id="4">
+				<True/>
+				<RegressionModel functionName="classification" normalizationMethod="simplemax">
+					<MiningSchema>
+						<MiningField name="y" usageType="target"/>
+						<MiningField name="decisionFunction(0)"/>
+						<MiningField name="decisionFunction(1)"/>
+						<MiningField name="decisionFunction(2)"/>
+					</MiningSchema>
+					<Output>
+						<OutputField name="probability(0)" optype="continuous" dataType="double" feature="probability" value="0"/>
+						<OutputField name="probability(1)" optype="continuous" dataType="double" feature="probability" value="1"/>
+						<OutputField name="probability(2)" optype="continuous" dataType="double" feature="probability" value="2"/>
+					</Output>
+					<RegressionTable intercept="0.0" targetCategory="0">
+						<NumericPredictor name="decisionFunction(0)" coefficient="1.0"/>
+					</RegressionTable>
+					<RegressionTable intercept="0.0" targetCategory="1">
+						<NumericPredictor name="decisionFunction(1)" coefficient="1.0"/>
+					</RegressionTable>
+					<RegressionTable intercept="0.0" targetCategory="2">
+						<NumericPredictor name="decisionFunction(2)" coefficient="1.0"/>
+					</RegressionTable>
+				</RegressionModel>
+			</Segment>
+		</Segmentation>
+	</MiningModel>
+</PMML>
