@@ -13,7 +13,7 @@ For full description see docs inside.
 
 ## CI/CD
 
-Manual cleanup: `find . -depth -type d \( -name target -or -name .bloop -or -name .bsp -or -name .metals -or -name metastore_db \) -exec echo rm -rfv {} \;`
+Manual cleanup: `find . -depth -type d \( -name target -or -name .bloop -or -name .bsp -or -name .metals -or -name metastore_db -or -name spark-warehouse \) -exec echo rm -rfv {} \;`
 
 Bash script, [build fat-jar for Spark](cicd/build_uber_jar.sh).
 Example: `bash -xve ./cicd/build_uber_jar.sh ./etl-ml-pieces.scala/ /tmp/workdir/PACKAGES`

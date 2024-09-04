@@ -37,7 +37,7 @@ lazy val `etl-ml-pieces-1923` =
         `spark-io`,
         `spark-transformers`,
         `spark-ml`,
-        // `spark-apps`
+        `spark-apps`
       ).map(
         _ % Cctt
       ): _*
@@ -57,7 +57,7 @@ lazy val `etl-ml-pieces-1923` =
       `spark-io`,
       `spark-transformers`,
       `spark-ml`,
-      // `spark-apps`
+      `spark-apps`
     )
     .settings(name := "etl-ml-pieces-1923")
     .settings(commonSettings)
@@ -188,18 +188,18 @@ lazy val `spark-ml` =
     .settings(commonDependencies)
     .settings(sparkSettings)
 
-// lazy val `spark-apps` =
-//   project
-//     .in(file("spark-apps"))
-//     .dependsOn(
-//       Seq(core, `spark-core`, `spark-io`, `spark-transformers`, `spark-ml`, `ml-models-json`, `hive-udaf-java`).map(
-//         _ % Cctt
-//       ): _*
-//     )
-//     .settings(commonSettings)
-//     .settings(commonDependencies)
-//     .settings(sparkSettings)
-//     .settings(libraryDependencies ++= Seq(com.beust.jcommander))
+lazy val `spark-apps` =
+  project
+    .in(file("spark-apps"))
+    .dependsOn(
+      Seq(core, `spark-core`, `spark-io`, `spark-transformers`, `spark-ml`, `ml-models-json`).map(
+        _ % Cctt
+      ): _*
+    )
+    .settings(commonSettings)
+    .settings(commonDependencies)
+    .settings(sparkSettings)
+    .settings(libraryDependencies ++= Seq(com.beust.jcommander))
 
 // settings
 
