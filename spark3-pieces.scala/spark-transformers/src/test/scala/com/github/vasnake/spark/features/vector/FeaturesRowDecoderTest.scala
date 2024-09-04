@@ -3,14 +3,14 @@
 package com.github.vasnake.spark.features.vector
 
 import scala.collection.mutable
-
 import com.github.vasnake.`etl-core`._
 import com.github.vasnake.spark.test.SimpleLocalSpark
 import com.github.vasnake.test.EqualityCheck.createSeqFloatsEquality
-import com.github.vasnake.test.{ Conversions => CoreConversions }
-import org.apache.spark.sql._
-import org.apache.spark.sql.catalyst.encoders.RowEncoder
-import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
+import com.github.vasnake.test.{Conversions => CoreConversions}
+
+import org.apache.spark.sql
+import sql._
+import sql.catalyst.expressions.GenericRowWithSchema
 import org.scalactic.Equality
 import org.scalatest._
 import org.scalatest.flatspec._
@@ -387,7 +387,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val err = intercept[IllegalArgumentException] {
       val vector = extractVector(gfs, dfRowWithAllVariations)
     }
-    assert(err.getMessage.take(31) === """Field "no_field" does not exist""")
+    assert(err.getMessage contains """no_field does not exist""")
   }
 
   it should "abide by the rules of vectorization: fail if field in dataframe have unknown type" in {
@@ -642,7 +642,7 @@ class FeaturesRowDecoderTest extends AnyFlatSpec with should.Matchers with Simpl
     val err = intercept[IllegalArgumentException] {
       val decoder = FeaturesRowDecoder(df.schema, gfs)
     }
-    assert(err.getMessage.take(31) === """Field "no_field" does not exist""")
+    assert(err.getMessage contains """no_field does not exist""")
   }
 
   it should "abide by the rules of vectorization: fail if field in dataframe have unknown type 2" in {
@@ -814,7 +814,9 @@ object FeaturesRowDecoderTest {
     // import spark.implicits._
     val row = dfRowWithAllVariations
     val schema = row.schema
+    // implicit val enc: Encoder[Row] = RowEncoder.encoderFor(schema, lenient = true)
+    implicit val enc: Encoder[Row] = (sql.Encoders.row(schema))
 
-    spark.createDataset(Seq(row))(RowEncoder(schema))
+    spark.createDataset(Seq(row))
   }
 }

@@ -4,10 +4,10 @@ package com.github.vasnake.spark.features.aggregate
 
 import com.github.vasnake.`etl-core`.aggregate.AggregationPipeline
 import com.github.vasnake.`etl-core`.aggregate.config.AggregationPipelineConfig
+
 import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.sql
-import org.apache.spark.sql._
-import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
+import sql._
 
 /** Single feature represented by a number, float or double.
   * Group of features (dense vector as array, sparse vector as map) represented by 3 types of columns:
@@ -26,9 +26,11 @@ object DatasetAggregator { // TODO: move to com.github.vasnake.spark.dataset.tra
   )(implicit
     spark: SparkSession
   ): DataFrame = {
+
     import spark.implicits._
-    import org.apache.spark.sql.catalyst.encoders.RowEncoder
-    implicit val outRowEncoder: ExpressionEncoder[Row] = RowEncoder(df.schema)
+    // import sql.catalyst.encoders.RowEncoder
+    // implicit val outRowEncoder: Encoder[Row] = RowEncoder.encoderFor(df.schema)
+    implicit val outRowEncoder: Encoder[Row] = sql.Encoders.row(df.schema)
 
     val aggregators: Broadcast[DatasetAggregators] = spark
       .sparkContext
