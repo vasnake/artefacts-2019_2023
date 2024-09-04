@@ -104,7 +104,7 @@ object HiveExternalCatalog extends CustomLogging {
       val clazz = Utils.classForName(className)
       val ctor = clazz.getDeclaredConstructor(ctorArgTag1.runtimeClass, ctorArgTag2.runtimeClass)
       val args = Array[AnyRef](ctorArg1, ctorArg2)
-      ctor.newInstance(args: _*).asInstanceOf[T]
+      ctor.newInstance(args: _*) // .asInstanceOf[T]
     }
     catch {
       case NonFatal(e) =>

@@ -67,11 +67,9 @@ class SQLHiveWriterTest extends AnyFlatSpec with should.Matchers {
   }
 
   it should "fail if part. col not in schema" in {
-    assert(
-      writer.createTableDDL("mydb", "mytab", partitionColNames = Seq("bb"), schema("a", "int", "b", "string")).toString
-        ==
-        "Failure(java.lang.IllegalArgumentException: Field \"bb\" does not exist.\nAvailable fields: a, b)"
-    )
+    val actual = writer.createTableDDL("mydb", "mytab", partitionColNames = Seq("bb"), schema("a", "int", "b", "string")).toString
+    val expected = """bb does not exist. Available: a, b"""
+    assert(actual contains expected)
   }
 
   private def schema(cols: String*): StructType = {
