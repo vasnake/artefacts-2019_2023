@@ -34,7 +34,7 @@ lazy val `etl-ml-pieces-1923` =
         `ml-models-json`,
         `spark-core`,
         `spark-udf`,
-        // `spark-io`,
+        `spark-io`,
         // `spark-transformers`,
         // `spark-ml`,
         // `spark-apps`
@@ -54,7 +54,7 @@ lazy val `etl-ml-pieces-1923` =
       `ml-models-json`,
       `spark-core`,
       `spark-udf`,
-      // `spark-io`,
+      `spark-io`,
       // `spark-transformers`,
       // `spark-ml`,
       // `spark-apps`
@@ -156,13 +156,13 @@ lazy val `spark-udf` =
     .settings(commonDependencies)
     .settings(sparkSettings)
 
-// lazy val `spark-io` =
-//   project
-//     .in(file("spark-io"))
-//     .dependsOn(Seq(core, common, `spark-core`).map(_ % Cctt): _*)
-//     .settings(commonSettings)
-//     .settings(commonDependencies)
-//     .settings(sparkSettings)
+lazy val `spark-io` =
+  project
+    .in(file("spark-io"))
+    .dependsOn(Seq(core, common, `spark-core`).map(_ % Cctt): _*)
+    .settings(commonSettings)
+    .settings(commonDependencies)
+    .settings(sparkSettings)
 
 // lazy val `spark-transformers` =
 //   project
