@@ -12,7 +12,7 @@ import org.scalatest.matchers.should
 
 trait DataFrameHelpers extends should.Matchers {
 
-  // sbt> set Test / envVars := Map("DEBUG_MODE" -> "true")
+  // sbt> set ThisBuild / Test / envVars := Map("DEBUG_MODE" -> "true")
   lazy val debugMode: Boolean = sys.env.getOrElse("DEBUG_MODE", "false").toBoolean
 
   def show(

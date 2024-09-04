@@ -19,6 +19,9 @@ case class GenericSum(
 
   override def prettyName: String = "generic_sum"
 
+  override protected def withNewChildrenInternal(newChildren: IndexedSeq[Expression]): Expression =
+    copy(child = newChildren.head)
+
   override def withNewMutableAggBufferOffset(newMutableAggBufferOffset: Int): ImperativeAggregate =
     copy(mutableAggBufferOffset = newMutableAggBufferOffset)
 

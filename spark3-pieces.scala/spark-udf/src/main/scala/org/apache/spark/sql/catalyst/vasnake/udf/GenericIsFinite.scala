@@ -21,8 +21,8 @@ import org.apache.spark.sql.types._
   since = "0.1.0"
 )
 case class GenericIsFinite(child: Expression) extends GenericUnaryPredicateNotNull {
+  override protected def withNewChildInternal(newChild: Expression): Expression = copy(child = newChild)
   override def inputTypes: Seq[AbstractDataType] = Seq(TypeCollection(DoubleType, FloatType))
-
   override def onNullInput: Any = false // not finite
   override def javaOnNullInput: String = "false"
 

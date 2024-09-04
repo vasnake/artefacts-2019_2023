@@ -36,6 +36,9 @@ case class GenericMostFreq(
 
   override def prettyName: String = "generic_most_freq"
 
+  override protected def withNewChildrenInternal(newChildren: IndexedSeq[Expression]): Expression =
+    copy(child = newChildren.head)
+
   override def withNewMutableAggBufferOffset(newMutableAggBufferOffset: Int): ImperativeAggregate =
     copy(mutableAggBufferOffset = newMutableAggBufferOffset)
 

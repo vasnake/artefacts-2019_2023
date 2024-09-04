@@ -58,8 +58,8 @@ class PrimitiveLongTest extends AnyFlatSpec with should.Matchers with LocalSpark
   it should "filter with threshold, part L, most_freq" in {
     val input = inputDF.where("part = 'L'")
     show(input, message = "input")
-    mfqAndCheckFull(input, expected = "0", threshold = "2/3") // freq >= threshold, have good value
-    mfqAndCheckFull(input, expected = "null", threshold = "3/4") // freq < threshold, no good values
+    mfqAndCheckFull(input, expected = "0", threshold = "2.0/3.0001") // freq >= threshold, have good value
+    mfqAndCheckFull(input, expected = "null", threshold = "2.0001/3.0") // freq < threshold, no good values
   }
 
   it should "select value by index if there is a tie, part M, most_freq" in {

@@ -53,7 +53,7 @@ Other sbt related resources
 - https://github.com/sbt/sbt-assembly
 
 - set envvars for sbt `export JAVA_OPTS="-XX:MaxMetaspaceSize=1G -Xmx4G -XX:+UseParallelGC" JAVA_HOME=$(/usr/libexec/java_home -v 1.8) && sbt -v`
-- set envvars for tests `sbt> set Test/envVars := Map("DEBUG_MODE" -> "true", "SPARK_LOCAL_IP" -> "127.0.0.1")`; `sbt> set Test/logBuffered := false`
+- set envvars for tests `sbt> set ThisBuild / Test / envVars := Map("DEBUG_MODE" -> "true", "SPARK_LOCAL_IP" -> "127.0.0.1")`; `sbt> set Test/logBuffered := false`
 - select individual test `sbt> testQuick *InverseVariabilityTransformer* -- -z "reference"`
 - logs selectors/tuning `test/resources/log4j*.properties`
 

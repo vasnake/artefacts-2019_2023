@@ -25,6 +25,9 @@ case class GenericAvg(
   override def withNewInputAggBufferOffset(newInputAggBufferOffset: Int): ImperativeAggregate =
     copy(inputAggBufferOffset = newInputAggBufferOffset)
 
+  override protected def withNewChildrenInternal(newChildren: IndexedSeq[Expression]): Expression =
+    copy(child = newChildren.head)
+
   @inline def combineItems(x: AccImpl.V, y: AccImpl.V): AccImpl.V = {
     debug(s"combineItems enter, x: `${x}`, y: `${y}`")
 

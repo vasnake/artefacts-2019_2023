@@ -230,10 +230,10 @@ object functions {
     (name, (expressionInfo[T](name), builder, alias))
   }
 
-  private def expressionInfo[T <: Expression: ClassTag](name: String): ExpressionInfo = {
+  private def expressionInfo[T <: Expression : ClassTag](name: String): ExpressionInfo = {
     val clazz = scala.reflect.classTag[T].runtimeClass
     val anno = clazz.getAnnotation(classOf[ExpressionDescription])
-    if (anno != null)
+    if (anno != null) {
       new ExpressionInfo(
         clazz.getCanonicalName,
         null, // db
@@ -242,9 +242,14 @@ object functions {
         anno.arguments(),
         anno.examples(),
         anno.note(),
-        anno.since()
+        "", // group,
+        anno.since(),
+        "", // deprecated,
+        "" // source
       )
-    else
+    } else {
       new ExpressionInfo(clazz.getCanonicalName, name)
+    }
   }
+
 }

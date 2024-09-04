@@ -23,5 +23,9 @@ import org.apache.spark.sql.catalyst.vasnake.udf.base.GenericBinaryArraysElement
 )
 case class GenericVectorSemiDiff(left: Expression, right: Expression)
     extends GenericBinaryArraysElements {
+
+  override protected def withNewChildrenInternal(newLeft: Expression, newRight: Expression): Expression =
+    copy(left = newLeft, right = newRight)
+
   def binaryOp(x1: jDouble, x2: jDouble): jDouble = (x1 - x2) / 2.0
 }

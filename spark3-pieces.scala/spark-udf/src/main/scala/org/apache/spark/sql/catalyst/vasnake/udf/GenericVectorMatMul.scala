@@ -31,11 +31,15 @@ import org.apache.spark.sql.catalyst.vasnake.udf.base.GenericBinaryArraysElement
 )
 case class GenericVectorMatMul(left: Expression, right: Expression)
     extends GenericBinaryArraysElements {
-  def binaryOp(x1: jDouble, x2: jDouble): jDouble =
+
+  override def binaryOp(x1: jDouble, x2: jDouble): jDouble =
     throw new IllegalAccessError("This method eliminated by optimized class structure")
 
   override protected def nullSafeEvalImplBase(array1: ArrayData, array2: ArrayData): ArrayData =
     throw new IllegalAccessError("This method eliminated by optimized class structure")
+
+  override protected def withNewChildrenInternal(newLeft: Expression, newRight: Expression): Expression =
+    copy(left = newLeft, right = newRight)
 
   override def nullSafeEval(value1: Any, value2: Any): Any = {
     // Called from `eval` when both arguments are not null
