@@ -371,12 +371,12 @@ class NEPriorClassProbaTest
 
     // input col not exists
 
-    assert(intercept[sql.AnalysisException] {
-      model
-        .setInputCol("_probs")
-        .transform(input)
+    val actual = intercept[sql.AnalysisException] {
+      model.setInputCol("_probs").transform(input)
         .show()
-    }.getMessage.contains("""cannot resolve '`_probs`'"""))
+    }
+    val expected = """name `_probs` cannot be resolved"""
+    assert(actual.getMessage contains expected)
 
     assert(intercept[sql.AnalysisException] {
       model
@@ -384,20 +384,19 @@ class NEPriorClassProbaTest
         .setGroupColumns(Seq("_uid"))
         .transform(input)
         .show()
-    }.getMessage.contains("""cannot resolve '`_uid`'"""))
+    }.getMessage.contains("""name `_uid` cannot be resolved"""))
 
     assert(intercept[IllegalArgumentException] {
-      estimator
-        .setInputCol("_probs")
+      estimator.setInputCol("_probs")
         .fit(input)
-    }.getMessage.contains("""Field "_probs" does not exist"""))
+    }.getMessage.contains("""_probs does not exist"""))
 
     assert(intercept[IllegalArgumentException] {
       estimator
         .setInputCol("probs")
         .setGroupColumns(Seq("_uid"))
         .fit(input)
-    }.getMessage.contains("""Field "_uid" does not exist"""))
+    }.getMessage.contains("""_uid does not exist"""))
 
     // output col exists
     assert(intercept[IllegalArgumentException] {
