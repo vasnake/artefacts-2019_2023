@@ -32,7 +32,10 @@ uber-jar (`sbt assembly`): `target/scala-2.12/etl-ml-pieces-1923-assembly-1.0.0.
 [error] Failed tests:
 [error]         com.github.vasnake.spark.app.datasets.JoinerAppTest
 
-[info] - should assign aliases to joined dfs *** FAILED ***
-[info]   Array("[42,OKID,2]") did not contain the same elements as List("[2]") (JoinerAppTest.scala:464)      
+[info] - should build map domain dropping nulls on merge *** FAILED ***
+[info]   Array("[42,OKID,null]") did not contain the same elements as List("[42,OKID,Map(s42 -> 42.0, d42 -> 142.0, f42 -> 242.0)]") (JoinerAppTest.scala:605)
+
+[info] - should build map domain w/o duplicated keys *** FAILED ***
+[info]   Array("[42,OKID,{a -> 1.0, b -> 2.0, c -> 3.0, d -> 4.0}]") did not contain the same elements as List("[42,OKID,[a -> 1.0, b -> 2.0, c -> 3.0, d -> 4.0]]") (JoinerAppTest.scala:634)
 ```
 failed tests

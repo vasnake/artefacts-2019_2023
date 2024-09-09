@@ -4,7 +4,6 @@ package com.github.vasnake.spark.app.datasets.joiner
 
 import scala.collection.mutable
 import scala.util._
-
 import com.github.vasnake.`etl-core`.aggregate
 import com.github.vasnake.spark.app.datasets.joiner.config._
 import com.github.vasnake.spark.dataset.transform.Joiner._
@@ -12,13 +11,13 @@ import com.github.vasnake.spark.features.aggregate.DatasetAggregator
 import com.github.vasnake.spark.features.aggregate.DatasetAggregator.DatasetAggregators
 import com.github.vasnake.spark.io
 import com.github.vasnake.text.evaluator._
+
 import org.apache.log4j.Logger
 import org.apache.spark.broadcast.Broadcast
 
 import org.apache.spark.sql
 import sql._
 import sql.types.StructType
-
 import org.json4s
 
 object EtlFeatures {
@@ -240,8 +239,10 @@ object EtlFeatures {
         .foldLeft(df)((df, colName) => dropMapNullValues(df, colName, Some(collectionDataType)))
         .withColumn(
           domainName,
-          sf.map_concat(cols.map(sf.col): _*)
-          // sf.expr(s"brickhouse_combine( ${cols.mkString(",")} )") // external dependency (create catalyst UDF)
+          sf.map_concat(cols
+            .map(name => sf.coalesce(sf.col(name), sf.expr("map()"))): _*
+          ) // spark.conf.set("spark.sql.mapKeyDedupPolicy", "LAST_WIN")
+          // map_concat produce null if any col is null => coalesce
         )
 
     def notNullItemsCount(domainName: String): sql.Column =
@@ -264,13 +265,14 @@ object EtlFeatures {
       // I'm sure that keys.order is the same as values.order
       // https://github.com/apache/spark/blob/7ab167a9952c363306f0b9ee7402482072039d2b/sql/catalyst/src/main/scala/org/apache/spark/sql/catalyst/util/ArrayBasedMapData.scala#L28
       val _expr = sf.expr(
-        s"map_from_entries(filter(arrays_zip(map_keys(${colName}), map_values(${colName})), _x -> _x['1'] is not null))"
+        s"map_from_entries(filter(arrays_zip(map_keys(${colName}), map_values(${colName})), _x -> _x['1'] IS NOT NULL))"
       )
 
       colType
         .map(_expr.cast)
         .getOrElse(_expr)
     }
+
 
     df.withColumn(colName, expr)
   }
@@ -620,14 +622,16 @@ object EtlFeatures {
         )
         .map(_.name)
 
-      if (primitiveColNames.nonEmpty)
+      if (primitiveColNames.nonEmpty) {
+        logger.debug(s"buildCollectionDomain, collectPrimitives [${primitiveColNames.mkString(",")}] ...")
         builder.collectPrimitives(source, primitiveColNames, domainName)
-      else
+      } else {
+        logger.debug("buildCollectionDomain, no primitives, goto collections ...")
         source
+      }
     }
 
-    val collectionTypeColNames: Seq[String] = df
-      .schema
+    val collectionTypeColNames: Seq[String] = df.schema
       .filter(fld =>
         !keyColumns.contains(fld.name) && fld.dataType.getClass == builder.collectionClass
       )
@@ -635,18 +639,26 @@ object EtlFeatures {
 
     // create domain column
     val res =
-      if (collectionTypeColNames.length < 1)
+      if (collectionTypeColNames.length < 1) {
+        logger.debug("buildCollectionDomain, no collections, empty domain")
         df.withColumn(domainName, sf.lit(null))
-      else if (collectionTypeColNames.length == 1)
+      }
+      else if (collectionTypeColNames.length == 1) {
+        logger.debug("buildCollectionDomain, just one collection = domain")
         builder.renameToDomain(df, collectionTypeColNames.head, domainName)
-      else
+      }
+      else {
+        logger.debug(s"buildCollectionDomain, merge collections [${collectionTypeColNames.mkString(",")}] ...")
         builder.mergeCollections(df, domainName, collectionTypeColNames)
+      }
 
     res.select(
       sf.col(UID_COL_NAME),
       sf.col(UID_TYPE_COL_NAME),
-      sf.when(builder.notNullItemsCount(domainName) < 1, null)
-        .otherwise(res(domainName))
+      sf
+        // .when(builder.notNullItemsCount(domainName) < 1, null)
+        // .otherwise(res(domainName))
+        .col(domainName)
         .cast(builder.collectionDataType)
         .alias(domainName)
     )

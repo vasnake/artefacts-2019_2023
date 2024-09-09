@@ -31,20 +31,9 @@ class JoinerAppTest extends AnyFlatSpec with DataFrameHelpers  with SimpleLocalS
 
   override def beforeAll(): Unit = {
     logger.debug("JoinerAppTest, init started ...")
+
     super.beforeAll()
-
-    // TODO: eliminate this by using catalyst UDF
-    // https://github.com/jeromebanks/brickhouse/blob/4292ca32001bca5bcbca29a7150a42ca436e2864/src/main/resources/brickhouse.hql#L16
-    val alias = "brickhouse_combine"
-    val classPath = "brickhouse.udf.collect.CombineUDF"
-    val expr = s"CREATE FUNCTION IF NOT EXISTS ${alias} AS '${classPath}'"
-    // val expr = s"CREATE OR REPLACE TEMPORARY FUNCTION ${alias} AS '${classPath}'"
-
-    val tryCreateUDF = Try.apply(() => spark.sql(expr).collect()) // by name: lazy
-    //1 tryCreateUDF.fold(
-    //   err => logger.error(s"Failed to register brickhouse.udf.collect.CombineUDF: ${err}"),
-    //   _ => logger.debug("UDF registered")
-    // )
+    spark.conf.set("spark.sql.mapKeyDedupPolicy", "LAST_WIN")
 
     logger.debug("JoinerAppTest, init done")
   }
@@ -566,7 +555,11 @@ class JoinerAppTest extends AnyFlatSpec with DataFrameHelpers  with SimpleLocalS
       .withColumn("m3", sf.map(sf.col("f3"), sf.col("f4")))
       .drop("f3", "f4")
 
+    show(df, "source table")
     val res = EtlFeatures.buildMapDomain("baz", df, "float")
+    // SparkRuntimeException: [DUPLICATED_MAP_KEY] Duplicate map key a was found, please check the input data.
+    // If you want to remove the duplicated keys, you can set "spark.sql.mapKeyDedupPolicy" to "LAST_WIN"
+    show(res, "one domain table")
 
     val expected = Seq("[42,OKID,Map(a -> 1.0, b -> 2.0, c -> 3.0, d -> 4.0)]")
     val actual = res.collect.map(_.toString)
@@ -576,6 +569,7 @@ class JoinerAppTest extends AnyFlatSpec with DataFrameHelpers  with SimpleLocalS
         "StructField(uid_type,StringType,true);" +
         "StructField(baz,MapType(StringType,FloatType,true),true)"
     )
+
     actual should contain theSameElementsAs expected
   }
 
@@ -597,17 +591,18 @@ class JoinerAppTest extends AnyFlatSpec with DataFrameHelpers  with SimpleLocalS
   }
 
   it should "build map domain dropping nulls on merge" in {
-    val df = inputDF(spark).withColumn("uid", sf.lit("42")).withColumn("uid_type", sf.lit("OKID"))
-    val res = EtlFeatures.buildMapDomain("quuz", df, "float")
+    val df = inputDF(spark)
+      .withColumn("uid", sf.lit("42"))
+      .withColumn("uid_type", sf.lit("OKID"))
+
+    show(df, "source table for map domain")
+    val res = EtlFeatures.buildMapDomain("quuz", df, "float").cache()
+    show(res, "map domain w/o null values")
+
     val expected = Seq("[42,OKID,Map(s42 -> 42.0, d42 -> 142.0, f42 -> 242.0)]")
     val actual = res.collect.map(_.toString)
 
-    assert(res.schema.mkString(";") ===
-      "StructField(uid,StringType,false);" +
-        "StructField(uid_type,StringType,false);" +
-        "StructField(quuz,MapType(StringType,FloatType,true),true)"
-    )
-
+    assert(res.schema.catalogString === "struct<uid:string,uid_type:string,quuz:map<string,float>>")
     actual should contain theSameElementsAs expected
   }
 
@@ -1417,12 +1412,6 @@ object EtlFeaturesFunctionsTest {
   import joiner.config._
   import joiner._
 //  import joiner.implicits._
-
-  def _show(df: DataFrame): Unit = {
-    df.explain(extended = true)
-    df.printSchema()
-    df.show(numRows = 200, truncate = false)
-  }
 
   object implicits {
     import scala.language.implicitConversions
