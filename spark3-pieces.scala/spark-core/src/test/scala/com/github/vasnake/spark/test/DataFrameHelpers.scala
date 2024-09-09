@@ -24,8 +24,8 @@ trait DataFrameHelpers extends should.Matchers {
     if (debugMode || force) {
       val _df = df.persist(newLevel = StorageLevel.MEMORY_ONLY)
       val rows = _df.collect()
-      if (message.nonEmpty)
-        println(s"\n${message}; rows: ${rows.length}; partitions: ${_df.rdd.getNumPartitions}\n")
+      if (message.nonEmpty) println(s"\n${message}; rows: ${rows.length}; partitions: ${_df.rdd.getNumPartitions}\n")
+      _df.explain(extended = true)
       _df.printSchema()
       _df.show(nrows, truncate = false)
       println(rows.mkString("\n"))

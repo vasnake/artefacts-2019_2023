@@ -14,10 +14,11 @@ import com.github.vasnake.spark.io
 import com.github.vasnake.text.evaluator._
 import org.apache.log4j.Logger
 import org.apache.spark.broadcast.Broadcast
+
 import org.apache.spark.sql
-import org.apache.spark.sql._
-import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
-import org.apache.spark.sql.types.StructType
+import sql._
+import sql.types.StructType
+
 import org.json4s
 
 object EtlFeatures {
@@ -479,8 +480,7 @@ object EtlFeatures {
       .as[MatchingTableRow]
   }
 
-  def makeDomainSource(cfg: DomainConfig, sources: Seq[DomainSourceDataFrame])
-    : DomainSourceDataFrame = {
+  def makeDomainSource(cfg: DomainConfig, sources: Seq[DomainSourceDataFrame]): DomainSourceDataFrame = {
     // join set of sources to one, project domain source according to config
 
     // "names":     [
@@ -491,6 +491,7 @@ object EtlFeatures {
     // "join_rule": "a full_outer (b left_outer baz)"
     // "features":  ["a.*", "b.*", "baz.price as fixed_price"],
 
+    require(sources.nonEmpty, "Domain sources list must not be empty")
     require(
       sources.length == cfg.source.names.length,
       s"Domain sources and config.source.names must be collections of the same size. cfg: ${cfg}, sources: ${sources}"
@@ -499,27 +500,28 @@ object EtlFeatures {
     val srcWrapper = sources.head
 
     def joinSources(): Option[DataFrame] = {
-      // TODO: require: join-rule.items are a subset of sources
-      val rule =
-        for (jr <- cfg.source.join_rule)
-          yield parseJoinRule(jr, defaultItem = srcWrapper.source.alias)
-      val tables: Map[String, DataFrame] = sources.map(src => (src.source.alias, src.df.get)).toMap
+      // TODO: require: set of join-rule.items == subset of sources
 
-      for (je <- rule) yield joinWithAliases(tables, je)
+      val ruleOpt = for (jr <- cfg.source.join_rule)
+        yield parseJoinRule(jr, defaultItem = srcWrapper.source.alias)
+
+      val alias2df: Map[String, DataFrame] = sources.map(src => (src.source.alias, src.df.get)).toMap
+
+      ruleOpt map { jr => joinWithAliases(alias2df, jr) }
     }
 
-    val df =
+    val dfOpt =
       if (cfg.source.names.length > 1 && cfg.source.join_rule.getOrElse("").trim.nonEmpty)
         joinSources()
       else
-        srcWrapper.df.map(_.as(srcWrapper.source.alias))
+        srcWrapper.df.map(_.as(srcWrapper.source.alias)) // just one source, set alias for it
 
-    srcWrapper.copy(df = df.map(_.selectFeatures(cfg.features)))
+    logger.debug(s"selecting features: ${cfg.features.getOrElse(List.empty).mkString(",")}")
+    srcWrapper.copy(df = dfOpt.map(_.selectFeatures(cfg.features)))
   }
 
-  def joinWithAliases(tables: Map[String, DataFrame], joinTree: JoinExpressionEvaluator[String])
-    : DataFrame =
-    // join-result = (join-tree, df-catalog) => df(uid, uid_type, features: _*)
+  // join-result = (join-tree, df-catalog) => df(uid, uid_type, features: _*)
+  def joinWithAliases(tables: Map[String, DataFrame], joinTree: JoinExpressionEvaluator[String]): DataFrame =
     JoinRule.join(
       tree = joinTree,
       catalog = name => tables(name).as(name),
@@ -717,9 +719,8 @@ object EtlFeatures {
     spark: SparkSession
   ): DataFrame = {
     // compile aggregation functions for each domain (may be for features in domain), perform aggregation
-    import org.apache.spark.sql.catalyst.encoders.RowEncoder
     import spark.implicits._
-    implicit val outRowEncoder: ExpressionEncoder[sql.Row] = RowEncoder(df.schema)
+    implicit val outRowEncoder: Encoder[sql.Row] = sql.Encoders.row(df.schema)
 
     val aggregators: Broadcast[DatasetAggregators] = spark
       .sparkContext

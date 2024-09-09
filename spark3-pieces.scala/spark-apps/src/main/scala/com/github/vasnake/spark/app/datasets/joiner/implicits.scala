@@ -85,10 +85,11 @@ object implicits {
     }
 
     def selectFeatures(featuresSelectExpressions: Option[List[String]]): DataFrame = {
+      // empty list == none
       if (featuresSelectExpressions.getOrElse(List.empty[String]).nonEmpty)
         featuresSelectExpressions
       else None
-    }.map(expressions =>
+    }.map(expressions => // e.g. ["a.*", "c.*", "b.*"]
       ds.select(
         col(UID_COL_NAME) +:
           col(UID_TYPE_COL_NAME) +:
@@ -98,11 +99,26 @@ object implicits {
 
     def dropRepeatedCols: DataFrame = {
       import scala.collection.mutable
+      val uniqueNamesOrdered = mutable.LinkedHashSet.empty[String] // preserve order
+      for (name <- ds.schema.names) uniqueNamesOrdered += name
 
-      val names = mutable.LinkedHashSet.empty[String]
-      for (f <- ds.schema) names += f.name // preserve order
+      // unique index, non-unique names
+      val name_index: Seq[(String, String)] = ds.schema.names.zipWithIndex.map {case (n, i) => (n, i.toString)}
 
-      ds.select(names.toList.map(col): _*)
+      // unique names with corresponding indices
+      val name2index: Map[String, String] = name_index.reverse.toMap // first non-unique name has priority
+
+      // mapping from index to column name, unique
+      val uniqueNamesCols: Seq[sql.Column] = uniqueNamesOrdered.map(name => col(name2index(name)).as(name)).toList
+
+      // convert names to indices: 0, 1, 2, ...
+      val indexedColumnsDS = ds.toDF(name_index.map(_._2): _*)
+
+      // select unique original names in order: map indices to names
+      indexedColumnsDS.select(uniqueNamesCols: _*)
+
+      // ds.select(names.toList.map(col): _*) // ds.selectExpr(names.toList: _*)
+      // sql.AnalysisException: [AMBIGUOUS_REFERENCE] Reference `uid` is ambiguous, could be: [`a`.`uid`, `b`.`uid`, `c`.`uid`].;
     }
 
     def dropPartitioningCols(partitions: List[Map[String, String]], except: Set[String])

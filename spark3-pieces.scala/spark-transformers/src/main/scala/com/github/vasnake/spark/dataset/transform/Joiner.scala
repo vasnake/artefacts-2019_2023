@@ -12,7 +12,7 @@ import org.apache.spark.sql.DataFrame
 object Joiner {
   private def JOIN_COLUMNS_NAMES: Seq[String] = Seq("uid", "uid_type")
 
-  @transient lazy val logger: Logger = LogManager.getLogger(this.getClass.getSimpleName)
+  @transient lazy val logger: Logger = LogManager.getLogger(this.getClass)
 
   def parseJoinRule(rule: String, defaultItem: String): JoinExpressionEvaluator[String] = {
     // join rule in form of: "topics full_outer (profiles left_outer groups)"
@@ -63,9 +63,14 @@ object Joiner {
       checkpoint: Option[DF => DF] = None
     ): DF =
       tree.eval[DF] {
-        case (left, right, join) =>
+        case (left, right, join) => {
+
+          logger.debug(s"join ${join} on ${keys.mkString(",")}, left ${left.schema.catalogString}, right ${right.schema.catalogString}")
           val joined = left.join(right, keys, join)
+          logger.debug(s"join result: ${joined.schema.catalogString}")
+
           checkpoint.map(_checkpoint => _checkpoint(joined)).getOrElse(joined)
+        }
       }(identity, catalog)
 
     private def _parse[T](

@@ -4,18 +4,21 @@
 package com.github.vasnake.spark.app.datasets
 
 import com.github.vasnake.spark.test._
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
-import org.scalatest.flatspec._
-import org.scalatest.matchers._
 import com.github.vasnake.core.text.StringToolbox
 import com.github.vasnake.spark.dataset.transform.Joiner.JoinRule
+import com.github.vasnake.spark.test.DataFrameHelpers
+
 import org.apache.spark.sql
+import sql.{DataFrame, Row, SparkSession}
 import org.apache.spark.storage.StorageLevel
 
 import scala.collection.mutable
 import scala.util.Try
 
-class JoinerAppTest extends AnyFlatSpec with should.Matchers  with SimpleLocalSparkWithHive {
+import org.scalatest.flatspec._
+// import org.scalatest.matchers._
+
+class JoinerAppTest extends AnyFlatSpec with DataFrameHelpers  with SimpleLocalSparkWithHive {
 
   import spark.implicits._
   import EtlFeaturesFunctionsTest._
@@ -1329,6 +1332,7 @@ class JoinerAppTest extends AnyFlatSpec with should.Matchers  with SimpleLocalSp
       features = Some(List("a.*", "c.*", "b.*")),
       group_type = None, cast_type = None, agg = None
     )
+
     val sources = Seq(
       DomainSourceDataFrame(
         domain = "foo", source = NameWithAlias("foo_src", "a"), table = NameWithAlias("", ""), df = Some(Seq(
@@ -1343,13 +1347,19 @@ class JoinerAppTest extends AnyFlatSpec with should.Matchers  with SimpleLocalSp
           SourceRow("uid: 42, uid_type: OKID, pFeature3: 3"),SourceRow("uid: 43, uid_type: OKID")
         ).toDF.selectCSVcols("uid,uid_type,pFeature3")))
     )
-    val expected = Seq("[42,OKID,true,3,2]")
+
+    val expectedFields = "uid,uid_type,pFeature1,pFeature3,pFeature2".splitTrim
+    val expectedValues = Seq("[42,OKID,true,3,2]")
 
     val res = EtlFeatures.makeDomainSource(cfg, sources).df.get
-    val actual = res.collect.map(_.toString)
+    show(res, "domain source from 3 tables", force = true)
 
-    res.schema.map(_.name) should contain theSameElementsInOrderAs "uid,uid_type,pFeature1,pFeature3,pFeature2".splitTrim
-    actual should contain theSameElementsAs expected
+    val actualFields = res.schema.map(_.name)
+    val actualValues = res.collect.map(_.toString)
+
+    actualFields should contain theSameElementsInOrderAs expectedFields
+    actualValues should contain theSameElementsAs expectedValues
+
   }
 
   it should "make domain source from three sources with individual features selection" in {
@@ -1454,12 +1464,10 @@ object EtlFeaturesFunctionsTest {
   }
 
   def inputDF(spark: SparkSession): DataFrame = {
-    import org.apache.spark.sql.catalyst.encoders.RowEncoder
-
     val row = dataRow
     val schema = row.schema
 
-    spark.createDataset(Seq(row))(RowEncoder(schema))
+    spark.createDataset(Seq(row))(sql.Encoders.row(schema))
   }
 
   case class SourceRow
