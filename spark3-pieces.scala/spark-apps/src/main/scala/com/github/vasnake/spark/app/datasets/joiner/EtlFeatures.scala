@@ -240,7 +240,8 @@ object EtlFeatures {
         .foldLeft(df)((df, colName) => dropMapNullValues(df, colName, Some(collectionDataType)))
         .withColumn(
           domainName,
-          sf.expr(s"brickhouse_combine(${cols.mkString(",")})") // TODO: eliminate external dependency (create catalyst UDF)
+          sf.map_concat(cols.map(sf.col): _*)
+          // sf.expr(s"brickhouse_combine( ${cols.mkString(",")} )") // external dependency (create catalyst UDF)
         )
 
     def notNullItemsCount(domainName: String): sql.Column =

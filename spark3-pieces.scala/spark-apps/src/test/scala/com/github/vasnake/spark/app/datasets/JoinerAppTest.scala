@@ -5,7 +5,7 @@ package com.github.vasnake.spark.app.datasets
 
 import com.github.vasnake.spark.test._
 import com.github.vasnake.core.text.StringToolbox
-import com.github.vasnake.spark.dataset.transform.Joiner.JoinRule
+import com.github.vasnake.spark.dataset.transform.Joiner.{JoinRule, logger}
 import com.github.vasnake.spark.test.DataFrameHelpers
 
 import org.apache.spark.sql
@@ -14,7 +14,6 @@ import org.apache.spark.storage.StorageLevel
 
 import scala.collection.mutable
 import scala.util.Try
-
 import org.scalatest.flatspec._
 // import org.scalatest.matchers._
 
@@ -31,14 +30,23 @@ class JoinerAppTest extends AnyFlatSpec with DataFrameHelpers  with SimpleLocalS
   import com.github.vasnake.spark.dataset.transform.Joiner.parseJoinRule
 
   override def beforeAll(): Unit = {
+    logger.debug("JoinerAppTest, init started ...")
     super.beforeAll()
-    // TODO: create catalyst UDF
+
+    // TODO: eliminate this by using catalyst UDF
     // https://github.com/jeromebanks/brickhouse/blob/4292ca32001bca5bcbca29a7150a42ca436e2864/src/main/resources/brickhouse.hql#L16
     val alias = "brickhouse_combine"
     val classPath = "brickhouse.udf.collect.CombineUDF"
     val expr = s"CREATE FUNCTION IF NOT EXISTS ${alias} AS '${classPath}'"
     // val expr = s"CREATE OR REPLACE TEMPORARY FUNCTION ${alias} AS '${classPath}'"
-    spark.sql(expr).collect()
+
+    val tryCreateUDF = Try.apply(() => spark.sql(expr).collect()) // by name: lazy
+    //1 tryCreateUDF.fold(
+    //   err => logger.error(s"Failed to register brickhouse.udf.collect.CombineUDF: ${err}"),
+    //   _ => logger.debug("UDF registered")
+    // )
+
+    logger.debug("JoinerAppTest, init done")
   }
 
   it should "build array domain from primitive cols" in {
@@ -450,14 +458,18 @@ class JoinerAppTest extends AnyFlatSpec with DataFrameHelpers  with SimpleLocalS
     )
 
     val rule = parseJoinRule("a inner b inner c inner d", "")
+    val df = EtlFeatures.joinWithAliases(tables, rule).cache()
 
-    val df = EtlFeatures.joinWithAliases(tables, rule)
-    def expr(e: String) = df.select(sql.functions.expr(e)).collect.map(_.toString)
+    def select(e: String) = df.select(
+      sql.functions.expr(e)
+    )
+      .collect
+      .map(_.toString)
 
-    expr("a.*") should contain theSameElementsAs Seq("[42,OKID,true]")
-    expr("b.*") should contain theSameElementsAs Seq("[2]")
-    expr("c.*") should contain theSameElementsAs Seq("[3]")
-    expr("d.*") should contain theSameElementsAs Seq("[4.0]")
+    select("a.*") should contain theSameElementsAs Seq("[42,OKID,true]")
+    select("b.*") should contain theSameElementsAs Seq("[42,OKID,2]")
+    select("c.*") should contain theSameElementsAs Seq("[42,OKID,3]")
+    select("d.*") should contain theSameElementsAs Seq("[42,OKID,4.0]")
   }
 
   it should "perform different joins" in {
