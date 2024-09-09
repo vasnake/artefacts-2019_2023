@@ -17,9 +17,10 @@ import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.ml.Transformer
 import org.apache.spark.ml.param._
 import org.apache.spark.ml.util._
-import org.apache.spark.sql._
-import org.apache.spark.sql.catalyst.encoders.RowEncoder
-import org.apache.spark.sql.types._
+
+import org.apache.spark.sql
+import sql._
+import sql.types._
 
 /** APPLY stage: load batch of models from models descriptions and apply that batch
   * to each partition of input dataset (call model.transform(row) for each model and each row of the dataset.
@@ -210,7 +211,7 @@ object ApplyModelsTransformer extends DefaultParamsReadable[ApplyModelsTransform
   ): DataFrame =
     df.mapPartitions(
       applyModelsToIter(_, broadcasted)
-    )(RowEncoder(outSchema))
+    )(sql.Encoders.row(outSchema))
 
   private def applyModelsToIter(
     rows: Iterator[Row],

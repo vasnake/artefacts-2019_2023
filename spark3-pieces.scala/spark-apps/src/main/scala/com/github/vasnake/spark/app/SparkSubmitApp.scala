@@ -12,7 +12,7 @@ import org.apache.spark.sql.SparkSession
   * @param appParams object with annotated fields, see jcommander API
   */
 class SparkSubmitApp(appParams: Object) extends App with Serializable {
-  @transient implicit val logger: Logger = LogManager.getLogger(this.getClass.getSimpleName)
+  @transient implicit val logger: Logger = LogManager.getLogger(this.getClass)
 
   logger.info(s"App args: `${args.toSeq}`")
   @transient private val jc = new JCommander(appParams, null.asInstanceOf[java.util.ResourceBundle])

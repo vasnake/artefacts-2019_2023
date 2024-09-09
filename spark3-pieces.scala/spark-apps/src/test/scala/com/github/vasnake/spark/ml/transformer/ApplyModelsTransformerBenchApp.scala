@@ -8,11 +8,13 @@ import com.github.vasnake.common.file.FileToolbox
 import com.github.vasnake.core.text.StringToolbox
 import com.github.vasnake.json.JsonToolbox
 import com.github.vasnake.json.read.ModelConfig
-import com.github.vasnake.spark.app.SparkApp
+import org.apache.spark.vasnake.app.SparkApp
+
 import org.apache.spark.sql
-import org.apache.spark.sql._
-import org.apache.spark.sql.catalyst.encoders._
+import sql._
+
 import org.apache.spark.storage.StorageLevel
+
 import org.slf4j.LoggerFactory
 
 /** {{{
@@ -228,7 +230,7 @@ object ApplyModelsTransformerBenchApp extends SparkApp {
     }
 
   private def explode(df: DataFrame, factor: Int): DataFrame = {
-    implicit val encoder: ExpressionEncoder[Row] = RowEncoder(df.schema)
+    implicit val encoder: Encoder[Row] = sql.Encoders.row(df.schema)
     df.flatMap(row => for { _ <- 1 to factor } yield row.copy())
     // outdf.repartition(1).write.mode("overwrite").option("compression", "gzip").parquet(path)
   }

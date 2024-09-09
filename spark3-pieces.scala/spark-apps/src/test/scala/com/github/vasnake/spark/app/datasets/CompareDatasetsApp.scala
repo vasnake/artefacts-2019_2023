@@ -202,7 +202,6 @@ object CompareDatasetsApp {
         implicit val spark: SparkSession = df.sparkSession
 
         import scala.math.{ max, abs }
-        import org.apache.spark.sql.catalyst.encoders.RowEncoder
 //      import org.apache.spark.broadcast.Broadcast
 //      import spark.implicits._
 
@@ -386,7 +385,7 @@ object CompareDatasetsApp {
             Row.fromSeq(row.toSeq ++ appendix)
           }
         }(
-          RowEncoder(
+          sql.Encoders.row(
             df.schema
               .add(sql.types.StructField("is_equal", sql.types.DataTypes.BooleanType))
               .add(sql.types.StructField("diff", sql.types.DataTypes.StringType))

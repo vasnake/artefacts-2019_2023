@@ -1,4 +1,4 @@
-package com.github.vasnake.spark.app
+package org.apache.spark.vasnake.app
 
 import org.apache.spark.SparkConf
 import org.apache.spark.deploy.SparkHadoopUtil
@@ -13,7 +13,7 @@ import org.apache.spark.sql.SparkSession
   *    doStuffWithSparkAPI(args, spark) } }
   * }}}
   */
-trait SparkApp extends App { // org.apache.spark.vasnake.app
+trait SparkApp extends App { // com.github.vasnake.spark.app => org.apache.spark.vasnake.app
   type Job[R] = SparkSession => R
 
   /** Spark job main program

@@ -1,10 +1,10 @@
 package com.github.vasnake.spark.app.external_catalog
 
 import com.github.vasnake.core.text.{ StringToolbox => stb }
-import com.github.vasnake.spark.app.SparkApp
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.catalyst.catalog.CatalogTablePartition
 import org.apache.spark.sql.catalyst.expressions.Expression
+import org.apache.spark.vasnake.app.SparkApp
 
 /*
 Created by vasnake@gmail.com on 2024-08-07
