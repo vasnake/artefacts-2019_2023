@@ -1,0 +1,26 @@
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.out</target>
+
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} - %c{1} - %p - %m%n</pattern>
+<!--
+<pattern>%d{yyyy-MM-dd HH:mm:ss} - %c{1} - %p - %m%n</pattern>
+2020-08-06 18:37:54 - c.m.d.g.s.m.m.ScoreEqualize - WARN - msg
+
+<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+18:19:34.932 [Thread-4] DEBUG org.apache.hadoop.util.ShutdownHookManager - msg
+-->
+        </encoder>
+
+    </appender>
+
+    <logger name="com.github.vasnake" level="INFO"/>
+    <logger name="org.apache.parquet" level="ERROR"/>
+
+    <root level="WARN">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+</configuration>

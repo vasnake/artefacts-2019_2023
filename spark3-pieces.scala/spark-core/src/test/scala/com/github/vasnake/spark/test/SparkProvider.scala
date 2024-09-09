@@ -5,10 +5,12 @@ package com.github.vasnake.spark.test
 import com.holdenkarau.spark.testing.SparkSessionProvider
 import org.apache.spark.sql.SparkSession
 import org.scalatest._
+import org.slf4j.MDC
 
 trait SparkProvider {
   protected def loadSpark(): SparkSession
   @transient implicit protected lazy val spark: SparkSession = loadSpark()
+  @transient protected lazy val pid: String = java.lang.management.ManagementFactory.getRuntimeMXBean.getName
 }
 
 trait LocalSpark extends SparkProvider with BeforeAndAfterAll { this: Suite =>
@@ -25,6 +27,10 @@ trait LocalSpark extends SparkProvider with BeforeAndAfterAll { this: Suite =>
     .config("spark.checkpoint.dir", "/tmp/spark/checkpoints")
 
   override protected def beforeAll(): Unit = {
+    // appender.console.layout.pattern = %d{yyyy-MM-dd HH:mm:ss} - %p - %c{1} - [pid %X{PID}] - %m%n%ex
+    // appender.console.layout.pattern = %d{yyyy-MM-dd HH:mm:ss} - %p - %c{1} - %m%n%ex - [pid/tid %processId/%threadId %threadName]
+    MDC.put("PID", pid)
+
     super.beforeAll()
     SparkSessionProvider._sparkSession = sparkBuilder.getOrCreate()
   }
