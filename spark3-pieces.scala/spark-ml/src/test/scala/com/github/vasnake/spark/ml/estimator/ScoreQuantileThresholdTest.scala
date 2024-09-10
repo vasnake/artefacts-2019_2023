@@ -423,15 +423,10 @@ class ScoreQuantileThresholdTest
   }
 
   it should "fail if used columns not exists" in {
-    //  columns, no inputCol or groupColumns => failed fit, transform;
     // testOnly *QuantileThreshold* -- -z "columns not exists"
 
     val df = spark
-      .createDataFrame(
-        Seq(
-          ("a", 0.4, "A")
-        )
-      )
+      .createDataFrame(Seq(("a", 0.4, "A")))
       .toDF("uid", "score", "category")
 
     val estimator = new ScoreQuantileThresholdEstimator()
@@ -444,35 +439,32 @@ class ScoreQuantileThresholdTest
     def failFitNoInputCol(): Unit =
       assert(intercept[IllegalArgumentException] {
         estimator.setInputCol("xs").fit(df)
-      }.getMessage.contains("""Field "xs" does not exist"""))
+      }.getMessage.contains("""xs does not exist"""))
 
     def failFitNoGroupCol(): Unit =
       assert(intercept[IllegalArgumentException] {
         estimator.setInputCol("score").setGroupColumns(Seq("group")).fit(df)
-      }.getMessage.contains("""Field "group" does not exist"""))
+      }.getMessage.contains("""group does not exist"""))
 
     def failTransformNoInputCol(): Unit =
       assert(intercept[IllegalArgumentException] {
         model.setInputCol("xs").transform(df)
-      }.getMessage.contains("""Field "xs" does not exist"""))
+      }.getMessage.contains("""xs does not exist"""))
 
     def failTransformNoGroupCol(): Unit =
-      assert(
-        intercept[sql.AnalysisException] {
-          model.setInputCol("score").setGroupColumns(Seq("group")).transform(df)
-        }.getMessage
-          .contains("""cannot resolve '`group`' given input columns: [uid, score, category]""")
-      )
+      assert(intercept[sql.AnalysisException] {
+        model.setInputCol("score").setGroupColumns(Seq("group")).transform(df)
+      }.getMessage.contains("""`group` cannot be resolved"""))
 
     def failTransformSchemaNoInputCol(): Unit =
       assert(intercept[IllegalArgumentException] {
         model.setInputCol("xs").setGroupColumns(Seq("category", "uid")).transformSchema(df.schema)
-      }.getMessage.contains("""Field "xs" does not exist"""))
+      }.getMessage.contains("""xs does not exist"""))
 
     def failTransformSchemaNoGroupCol(): Unit =
       assert(intercept[IllegalArgumentException] {
         model.setInputCol("score").setGroupColumns(Seq("group")).transformSchema(df.schema)
-      }.getMessage.contains("""Field "group" does not exist"""))
+      }.getMessage.contains("""group does not exist"""))
 
     failFitNoInputCol()
     failFitNoGroupCol()
