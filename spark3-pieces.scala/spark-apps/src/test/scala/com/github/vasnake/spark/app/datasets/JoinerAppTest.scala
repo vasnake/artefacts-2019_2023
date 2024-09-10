@@ -10,10 +10,10 @@ import com.github.vasnake.spark.test.DataFrameHelpers
 
 import org.apache.spark.sql
 import sql.{DataFrame, Row, SparkSession}
-import org.apache.spark.storage.StorageLevel
 
 import scala.collection.mutable
 import scala.util.Try
+
 import org.scalatest.flatspec._
 // import org.scalatest.matchers._
 
@@ -608,31 +608,28 @@ class JoinerAppTest extends AnyFlatSpec with DataFrameHelpers  with SimpleLocalS
 
   it should "build map domain w/o duplicated keys" in {
     val df = Seq(SourceRow("uid: 42, uid_type: OKID, mFeature: a=1;b=2;c=3")).toDF
-      .selectCSVcols("uid;uid_type; mFeature as m1; mFeature as m2; map('d', 4) as m3", sep = ";")
+      .selectCSVcols(
+        "uid;uid_type; mFeature as m1; mFeature as m2; map('d', 4) as m3",
+        sep = ";"
+      )
 
-    val res = EtlFeatures.buildMapDomain("baz", df, "float").persist(StorageLevel.MEMORY_ONLY)
+    val expectedRows = Seq("[42,OKID,{a -> 1.0, b -> 2.0, c -> 3.0, d -> 4.0}]")
+    val expectedKeys = Seq("[WrappedArray(a, b, c, d)]")
+    val expectedSchema = "struct<uid:int,uid_type:string,baz:map<string,float>>"
 
-    res.select(sf.map_keys(res("baz")))
-      .collect.map(_.toString) should contain theSameElementsAs Seq("[WrappedArray(a, b, c, d)]")
+    val res = cache(EtlFeatures.buildMapDomain("baz", df, "float"))
 
-    val expected = Seq("[42,OKID,[a -> 1.0, b -> 2.0, c -> 3.0, d -> 4.0]]")
+    val actualSchema = res.schema.catalogString
+    val actualKeys = res.select(sf.map_keys(res("baz"))).collect.map(_.toString)
+    val actualRows: Seq[String] = res
+      .select(res.schema.map { field => sf.col(field.name).cast("string") }: _*)
+      .collect
+      .map(_.toString)
+      .toSeq
 
-    val actual: Array[String] = {
-      val castCols = res.schema.map { field => sf.col(field.name).cast("string") }
-
-      res
-        .select(castCols: _*)
-        .collect
-        .map(_.toString)
-    }
-
-    assert(res.schema.mkString(";") ===
-      "StructField(uid,IntegerType,true);" +
-        "StructField(uid_type,StringType,true);" +
-        "StructField(baz,MapType(StringType,FloatType,true),true)"
-    )
-
-    actual should contain theSameElementsAs expected
+    assert(actualSchema === expectedSchema)
+    actualKeys should contain theSameElementsAs expectedKeys
+    actualRows should contain theSameElementsAs expectedRows
   }
 
   it should "build null map domain from empty collection" in {
@@ -654,12 +651,7 @@ class JoinerAppTest extends AnyFlatSpec with DataFrameHelpers  with SimpleLocalS
 
     val actual = res.collect.map(_.toString)
 
-    assert(res.schema.mkString(";") ===
-      "StructField(uid,IntegerType,true);" +
-        "StructField(uid_type,StringType,true);" +
-        "StructField(baz,MapType(StringType,FloatType,true),true)"
-    )
-
+    assert(res.schema.catalogString === "struct<uid:int,uid_type:string,baz:map<string,float>>")
     actual should contain theSameElementsAs expected
   }
 
@@ -671,15 +663,11 @@ class JoinerAppTest extends AnyFlatSpec with DataFrameHelpers  with SimpleLocalS
       )
 
     val res = EtlFeatures.buildMapDomain("baz", df, "float")
+
     val expected = Seq("[42,OKID,null]")
     val actual = res.collect.map(_.toString)
 
-    assert(res.schema.mkString(";") ===
-      "StructField(uid,IntegerType,true);" +
-        "StructField(uid_type,StringType,true);" +
-        "StructField(baz,MapType(StringType,FloatType,true),true)"
-    )
-
+    assert(res.schema.catalogString === "struct<uid:int,uid_type:string,baz:map<string,float>>")
     actual should contain theSameElementsAs expected
   }
 
@@ -1407,11 +1395,9 @@ class JoinerAppTest extends AnyFlatSpec with DataFrameHelpers  with SimpleLocalS
 
 object EtlFeaturesFunctionsTest {
 
-  import StringToolbox._
-//  import DefaultSeparators._
+  import StringToolbox._  //  import DefaultSeparators._
   import joiner.config._
-  import joiner._
-//  import joiner.implicits._
+  import joiner._  //  import joiner.implicits._
 
   object implicits {
     import scala.language.implicitConversions

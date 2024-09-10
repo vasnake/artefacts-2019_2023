@@ -519,7 +519,7 @@ object EtlFeatures {
       else
         srcWrapper.df.map(_.as(srcWrapper.source.alias)) // just one source, set alias for it
 
-    logger.debug(s"selecting features: ${cfg.features.getOrElse(List.empty).mkString(",")}")
+    logger.debug(s"makeDomainSource, selecting features: ${cfg.features.getOrElse(List.empty).mkString(",")}")
     srcWrapper.copy(df = dfOpt.map(_.selectFeatures(cfg.features)))
   }
 
@@ -656,9 +656,8 @@ object EtlFeatures {
       sf.col(UID_COL_NAME),
       sf.col(UID_TYPE_COL_NAME),
       sf
-        // .when(builder.notNullItemsCount(domainName) < 1, null)
-        // .otherwise(res(domainName))
-        .col(domainName)
+        .when(builder.notNullItemsCount(domainName) < 1, null)
+        .otherwise(res(domainName))
         .cast(builder.collectionDataType)
         .alias(domainName)
     )
