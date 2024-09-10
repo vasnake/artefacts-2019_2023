@@ -27,5 +27,14 @@ uber-jar (`sbt assembly`): `target/scala-2.12/etl-ml-pieces-1923-assembly-1.0.0.
 [error] Failed tests:
 [error]         com.github.vasnake.spark.ml.estimator.ScoreEqualizerTest
 
+[info] - should take sample w/o groups *** FAILED ***
+[info]   4 did not equal 5 (ScoreEqualizerTest.scala:696)  
+
+[info] - should take sample for each group *** FAILED ***
+[info]   5 did not equal 6 (ScoreEqualizerTest.scala:731)  
+
+[info] - should fail if input columns not exists *** FAILED ***
+[info]   "xs does not exist. Available: uid, score_raw, category" did not contain "Field "xs" does not exist" (ScoreEqualizerTest.scala:788)   
+
 ```
 failed tests

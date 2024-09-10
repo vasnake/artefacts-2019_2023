@@ -7,12 +7,15 @@ import com.github.vasnake.common.file.FileToolbox
 import com.github.vasnake.core.text.StringToolbox
 import com.github.vasnake.spark.ml.estimator
 import com.github.vasnake.spark.test._
+
 import org.apache.spark.sql
-import org.apache.spark.sql._
-import org.apache.spark.sql.types._
+import sql._
+import sql.types._
+
 import org.scalatest._
 import org.scalatest.flatspec._
 import org.scalatest.matchers._
+
 import scala.util.Random
 
 class ScoreEqualizerTest
@@ -20,6 +23,7 @@ class ScoreEqualizerTest
        with should.Matchers
        with LocalSpark
        with DataFrameHelpers {
+
   import ScoreEqualizerTest._
   import spark.implicits._
   val check5: (DataFrame, DataFrame) => Assertion = assertResult(accuracy = 5)
@@ -760,14 +764,8 @@ class ScoreEqualizerTest
   }
 
   it should "fail if input columns not exists" in {
-    //  columns, no inputCol or groupColumns => failed fit, transform;
-
     val df = spark
-      .createDataFrame(
-        Seq(
-          ("a", 0.4, "A")
-        )
-      )
+      .createDataFrame(Seq(("a", 0.4, "A")))
       .toDF("uid", "score_raw", "category")
 
     val estimator = new ScoreEqualizerEstimator()
@@ -781,21 +779,21 @@ class ScoreEqualizerTest
       val ex = intercept[IllegalArgumentException] {
         estimator.setInputCol("xs").fit(df)
       }
-      assert(ex.getMessage.contains("""Field "xs" does not exist"""))
+      assert(ex.getMessage.contains("""xs does not exist"""))
     }
 
     def failFitNoGroupCol(): Unit = {
       val ex = intercept[IllegalArgumentException] {
         estimator.setInputCol("score_raw").setGroupColumns(Seq("group")).fit(df)
       }
-      assert(ex.getMessage.contains("""Field "group" does not exist"""))
+      assert(ex.getMessage.contains("""group does not exist"""))
     }
 
     def failTransformNoInputCol(): Unit = {
       val ex = intercept[IllegalArgumentException] {
         model.setInputCol("xs").transform(df)
       }
-      assert(ex.getMessage.contains("""Field "xs" does not exist"""))
+      assert(ex.getMessage.contains("""xs does not exist"""))
     }
 
     def failTransformNoGroupCol(): Unit = {
@@ -804,7 +802,7 @@ class ScoreEqualizerTest
       }
       assert(
         ex.getMessage
-          .contains("""cannot resolve '`group`' given input columns: [uid, score_raw, category]""")
+          .contains("""name `group` cannot be resolved""")
       )
     }
 
@@ -812,14 +810,14 @@ class ScoreEqualizerTest
       val ex = intercept[IllegalArgumentException] {
         model.setInputCol("xs").setGroupColumns(Seq("category", "uid")).transformSchema(df.schema)
       }
-      assert(ex.getMessage.contains("""Field "xs" does not exist"""))
+      assert(ex.getMessage.contains("""xs does not exist"""))
     }
 
     def failTransformSchemaNoGroupCol(): Unit = {
       val ex = intercept[IllegalArgumentException] {
         model.setInputCol("score_raw").setGroupColumns(Seq("group")).transformSchema(df.schema)
       }
-      assert(ex.getMessage.contains("""Field "group" does not exist"""))
+      assert(ex.getMessage.contains("""group does not exist"""))
     }
 
     failFitNoInputCol()
