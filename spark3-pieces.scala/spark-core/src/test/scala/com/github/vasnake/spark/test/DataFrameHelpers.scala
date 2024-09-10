@@ -19,13 +19,14 @@ trait DataFrameHelpers extends should.Matchers {
     df: DataFrame,
     message: String = "",
     nrows: Int = 100,
-    force: Boolean = false
+    force: Boolean = false,
+    explain: Boolean = false
   ): Unit =
     if (debugMode || force) {
       val _df = df.persist(newLevel = StorageLevel.MEMORY_ONLY)
       val rows = _df.collect()
       if (message.nonEmpty) println(s"\n${message}; rows: ${rows.length}; partitions: ${_df.rdd.getNumPartitions}\n")
-      _df.explain(extended = true)
+      if (explain) _df.explain(extended = true)
       _df.printSchema()
       _df.show(nrows, truncate = false)
       println(rows.mkString("\n"))

@@ -23,7 +23,6 @@ class ScoreEqualizerTest
        with should.Matchers
        with LocalSpark
        with DataFrameHelpers {
-
   import ScoreEqualizerTest._
   import spark.implicits._
   val check5: (DataFrame, DataFrame) => Assertion = assertResult(accuracy = 5)
@@ -702,12 +701,12 @@ class ScoreEqualizerTest
         Seq(
           ("a", "OK", "foo", "a1", 0.3, 0.1, 0.0),
           ("b", "OK", "foo", "a1", 0.7, 3.14, 0.27968233),
-          ("b", "OK", "foo", "a1", 0.9, 3.14, 0.27968233),
-          ("b", "OK", "foo", "a1", 1.0, 3.14, 0.27968233),
-          ("c", "VK", "foo", "a1", 13.0, 26.0, 0.74796144),
-          ("d", "VK", "foo", "a1", 17.0, 28.0, 1.0),
-          ("d", "VK", "foo", "a1", 19.0, 28.0, 1.0),
-          ("d", "VK", "foo", "a1", 20.0, 28.0, 1.0)
+          ("c", "OK", "foo", "a1", 0.9, 3.14, 0.27968233),
+          ("d", "OK", "foo", "a1", 1.0, 3.14, 0.27968233),
+          ("e", "VK", "foo", "a1", 13.0, 26.0, 0.74796144),
+          ("f", "VK", "foo", "a1", 17.0, 28.0, 1.0),
+          ("g", "VK", "foo", "a1", 19.0, 28.0, 1.0),
+          ("h", "VK", "foo", "a1", 20.0, 28.0, 1.0)
         )
       )
       .toDF(
@@ -719,16 +718,18 @@ class ScoreEqualizerTest
         "score_raw",
         "expected"
       )
-      .repartition(2, $"uid_type")
+      .repartition(2, $"uid_type").orderBy("uid").cache()
+
+    show(input, "source")
 
     val eq = new estimator.ScoreEqualizerEstimator()
       .setInputCol("score_raw_train")
       .setGroupColumns(Seq("category", "uid_type", "audience_name"))
       .setSampleSize(1)
-      .setSampleRandomSeed(1)
+      .setSampleRandomSeed(0) // java rnd under the hood, we need deterministic rnd for tests
       .fit(input)
 
-    assert(eq.groupsConfig.toMap.apply("g/foo/VK/a1").intervals.length === 6)
+    assert(eq.groupsConfig.toMap.apply("g/foo/VK/a1").intervals.length === 4)
     assert(eq.groupsConfig.toMap.apply("g/foo/OK/a1").intervals.length === 4)
   }
 
