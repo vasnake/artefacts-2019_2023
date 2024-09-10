@@ -23,6 +23,14 @@ class SQLHiveWriterTest extends AnyFlatSpec with should.Matchers {
     )
   }
 
+  it should "create no-parts table, fields quoted" in {
+    assert(
+      writer.createTableDDL("mydb", "mytab", partitionColNames = Seq(), schema("foo-bar", "int"))
+        ==
+        Success("CREATE TABLE IF NOT EXISTS `mydb`.`mytab` (`foo-bar` INT)  STORED AS ORC")
+    )
+  }
+
   it should "create partitioned table" in {
     assert(
       writer.createTableDDL("mydb", "mytab", partitionColNames = Seq("b"), schema("a", "int", "b", "string"))
