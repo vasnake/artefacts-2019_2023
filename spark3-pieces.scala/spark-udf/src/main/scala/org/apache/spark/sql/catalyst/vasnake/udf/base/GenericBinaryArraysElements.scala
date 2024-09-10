@@ -83,8 +83,13 @@ trait GenericBinaryArraysElements extends ArrayBinaryLike with ComplexTypeMergin
   }
 
   @transient protected lazy val toDouble: Any => jDouble = elementType match {
-    case a: FractionalType => a.asInstanceOf[Fractional[Any]].toDouble
-    case b: IntegralType => b.asInstanceOf[Integral[Any]].toDouble
+    case FloatType => x => x.asInstanceOf[Float].toDouble
+    case DoubleType => x => x.asInstanceOf[jDouble]
+    case IntegerType => x => x.asInstanceOf[Int].toDouble
+    case LongType => x => x.asInstanceOf[Long].toDouble
+    case ByteType => x => x.asInstanceOf[Byte].toDouble
+    case ShortType => x => x.asInstanceOf[Short].toDouble
+    case DecimalType() => x => x.asInstanceOf[Decimal].toDouble
     case _ => throw new AnalysisException(s"Unsupported element type: ${elementType.sql}")
   }
 

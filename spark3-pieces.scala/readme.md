@@ -18,8 +18,6 @@ uber-jar (`sbt assembly`): `target/scala-2.12/etl-ml-pieces-1923-assembly-1.0.0.
 [error]         org.apache.spark.sql.catalyst.vasnake.udf.SemiSumTest
 [error]         org.apache.spark.sql.catalyst.vasnake.udf.MapDecimalTest
 [error]         org.apache.spark.sql.catalyst.vasnake.udf.SemiDiffTest
-[error]         org.apache.spark.sql.catalyst.vasnake.udf.CooMulTest
-[error]         org.apache.spark.sql.catalyst.vasnake.udf.MatMulTest
 
 ```
 failed tests

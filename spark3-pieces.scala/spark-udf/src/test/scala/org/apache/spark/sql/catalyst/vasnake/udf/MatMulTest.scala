@@ -3,9 +3,11 @@
 package org.apache.spark.sql.catalyst.vasnake.udf
 
 import com.github.vasnake.spark.test._
+
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types._
 import org.apache.spark.storage.StorageLevel
+
 //import org.scalatest._
 import org.scalatest.flatspec._
 
@@ -162,24 +164,24 @@ class MatMulTest extends AnyFlatSpec with DataFrameHelpers with LocalSpark {
     )
       .persist(StorageLevel.DISK_ONLY) // N.B. codegen ON switch here
 
-    val actual = data
+    show(data, "source vectors")
+
+    val result = data
       .selectExpr("uid", "matmul(va, vb) as matmul", "expected")
 
-    actual.explain(extended = true)
+    result.explain(extended = true)
     import org.apache.spark.sql.execution.debug._
-    actual.debugCodegen()
-    actual.debug()
+    result.debugCodegen()
+    result.debug()
 
-    show(actual, "result")
+    show(result, "result")
 
-    assert(
-      actual.schema("matmul").toString() === "StructField(matmul,ArrayType(FloatType,true),true)"
-    )
+    assert(result.schema("matmul").sql.toLowerCase === "matmul: array<float>")
 
     assert(
-      actual.select("matmul").collect().map(_.toString().toLowerCase).toList
+      result.select("matmul").collect().map(_.toString().toLowerCase).toList
         ===
-          actual.select("expected").collect().map(_.toString().toLowerCase).toList
+          result.select("expected").collect().map(_.toString().toLowerCase).toList
     )
 
     data.unpersist()
