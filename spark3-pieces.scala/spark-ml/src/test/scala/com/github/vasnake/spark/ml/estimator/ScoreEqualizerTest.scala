@@ -23,6 +23,7 @@ class ScoreEqualizerTest
        with should.Matchers
        with LocalSpark
        with DataFrameHelpers {
+
   import ScoreEqualizerTest._
   import spark.implicits._
   val check5: (DataFrame, DataFrame) => Assertion = assertResult(accuracy = 5)
@@ -666,7 +667,7 @@ class ScoreEqualizerTest
   }
 
   it should "take sample w/o groups" in {
-    val df = spark
+    val input = spark
       .createDataFrame(
         Seq(
           ("a", "OK", "foo", "a1", 0.3, 0.1, 0.0),
@@ -685,14 +686,16 @@ class ScoreEqualizerTest
         "score_raw",
         "expected"
       )
+      .orderBy("uid_type", "uid").repartition(1, $"uid_type").cache() // sampling (rnd) problem, fix rows distribution
+    println(s"\ninput rows: ${input.count()}, partitions: ${input.rdd.getNumPartitions}\n")
 
     val eq = new estimator.ScoreEqualizerEstimator()
       .setInputCol("score_raw_train")
-      .setSampleRandomSeed(0.5)
+      .setSampleRandomSeed(0)
       .setSampleSize(1)
-      .fit(df)
+      .fit(input)
 
-    assert(eq.groupsConfig.head._2.intervals.length === 5)
+    assert(eq.groupsConfig.head._2.intervals.length === 4)
   }
 
   it should "take sample for each group" in {
@@ -718,7 +721,8 @@ class ScoreEqualizerTest
         "score_raw",
         "expected"
       )
-      .repartition(2, $"uid_type").orderBy("uid").cache()
+      .orderBy("uid_type", "uid").repartition(1, $"uid_type").cache() // sampling (rnd) problem, fix rows distribution
+    println(s"\ninput rows: ${input.count()}, partitions: ${input.rdd.getNumPartitions}\n")
 
     show(input, "source")
 
