@@ -8,6 +8,7 @@ addCommandAlias("root", "cd etl-ml-pieces-1923")
 addCommandAlias("c", "compile")
 addCommandAlias("t", "testQuick")
 addCommandAlias("tt", "test")
+addCommandAlias("a", "assembly")
 addCommandAlias("r", "reload")
 addCommandAlias(
   "sc", // fmt, fix checks
@@ -33,6 +34,7 @@ onLoadMessage +=
       |│ ${styled("c")}           │ compile           │
       |│ ${styled("t")}           │ testQuick         │
       |│ ${styled("tt")}          │ test              │
+      |│ ${styled("a")}           │ assembly          │
       |│ ${styled("r")}           │ reload            │
       |│ ${styled("sc")}          │ sfmt, sfix checks │
       |│ ${styled("sf")}          │ sfix, sfmt        │

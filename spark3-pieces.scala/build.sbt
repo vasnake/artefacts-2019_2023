@@ -13,6 +13,8 @@ ThisBuild / assembly / assemblyMergeStrategy := {
   case n if n.contains("holdenkarau") => MergeStrategy.discard // never needed
   case PathList("cats", xs @ _*)      => MergeStrategy.discard // provided
   case PathList("shapeless", xs @ _*) => MergeStrategy.discard // provided
+  case PathList("META-INF", _*)       => MergeStrategy.discard
+  // case PathList("com", "fasterxml", "ackson", xs@_*) => MergeStrategy.first
   case x => (assembly / assemblyMergeStrategy).value(x)
 }
 
@@ -102,12 +104,13 @@ lazy val json =
     .settings(commonSettings)
     .settings(commonDependencies)
     .settings(
+      // TODO: try to simplify, you have to many dependencies
       libraryDependencies ++= Seq(
         dio.circe.`circe-core`,
         dio.circe.`circe-generic`,
         dio.circe.`circe-parser`,
-        org.json4s.`json4s-jackson`,
-        org.json4s.`json4s-ast`
+        org.json4s.`json4s-jackson`
+        // org.json4s.`json4s-ast`
       )
     )
 
@@ -206,7 +209,7 @@ lazy val `spark-apps` =
 lazy val sparkSettings = {
 
   lazy val dependencies = Seq(
-    libraryDependencies ++= (org.apache.spark.sparkModules ++ Seq(
+    libraryDependencies ++= (org.apache.spark.modules ++ Seq(
       org.json4s.`json4s-jackson`,
       org.json4s.`json4s-ast`
     )).map(_ % Provided),

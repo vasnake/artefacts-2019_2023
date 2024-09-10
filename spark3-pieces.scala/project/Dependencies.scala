@@ -4,10 +4,11 @@ object Dependencies {
   object io {
     object circe {
       // https://mvnrepository.com/artifact/io.circe/circe-core
-      // libraryDependencies += "io.circe" %% "circe-core" % "0.14.9"
-      val `circe-core` = "io.circe" %% "circe-core" % "0.12.0-M3"
-      val `circe-generic` = "io.circe" %% "circe-generic" % "0.12.0-M3"
-      val `circe-parser` = "io.circe" %% "circe-parser" % "0.12.0-M3"
+      // libraryDependencies += "io.circe" %% "circe-core" % "0.14.10"
+      val version = "0.14.10" // "0.12.0-M3"
+      val `circe-core` = "io.circe" %% "circe-core" % version
+      val `circe-generic` = "io.circe" %% "circe-generic" % version
+      val `circe-parser` = "io.circe" %% "circe-parser" % version
     }
   }
 
@@ -17,7 +18,6 @@ object Dependencies {
     }
 
     object holdenkarau {
-      // libraryDependencies += "com.holdenkarau" %% "spark-testing-base" % "3.5.1_1.5.3" % Test
       // val `spark-testing-base` = "com.holdenkarau" %% "spark-testing-base" % s"${org.apache.spark.sparkVersion}_1.5.3" // % Test
       val `spark-testing-base` = "com.holdenkarau" %% "spark-testing-base" % "3.5.1_1.5.3" // % Test
     }
@@ -58,18 +58,19 @@ object Dependencies {
 
     object json4s {
       // > Spark depends on old version
-
-      // https://mvnrepository.com/artifact/org.json4s/json4s-jackson
-      // libraryDependencies += "org.json4s" %% "json4s-jackson" % "4.0.7"
-      val `json4s-jackson` = "org.json4s" %% "json4s-jackson" % "3.7.0-M11"
-
-      // https://mvnrepository.com/artifact/org.json4s/json4s-ast
-      // libraryDependencies += "org.json4s" %% "json4s-ast" % "4.0.7"
-      val `json4s-ast` = "org.json4s" %% "json4s-ast" % "3.7.0-M11"
+      val version = "4.1.0-M6" // "3.7.0-M11"
       // other (than 3.5.3 for spark 2.4.8) versions lead to errors like this:
       // 24/08/09 11:46:23 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
       // [info] com.github.vasnake.spark.features.vector.FeaturesRowDecoderTest *** ABORTED ***
       // [info]   java.lang.NoClassDefFoundError: org/json4s/JsonAST$JValue
+
+      // https://mvnrepository.com/artifact/org.json4s/json4s-jackson
+      // libraryDependencies += "org.json4s" %% "json4s-jackson" % "4.0.7"
+      val `json4s-jackson` = "org.json4s" %% "json4s-jackson" % version
+
+      // https://mvnrepository.com/artifact/org.json4s/json4s-ast
+      // libraryDependencies += "org.json4s" %% "json4s-ast" % "4.0.7"
+      val `json4s-ast` = "org.json4s" %% "json4s-ast" % version
     }
 
     object pmml4s {
@@ -80,13 +81,13 @@ object Dependencies {
 
     object apache {
       object spark {
-        val sparkVersion = "3.5.2"
-        val sparkModules = Seq(
+        val version = "3.5.2"
+        val modules = Seq(
           "org.apache.spark" %% "spark-hive",
           "org.apache.spark" %% "spark-core",
           "org.apache.spark" %% "spark-sql",
           "org.apache.spark" %% "spark-mllib",
-        ).map(_ % sparkVersion)
+        ).map(_ % version)
       }
 
       object hive {
