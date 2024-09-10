@@ -4,9 +4,11 @@
 package com.github.vasnake.spark.io.hive
 
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.types.{DataType, StructField, StructType}
+
 import org.scalatest.flatspec._
 import org.scalatest.matchers._
-import org.apache.spark.sql.types.{DataType, StructField, StructType}
+
 import scala.util.Success
 
 class SQLHiveWriterTest extends AnyFlatSpec with should.Matchers {
@@ -17,7 +19,7 @@ class SQLHiveWriterTest extends AnyFlatSpec with should.Matchers {
     assert(
       writer.createTableDDL("mydb", "mytab", partitionColNames = Seq(), schema("a", "int"))
         ==
-        Success("CREATE TABLE IF NOT EXISTS `mydb`.`mytab` (`a` INT)  STORED AS ORC")
+        Success("CREATE TABLE IF NOT EXISTS `mydb`.`mytab` (a INT)  STORED AS ORC")
     )
   }
 
@@ -25,7 +27,7 @@ class SQLHiveWriterTest extends AnyFlatSpec with should.Matchers {
     assert(
       writer.createTableDDL("mydb", "mytab", partitionColNames = Seq("b"), schema("a", "int", "b", "string"))
         ==
-        Success("CREATE TABLE IF NOT EXISTS `mydb`.`mytab` (`a` INT) PARTITIONED BY (`b` STRING) STORED AS ORC")
+        Success("CREATE TABLE IF NOT EXISTS `mydb`.`mytab` (a INT) PARTITIONED BY (b STRING) STORED AS ORC")
     )
   }
 
@@ -35,9 +37,9 @@ class SQLHiveWriterTest extends AnyFlatSpec with should.Matchers {
         schema("a", "int", "b", "float", "c", "double", "d", "array<double>", "e", "map<long,short>", "uid_type", "string", "dt", "string")
       ) == Success(
       """CREATE TABLE IF NOT EXISTS `my_db`.`my_tab` (
-          |`a` INT, `b` FLOAT, `c` DOUBLE, `d` ARRAY<DOUBLE>, `e` MAP<BIGINT, SMALLINT>
+          |a INT, b FLOAT, c DOUBLE, d ARRAY<DOUBLE>, e MAP<BIGINT, SMALLINT>
           |) PARTITIONED BY (
-          |`dt` STRING, `uid_type` STRING
+          |dt STRING, uid_type STRING
           |) STORED AS ORC""".stripMargin.replace("\n", ""))
     )
   }
