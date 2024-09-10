@@ -29,8 +29,11 @@ uber-jar (`sbt assembly`): `target/scala-2.12/etl-ml-pieces-1923-assembly-1.0.0.
 [error]         com.github.vasnake.spark.ml.estimator.NEPriorClassProbaTest
 [error]         com.github.vasnake.spark.ml.estimator.ScoreQuantileThresholdTest
 
-[error] Failed tests:
-[error]         com.github.vasnake.spark.app.datasets.JoinerAppTest
+[info] - should fail if used columns not exists *** FAILED ***
+[info]   "xs does not exist. Available: uid, score, category" did not contain "Field "xs" does not exist" (ScoreQuantileThresholdTest.scala:431)   
+
+[info] - should take sample for each group, part D *** FAILED ***
+[info]   Set(2.25, 1.1) did not equal Set(1.1, 2.1) (ScoreQuantileThresholdTest.scala:405)     
 
 ```
 failed tests

@@ -93,7 +93,7 @@ object StratifiedSampler extends GroupingColumnsServices with CustomLogging {
         .count()
         .as[(String, Long)]
         .collect()
-      logDebug(s"stratification groups (group, size):\n${json(group_count)}")
+      logDebug(s"found ${group_count.length} stratification groups: (groupName, groupSize):\n${json(group_count)}")
 
       sample(
         ds = group_score,
@@ -104,7 +104,7 @@ object StratifiedSampler extends GroupingColumnsServices with CustomLogging {
     }.cache() // group_score_sample cached
 
     // materialize sample, free cached source
-    logDebug(s"sample rows: ${group_score_sample.count()}")
+    logDebug(s"sample rows count: ${group_score_sample.count()}")
     group_score.unpersist() // TODO: should be something like: CacheService.unpersist, from object given in parameter
 
     group_score_sample

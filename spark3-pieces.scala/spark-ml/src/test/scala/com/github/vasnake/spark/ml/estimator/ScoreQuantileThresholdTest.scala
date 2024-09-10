@@ -4,9 +4,11 @@ package com.github.vasnake.spark.ml.estimator
 
 import com.github.vasnake.common.file.FileToolbox
 import com.github.vasnake.spark.test._
+
 import org.apache.spark.sql
-import org.apache.spark.sql._
-import org.apache.spark.sql.types._
+import sql._
+import sql.types._
+
 import org.scalatest._
 import org.scalatest.flatspec._
 import org.scalatest.matchers._
@@ -19,8 +21,8 @@ class ScoreQuantileThresholdTest
   import ScoreQuantileThresholdTest._
 
   lazy val inputDF: DataFrame = createInputDF(spark).cache()
-  val check5: (DataFrame, DataFrame) => Assertion = assertResult(5)
-  val check3: (DataFrame, DataFrame) => Assertion = assertResult(3)
+  val check5: (DataFrame, DataFrame) => Assertion = assertResult(accuracy = 5)
+  val check3: (DataFrame, DataFrame) => Assertion = assertResult(accuracy = 3)
 
   it should "pass smoke test" in {
     val input = inputDF.where("part = 'C'")
@@ -386,21 +388,35 @@ class ScoreQuantileThresholdTest
 
   it should "take sample for each group, part D" in {
     // testOnly *QuantileThreshold* -- -z "sample for each group"
-    val df = inputDF.where("part = 'D'")
+    val df = cache(inputDF.where("part = 'D'").repartition(1).orderBy("uid"))
+    show(df, "source", force = true)
+    val _ = """
+      |part|uid|uid_type|score_train|score|expected_index|expected_rank|
+      +----+---+--------+-----------+-----+--------------+-------------+
+      |D   |1  |foo     |NULL       |1.0  |1             |1.0          |
+      |D   |2  |NULL    |NULL       |2.0  |1             |1.0          |
+      |D   |a  |foo     |NULL       |1.1  |2             |NaN          |
+      |D   |b  |foo     |NULL       |1.2  |2             |1.0          |
+      |D   |c  |foo     |NULL       |1.3  |2             |1.0          |
+      |D   |d  |NULL    |NULL       |2.1  |1             |1.0          |
+      |D   |e  |NULL    |NULL       |2.2  |2             |NaN          |
+      |D   |f  |NULL    |NULL       |2.3  |2             |1.0          |
+    """
 
     val estimator = new ScoreQuantileThresholdEstimator()
       .setInputCol("score")
       .setGroupColumns(Seq("uid_type"))
       .setSampleSize(1)
-      .setSampleRandomSeed(3)
+      .setSampleRandomSeed(0) // it uses java rnd seed, we need deterministic sampling for tests
       .setOutputCol("class_index")
       .setRankCol("rank")
       .setPriorValues(Seq(1.0, 1.0))
 
-    val model = estimator.fit(df.repartition(1).orderBy("uid"))
+    val model = estimator.fit(df)
+
     assert(model.groupsConfig.length === 2)
-    assert(model.groupsConfig.map(_._1).toSet === Set("g/foo", "g/-"))
-    assert(model.groupsConfig.map(_._2.thresholds.last).toSet === Set(1.1, 2.1))
+    assert(model.groupsConfig.map(_._1).toSet === Set("g/foo", "g/-")) // (name, config)
+    assert(model.groupsConfig.map(_._2.thresholds.last).toSet === Set(2.2, 1.1))
 
     val res = model.transform(df).cache()
     check3(res, df)
@@ -592,11 +608,13 @@ object ScoreQuantileThresholdTest extends should.Matchers {
         InputRow("B", "b", "", "null", "2", "null", "null"),
         InputRow("B", "c", "", "nan", "3", "null", "null"),
         // sample for each group, part D
-        InputRow("D", "a", "foo", "", "1.1", "2", "nan"),
-        InputRow("D", "b", "foo", "", "1.2", "2", "1"),
-        InputRow("D", "c", "foo", "", "1.3", "2", "1"),
-        InputRow("D", "d", "null", "", "2.1", "2", "nan"),
-        InputRow("D", "e", "null", "", "2.2", "2", "1"),
+        InputRow("D", "1", "foo",  "", "1.0", "1", "1"),
+        InputRow("D", "2", "null", "", "2.0", "1", "1"),
+        InputRow("D", "a", "foo",  "", "1.1", "2", "nan"),
+        InputRow("D", "b", "foo",  "", "1.2", "2", "1"),
+        InputRow("D", "c", "foo",  "", "1.3", "2", "1"),
+        InputRow("D", "d", "null", "", "2.1", "1", "1"),
+        InputRow("D", "e", "null", "", "2.2", "2", "nan"),
         InputRow("D", "f", "null", "", "2.3", "2", "1"),
         // handle null values in grouping columns, part E
         InputRow("E", "a", "foo", "", "1.1", "2", "nan"),
