@@ -60,6 +60,7 @@ class MapDecimalTest extends AnyFlatSpec with should.Matchers with LocalSpark wi
   it should "process date keys, part I" in {
     val input: DataFrame = MapTransformer(inputDF, "part = 'I'").date_decimal
     show(input, message = "input")
+
     sumAndCheck2(input, "Map(2021-05-12 -> 5.000)", "MapType(DateType,DecimalType(4,3),true)")
     avgAndCheck2(input, "Map(2021-05-12 -> 2.500)", "MapType(DateType,DecimalType(4,3),true)")
   }
@@ -67,6 +68,7 @@ class MapDecimalTest extends AnyFlatSpec with should.Matchers with LocalSpark wi
   it should "process time keys, part I" in {
     val input: DataFrame = MapTransformer(inputDF, "part = 'I'").time_decimal
     show(input, message = "input")
+
     sumAndCheck2(
       input,
       "Map(2021-05-12 12:34:55.0 -> 5.000)",

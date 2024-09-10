@@ -14,10 +14,5 @@ uber-jar (`sbt assembly`): `target/scala-2.12/etl-ml-pieces-1923-assembly-1.0.0.
 # testQuick *JoinerAppTest* -- -z "make domain source from three sources with features selection"
 # testQuick *JoinerAppTest* -- -z "build null map domain from null cols"
 
-[error] Failed tests:
-[error]         org.apache.spark.sql.catalyst.vasnake.udf.SemiSumTest
-[error]         org.apache.spark.sql.catalyst.vasnake.udf.MapDecimalTest
-[error]         org.apache.spark.sql.catalyst.vasnake.udf.SemiDiffTest
-
 ```
 failed tests

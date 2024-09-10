@@ -2,10 +2,12 @@
   */
 package org.apache.spark.sql.catalyst.vasnake.udf
 
-import scala.util.Try
-
 import com.github.vasnake.spark.test.ColumnValueParser
-import org.apache.spark.sql._
+
+import org.apache.spark.sql
+import sql._
+
+import scala.util.Try
 
 object Fixtures {
 
@@ -134,7 +136,6 @@ object Fixtures {
   }
 
   case class MapTransformer(df: DataFrame, filter: String) {
-    import org.apache.spark.sql
     private val spark = df.sparkSession
     import spark.implicits._
 
@@ -148,8 +149,7 @@ object Fixtures {
     def float_int: DataFrame = map[String, Int, Float, Int](k => k.toFloat, v => v)
     def byte_int: DataFrame = map[String, Int, Byte, Int](k => k.toByte, v => v)
     def short_int: DataFrame = map[String, Int, Short, Int](k => k.toShort, v => v)
-    def bool_int: DataFrame =
-      map[String, Int, Boolean, Int](k => Try(k.toBoolean).getOrElse(false), v => v)
+    def bool_int: DataFrame = map[String, Int, Boolean, Int](k => Try(k.toBoolean).getOrElse(false), v => v)
     def short_byte: DataFrame = map[String, Byte, Short, Byte](k => k.toShort, v => v)
     def byte_byte: DataFrame = map[String, Byte, Byte, Byte](k => k.toByte, v => v)
     def double_long: DataFrame = map[String, Long, Double, Long](k => k.toDouble, v => v)
@@ -161,23 +161,25 @@ object Fixtures {
       k => Try(java.sql.Date.valueOf(k)).getOrElse(java.sql.Date.valueOf("2021-05-12")),
       v => v
     )
+
     def time_int: DataFrame = map[String, Int, java.sql.Timestamp, Int](
       k =>
         Try(java.sql.Timestamp.valueOf(k))
           .getOrElse(java.sql.Timestamp.valueOf("2021-05-12 12:34:55")),
       v => v
     )
-    def date_decimal: DataFrame = map[String, sql.types.Decimal, java.sql.Date, sql.types.Decimal](
+
+    def date_decimal: DataFrame = map[String, BigDecimal, java.sql.Date, BigDecimal](
       k => Try(java.sql.Date.valueOf(k)).getOrElse(java.sql.Date.valueOf("2021-05-12")),
-      v => v.toPrecision(4, 3)
+      v => v
     ).selectExpr("part", "uid", "cast(feature as map<date, decimal(4,3)>) as feature")
 
     def time_decimal: DataFrame =
-      map[String, sql.types.Decimal, java.sql.Timestamp, sql.types.Decimal](
+      map[String, BigDecimal, java.sql.Timestamp, BigDecimal](
         k =>
           Try(java.sql.Timestamp.valueOf(k))
             .getOrElse(java.sql.Timestamp.valueOf("2021-05-12 12:34:55")),
-        v => v.toPrecision(4, 3)
+        v => v
       ).selectExpr("part", "uid", "cast(feature as map<timestamp, decimal(4,3)>) as feature")
 
     def map[IK, IV, OK, OV](
