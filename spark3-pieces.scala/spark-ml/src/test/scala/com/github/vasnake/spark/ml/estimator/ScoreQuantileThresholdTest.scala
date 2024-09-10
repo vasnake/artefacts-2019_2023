@@ -18,6 +18,7 @@ class ScoreQuantileThresholdTest
        with should.Matchers
        with LocalSpark
        with DataFrameHelpers {
+
   import ScoreQuantileThresholdTest._
 
   lazy val inputDF: DataFrame = createInputDF(spark).cache()

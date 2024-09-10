@@ -5,9 +5,11 @@ package com.github.vasnake.spark.ml.estimator
 import com.github.vasnake.common.file.FileToolbox
 import com.github.vasnake.spark.test.ColumnValueParser.parseArrayDouble
 import com.github.vasnake.spark.test._
+
 import org.apache.spark.sql
-import org.apache.spark.sql._
-import org.apache.spark.sql.types._
+import sql._
+import sql.types._
+
 import org.scalatest._
 import org.scalatest.flatspec._
 import org.scalatest.matchers._
@@ -321,24 +323,40 @@ class NEPriorClassProbaTest
   }
 
   it should "affect train set with sampling" in {
-    // sampling affects train set, M, prior(3, 7, 11)
-
     val input = inputDF.selectExpr("uid", "probs", "expected_probs_aligned").where("part = 'M'")
+    show(input, "source")
+    val _ = """
++---+---------------------+-------------------------------+
+|uid|probs                |expected_probs_aligned         |
++---+---------------------+-------------------------------+
+|a  |[0.0, 1.0, 0.0]      |[0.0, 1.0, 0.0]                |
+|b  |[33.0, 2.0, 43.0]    |[0.1036757, 0.004712, 0.89161] |
+|c  |[111.0, 3.0, 333.0]  |[0.04803, 9.73E-4, 0.950996]   |
+|d  |[3.0, 4.0, 2.0]      |[0.156249, 0.15625, 0.6875]    |
+|e  |[33.0, 44.0, 5.0]    |[0.333333, 0.333333, 0.333333] |
+|f  |[111.0, 222.0, 333.0]|[0.044843, 0.06726457, 0.88789]|
+|g  |[0.0, 6.0, 0.0]      |[0.0, 1.0, 0.0]                |
+|h  |[33.3, 44.4, 43.21]  |[0.094659, 0.094659, 0.81068]  |
++---+---------------------+-------------------------------+
+
+    """
 
     val estimator = new NEPriorClassProbaEstimator()
       .setInputCol("probs")
       .setPriorValues(Seq(3, 7, 11))
       .setSampleSize(1)
-      .setSampleRandomSeed(33)
+      .setSampleRandomSeed(0) // java rnd under the hood, we need deterministic rnd for tests
       .setCacheSettings("cache")
 
     val model = estimator.fit(input)
+
     assert(model.groupsConfig.length === 1)
 
-    val output = model
-      .setOutputCol("probs_aligned")
-      .transform(input)
-      .cache()
+    val output = cache(
+      model
+        .setOutputCol("probs_aligned")
+        .transform(input)
+    )
 
     check5(output, input)
   }
@@ -620,14 +638,14 @@ object NEPriorClassProbaTest {
         InputRow("b", "L", "1.1, 2.2, 3.3", "0.25000, 0.375, 0.375"),
         InputRow("c", "L", "111.1, 222.2, 333.3", "0.25, 0.375, 0.375"),
         // sampling affects train set, M, prior(3, 7, 11)
-        InputRow("a", "M", "0, 1, 0", "0, 1, 0"),
-        InputRow("b", "M", "33, 2, 43", "0.1036757, 0.004712, 0.89161"),
-        InputRow("c", "M", "111, 3, 333", "0.04803, 0.000973, 0.950996"),
-        InputRow("d", "M", "3, 4, 2", "0.156249, 0.15625, 0.6875"),
-        InputRow("e", "M", "33, 44, 5", "0.333333, 0.333333, 0.333333"),
-        InputRow("f", "M", "111, 222, 333", "0.044843, 0.06726457, 0.88789"),
-        InputRow("g", "M", "0, 6, 0", "0, 1, 0"),
-        InputRow("h", "M", "33.3, 44.4, 43.21", "0.094659, 0.094659, 0.81068")
+        InputRow("a", "M", "0, 1, 0", "0.00000,1.00000,0.00000"),
+        InputRow("b", "M", "33, 2, 43", "0.33333,0.01515,0.65152"),
+        InputRow("c", "M", "111, 3, 333", "0.18115,0.00367,0.81518"),
+        InputRow("d", "M", "3, 4, 2", "0.33333,0.33333,0.33333"),
+        InputRow("e", "M", "33, 44, 5", "0.44898,0.44898,0.10204"),
+        InputRow("f", "M", "111, 222, 333", "0.14286,0.21429,0.64286"),
+        InputRow("g", "M", "0, 6, 0", "0.00000,1.00000,0.00000"),
+        InputRow("h", "M", "33.3, 44.4, 43.21", "0.25340,0.25340,0.49321")
       )
     )
     // uid, part, probs, expected_probs_aligned
