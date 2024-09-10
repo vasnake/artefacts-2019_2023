@@ -12,7 +12,7 @@ My local station env (win11 + wsl2)
 cs setup
 
 # etl-ml-pieces-1923
-pushd /mnt/c/Users/valik/data/github/artefacts-2019_2023/etl-ml-pieces.scala/
+pushd /mnt/c/Users/vlk/data/github/artefacts-2019_2023/etl-ml-pieces.scala/
 sbt new devinsideyou/scala-seed.g8
 
 # produced project with this parameters:
@@ -22,7 +22,7 @@ sbt new devinsideyou/scala-seed.g8
 # some tuning required ...
 
 # start project sbt
-alias psbt='export JAVA_OPTS="-XX:MaxMetaspaceSize=1G -Xmx4G -XX:+UseParallelGC" && pushd /mnt/c/Users/valik/data/github/artefacts-2019_2023/etl-ml-pieces.scala/ && sbt -v && popd'
+alias psbt='export JAVA_OPTS="-XX:MaxMetaspaceSize=1G -Xmx4G -XX:+UseParallelGC" && pushd /mnt/c/Users/vlk/data/github/artefacts-2019_2023/etl-ml-pieces.scala/ && sbt -v && popd'
 
 psbt
 ```
@@ -59,8 +59,8 @@ Other sbt related resources
 
 ## project modules
 
-All modules packed to uber-jar (`sbt assembly`) and can be used in spark apps.
-For that you should add library to spark session: `spark-submit ... --jars hdfs:/lib/custom-transformers-SNAPSHOT.jar`.
+All modules packed to uber-jar (via `sbt assembly`) and can be used in spark apps,
+you should add library to spark session: `spark-submit ... --jars hdfs:/lib/custom-transformers-SNAPSHOT.jar`.
 
 ### hive-udaf-java
 
