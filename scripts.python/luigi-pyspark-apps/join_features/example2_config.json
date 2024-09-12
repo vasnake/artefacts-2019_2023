@@ -1,0 +1,218 @@
+{
+  "docs": {
+    "descr": "Config for heavy job, previous version of the app"
+  },
+  "vars": {
+    "date": "{{ datetime.date.today() - datetime.timedelta(days=1) }}"
+  },
+  "stages": [
+    "join"
+  ],
+  "jobs": {
+    "BuildBannerFeature": {
+      "stage": "join",
+      "xapp": "JoinerFeatures",
+      "trigger": "all_success",
+      "tags": [
+        "default"
+      ],
+      "config": {
+        "target_dt": "{{ vars.date }}",
+        "target_db": "dmgrinder_dev_source",
+        "target_table": "banner_feature",
+        "uid_types": [
+          {
+            "output": "BANNER",
+            "shuffle_partitions": 512,
+            "executor_memory_gb": 12,
+            "output_max_rows_per_bucket": 1000000,
+            "min_target_rows": 100500
+          }
+        ],
+        "sources": {
+          "events": {
+            "db": "dmgrinder_source",
+            "table": "universal_event",
+            "partition_conf": {
+              "source_name": "ANTIFRAUD",
+              "event_type": [
+                "SHOW",
+                "CLICK",
+                "TOP_GOAL",
+                "INSTALL_POSTCLICK",
+                "BANNER_EVENT",
+                "INAPP_POSTCLICK",
+                "INSTALL_POSTVIEW",
+                "INAPP_POSTVIEW"
+              ]
+            },
+            "period": 1,
+            "features": [
+              "gsum(map(concat_ws('#', if(event_type='BANNER_EVENT', concat('BANNER_EVENT_', event_name), event_type), uid_type), 1)) as event_cats_score"
+            ],
+            "uids": {
+              "'BANNER'": "objects['banner_id']"
+            }
+          },
+          "banners": {
+            "db": "ods_targetdb_data",
+            "table": "banner_topic",
+            "partition_conf": {},
+            "period": 1,
+            "md_sources": [
+              {
+                "db": "ods_targetdb_data",
+                "table": "package_extended",
+                "select": {
+                  "package_id": "package_id",
+                  "platform": "platform",
+                  "cpm_cpc": "cpm_cpc"
+                },
+                "join_conf": {
+                  "on": [
+                    "package_id"
+                  ],
+                  "how": "left",
+                  "type": "broadcast"
+                }
+              }
+            ],
+            "features": [
+              "first(map_from_arrays(topic_names, array_repeat(1, size(topic_names)))) as topic_names",
+              "first(array(datediff(dt, created), datediff(dt, updated))) as banner_age",
+              "first(if(platform is null, null, map(platform, 1))) as platform",
+              "first(if(cpm_cpc is null, null, map(cpm_cpc, 1))) as priced"
+            ],
+            "uids": {
+              "'BANNER'": "cast(id as string)"
+            }
+          },
+          "banner_text_taxons": {
+            "db": "ods_target_data",
+            "table": "banner_text_taxons",
+            "partition_conf": {},
+            "period": 1,
+            "features": [
+              "first(text_taxons_map) as text_taxons"
+            ],
+            "uids": {
+              "'BANNER'": "cast(banner as string)"
+            }
+          },
+          "banner_text_embeddings": {
+            "db": "ods_target_data",
+            "table": "banner_text_embedding",
+            "partition_conf": {},
+            "period": 1,
+            "features": [
+              "first(map_from_arrays(cast(text_embedding as array<string>), array_repeat(1, size(text_embedding)))) as text_embedding"
+            ],
+            "uids": {
+              "'BANNER'": "cast(banner as string)"
+            }
+          },
+          "banner_content_taxons": {
+            "db": "ods_target_data",
+            "table": "banner_content_taxons",
+            "partition_conf": {},
+            "period": 1,
+            "features": [
+              "first(content_taxons_map) as content_taxons"
+            ],
+            "uids": {
+              "'BANNER'": "cast(banner as string)"
+            }
+          },
+          "adratio": {
+            "db": "dmgrinder_source",
+            "table": "adratio_feature",
+            "partition_conf": {
+              "feature_name": "banner_pad_cats_ctr_wscore",
+              "aggregation_period": "1_days",
+              "uid_type": "BANNER"
+            },
+            "period": 1,
+            "features": [
+              "first(feature) as pad_cats_ctr_wscore"
+            ]
+          }
+        },
+        "join_rule": "events LEFT banners LEFT banner_text_taxons LEFT banner_text_embeddings LEFT banner_content_taxons LEFT adratio",
+        "domains": [
+          {
+            "name": "event_cats_score",
+            "type": "map<string,float>",
+            "comment": "Log-normalized event category counts",
+            "columns": [
+              "aggregate(arrays_zip(map_keys(event_cats_score), map_values(event_cats_score)), cast(map() as map<string,double>), (s, x) -> if(log1p(x['1']) <= s[split(x['0'], '#')[0]], s, user_dmdesc.combine(s, map(split(x['0'], '#')[0], log1p(x['1']))))) as event_cats_score"
+            ]
+          },
+          {
+            "name": "platform",
+            "type": "map<string,int>",
+            "comment": "Platform category from package associated with banner",
+            "columns": [
+              "banners.platform"
+            ]
+          },
+          {
+            "name": "priced",
+            "type": "map<string,int>",
+            "comment": "Pricing model category from package associated with banner",
+            "columns": [
+              "banners.priced"
+            ]
+          },
+          {
+            "name": "text_taxons",
+            "type": "map<string,float>",
+            "comment": "Banner text taxons",
+            "columns": [
+              "banner_text_taxons.text_taxons"
+            ]
+          },
+          {
+            "name": "content_taxons",
+            "type": "map<string,float>",
+            "comment": "Banner image taxons",
+            "columns": [
+              "banner_content_taxons.content_taxons"
+            ]
+          },
+          {
+            "name": "pad_cats_ctr_wscore",
+            "type": "map<string,float>",
+            "comment": "Ctr scores for banners per pad category",
+            "columns": [
+              "adratio.pad_cats_ctr_wscore"
+            ]
+          },
+          {
+            "name": "text_embedding",
+            "type": "map<string,int>",
+            "comment": "Banner text embedding",
+            "columns": [
+              "banner_text_embeddings.text_embedding"
+            ]
+          },
+          {
+            "name": "topic_names",
+            "type": "map<string,int>",
+            "comment": "Banner topics, e.g., {womenclothes: 1, beauty_health: 1, ...}",
+            "columns": [
+              "banners.topic_names"
+            ]
+          },
+          {
+            "name": "banner_age",
+            "type": "array<int>",
+            "comment": "Amount of days from create and update",
+            "columns": [
+              "banners.banner_age"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

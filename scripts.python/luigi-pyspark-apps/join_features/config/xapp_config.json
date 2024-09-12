@@ -1,0 +1,357 @@
+{
+  "docs": {
+    "description": "Json schema for app config"
+  },
+  "schema": {
+    "$defs": {
+      "partition_conf": {
+        "type": "object",
+        "propertyNames": {
+          "pattern": "(?!^dt$)(^([a-z]|[0-9]|_)*([a-z])+([a-z]|[0-9]|_)*$)"
+        },
+        "required": [],
+        "additionalProperties": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          ]
+        }
+      }
+    },
+    "type": "object",
+    "properties": {
+      "target_dt": {
+        "type": "string",
+        "format": "date"
+      },
+      "target_db": {
+        "type": "string",
+        "pattern": "^([a-z]|[0-9]|_)*([a-z])+([a-z]|[0-9]|_)*$"
+      },
+      "target_table": {
+        "type": "string",
+        "pattern": "^([a-z]|[0-9]|_)*([a-z])+([a-z]|[0-9]|_)*$"
+      },
+      "uid_types": {
+        "type": "array",
+        "items": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^\\S+$"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "output": {
+                  "type": "string",
+                  "pattern": "^\\S+$"
+                },
+                "matching": {
+                  "type": "object",
+                  "properties": {
+                    "input": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "pattern": "^\\S+$"
+                      },
+                      "minItems": 1,
+                      "uniqueItems": true
+                    },
+                    "db": {
+                      "type": "string",
+                      "pattern": "^([a-z]|[0-9]|_)*([a-z])+([a-z]|[0-9]|_)*$"
+                    },
+                    "table": {
+                      "type": "string",
+                      "pattern": "^([a-z]|[0-9]|_)*([a-z])+([a-z]|[0-9]|_)*$"
+                    },
+                    "max_dt_diff": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "description": "Search for a date partition, formula max(dt | target_dt - max_dt_diff <= dt <= target_dt)."
+                    }
+                  },
+                  "required": [
+                    "input",
+                    "db",
+                    "table"
+                  ],
+                  "additionalProperties": false
+                },
+                "shuffle_partitions": {
+                  "type": "integer",
+                  "description": "spark.sql.shuffle.partitions",
+                  "minimum": 1
+                },
+                "executor_memory_gb": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 28
+                },
+                "output_max_rows_per_bucket": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "min_target_rows": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "checkpoint_interval": {
+                  "type": "integer",
+                  "minimum": 5
+                }
+              },
+              "required": [
+                "output"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "minItems": 1,
+        "uniqueItems": true
+      },
+      "sources": {
+        "type": "object",
+        "propertyNames": {
+          "pattern": "(?!^(dt|uid|uid_type)$)(^([a-z]|[0-9]|_)*([a-z])+([a-z]|[0-9]|_)*$)"
+        },
+        "required": [],
+        "minProperties": 1,
+        "additionalProperties": {
+          "type": "object",
+          "properties": {
+            "db": {
+              "type": "string",
+              "pattern": "^([a-z]|[0-9]|_)*([a-z])+([a-z]|[0-9]|_)*$"
+            },
+            "table": {
+              "type": "string",
+              "pattern": "^([a-z]|[0-9]|_)*([a-z])+([a-z]|[0-9]|_)*$"
+            },
+            "partition_conf": {
+              "$ref": "#/$defs/partition_conf"
+            },
+            "period": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "dt_selection_mode": {
+              "enum": [
+                "single_last",
+                "multiple_all",
+                "multiple_any",
+                "multiple_max_dt"
+              ],
+              "default": "single_last"
+            },
+            "read_as_big_orc": {
+              "type": "boolean",
+              "default": false
+            },
+            "md_sources": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "db": {
+                    "type": "string",
+                    "pattern": "^([a-z]|[0-9]|_)*([a-z])+([a-z]|[0-9]|_)*$"
+                  },
+                  "table": {
+                    "type": "string",
+                    "pattern": "^([a-z]|[0-9]|_)*([a-z])+([a-z]|[0-9]|_)*$"
+                  },
+                  "partition_conf": {
+                    "$ref": "#/$defs/partition_conf"
+                  },
+                  "where": {
+                    "type": "string"
+                  },
+                  "select": {
+                    "type": "object",
+                    "propertyNames": {
+                      "pattern": "(?!^dt$)(^([a-z]|[0-9]|_)*([a-z])+([a-z]|[0-9]|_)*$)"
+                    },
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "minProperties": 1
+                  },
+                  "join_conf": {
+                    "type": "object",
+                    "properties": {
+                      "on": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "pattern": "(?!^dt$)(^([a-z]|[0-9]|_)*([a-z])+([a-z]|[0-9]|_)*$)"
+                          },
+                          {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "pattern": "(?!^dt$)(^([a-z]|[0-9]|_)*([a-z])+([a-z]|[0-9]|_)*$)"
+                            },
+                            "minItems": 1,
+                            "uniqueItems": true
+                          }
+                        ]
+                      },
+                      "how": {
+                        "enum": [
+                          "left",
+                          "inner"
+                        ],
+                        "default": "left"
+                      },
+                      "type": {
+                        "enum": [
+                          "regular",
+                          "broadcast",
+                          "skewed"
+                        ],
+                        "default": "regular"
+                      },
+                      "salt_parts": {
+                        "type": "integer",
+                        "minimum": 1
+                      }
+                    },
+                    "required": [
+                      "on"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "db",
+                  "table",
+                  "select",
+                  "join_conf"
+                ],
+                "additionalProperties": false
+              },
+              "uniqueItems": true
+            },
+            "where": {
+              "type": "string"
+            },
+            "features": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "uids": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "minProperties": 1,
+              "default": {
+                "uid_type": "uid"
+              }
+            },
+            "checkpoint": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          "required": [
+            "db",
+            "table",
+            "partition_conf",
+            "features"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "join_rule": {
+        "type": "string",
+        "pattern": "\\w+"
+      },
+      "domains": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "pattern": "(?!^(dt|uid|uid_type)$)(^([a-z]|[0-9]|_)*([a-z])+([a-z]|[0-9]|_)*$)"
+            },
+            "type": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "columns": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "extra_expr": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "type",
+            "columns"
+          ],
+          "additionalProperties": false
+        },
+        "minItems": 1,
+        "uniqueItems": true
+      },
+      "strict_check_array": {
+        "type": "boolean",
+        "default": true
+      },
+      "nan_inf_to_null": {
+        "type": "boolean",
+        "default": true
+      }
+    },
+    "required": [
+      "target_dt",
+      "target_db",
+      "target_table",
+      "uid_types",
+      "sources",
+      "join_rule",
+      "domains",
+      "strict_check_array",
+      "nan_inf_to_null"
+    ],
+    "additionalProperties": false
+  },
+  "batching": [],
+  "constraints": {
+    "unique_together": [
+      [
+        "/target_db",
+        "/target_table"
+      ]
+    ],
+    "empty_intersection": []
+  }
+}

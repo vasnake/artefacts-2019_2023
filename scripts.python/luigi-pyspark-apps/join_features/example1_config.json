@@ -1,0 +1,552 @@
+{
+  "docs": {
+    "descr": "Config for heavy job, previous version of the app"
+  },
+  "vars": {
+    "date": "{{ datetime.date.today() - datetime.timedelta(days=1) }}",
+    "hw_osm_exprs": [
+      "first(if(work_levels_mean between 1 and 100, work_levels_mean, null)) as work_levels_mean",
+      "first(if(work_levels_max between 1 and 170, work_levels_max, null)) as work_levels_max",
+      "first(if(home_levels_mean between 1 and 100, home_levels_mean, null)) as home_levels_mean",
+      "first(if(home_levels_max between 1 and 170, home_levels_max, null)) as home_levels_max"
+    ],
+    "hw_osm_names": [
+      "buildings_cnt",
+      "area_density",
+      "railway_station_150m",
+      "public_transport_stop_position_150m",
+      "public_transport_platform_150m",
+      "highway_traffic_signals_150m",
+      "highway_crossing_150m",
+      "office_150m",
+      "shop_alco_150m",
+      "shop_product_150m",
+      "shop_other_150m",
+      "leisure_150m",
+      "flat_150m",
+      "amenity_bank_150m",
+      "amenity_pharmacy_150m",
+      "amenity_restaurant_150m",
+      "amenity_fastfood_150m",
+      "commercial_150m",
+      "industrial_150m",
+      "marketplace_150m",
+      "natural_150m",
+      "school_150m",
+      "university_150m",
+      "college_150m",
+      "hospital_150m"
+    ]
+  },
+  "stages": [
+    "join"
+  ],
+  "jobs": {
+    "JoinAllIntoHid": {
+      "stage": "join",
+      "xapp": "JoinerFeatures",
+      "trigger": "all_success",
+      "tags": [
+        "default"
+      ],
+      "config": {
+        "target_dt": "{{ vars.date }}",
+        "target_db": "dmgrinder_dev_source",
+        "target_table": "hid_dataset_3_0",
+        "uid_types": [
+          {
+            "output": "HID",
+            "matching": {
+              "input": [
+                "VKID",
+                "OKID",
+                "EMAIL",
+                "PHONE",
+                "GAID",
+                "IDFA",
+                "VID"
+              ],
+              "db": "cdm_hid",
+              "table": "hid_stable_matching",
+              "max_dt_diff": 33
+            },
+            "shuffle_partitions": 8192,
+            "executor_memory_gb": 16,
+            "output_max_rows_per_bucket": 400160,
+            "min_target_rows": 100500500,
+            "checkpoint_interval": 8
+          }
+        ],
+        "sources": {
+          "shows_activity": {
+            "db": "ds_scoring",
+            "table": "dm_universal_feature",
+            "partition_conf": {
+              "feature_name": "hid_shows_activity_scores",
+              "uid_type": "HID"
+            },
+            "period": 4,
+            "features": [
+              "first(score_list) as score_list"
+            ]
+          },
+          "banner_cats_ctr_wscore_30d": {
+            "db": "ds_scoring",
+            "table": "dm_universal_feature",
+            "partition_conf": {
+              "feature_name": "hid_banner_text_taxons_ctr_wscore_30d",
+              "uid_type": "HID"
+            },
+            "period": 4,
+            "features": [
+              "first(score_map) as score_map"
+            ]
+          },
+          "hw_osm_features": {
+            "db": "cdm_geomarts",
+            "table": "hw_osm_features",
+            "partition_conf": {
+              "uid_type": "HID"
+            },
+            "period": 66,
+            "features": "{% set exprs = vars.hw_osm_exprs %} {% for n in vars.hw_osm_names %} {% set _ = exprs.append('first(work_{n}) as work_{n}'.format(n=n)) %} {% set _ = exprs.append('first(home_{n}) as home_{n}'.format(n=n)) %} {% endfor %} {{ exprs }}"
+          },
+          "topics_motor200": {
+            "db": "cdm_weblog_profiles",
+            "table": "topics_motor200",
+            "partition_conf": {
+              "uid_type": [
+                "VID",
+                "VKID",
+                "OKID",
+                "EMAIL"
+              ]
+            },
+            "period": 1,
+            "features": "{% set exprs = [] %} {% for i in range(200) %} {% set _ = exprs.append('max(topic_{i}) as topic_{i}'.format(i=i+1)) %} {% endfor %} {{ exprs }}"
+          },
+          "living_regions": {
+            "db": "ds_geo",
+            "table": "living_region_features_v2",
+            "partition_conf": {
+              "agg_type": "120days",
+              "uid_type": [
+                "VKID",
+                "OKID",
+                "EMAIL",
+                "GAID",
+                "IDFA"
+              ]
+            },
+            "period": 66,
+            "features": [
+              "gmax(if(country is null, null, map(concat('country_', country), 1))) as country_map",
+              "gmax(if(region is null, null, map(concat('region_', region), 1))) as region_map",
+              "gmax(if(city is null, null, map(concat('city_', city), 1))) as city_map",
+              "max(log1p(num_countries)) as num_countries",
+              "max(log1p(num_regions)) as num_regions",
+              "max(log1p(num_cities)) as num_cities",
+              "avg(coalesce((weighted_gdp + gdp_capital_ratio) / 2, weighted_gdp, gdp_capital_ratio)) as gdp",
+              "avg(((opensber_avg_deposits + opensber_avg_deposit_sum) / 2) + opensber_avg_account) as deposit",
+              "avg(opensber_avg_mortgage_sum) as opensber_avg_mortgage_sum",
+              "avg(opensber_avg_customer_loan_sum) as opensber_avg_customer_loan_sum",
+              "avg(coalesce((weighted_salary_region + opensber_avg_salary) / 2, weighted_salary_region, opensber_avg_salary)) as salary",
+              "avg(opensber_avg_card_spendings) as opensber_avg_card_spendings",
+              "avg(opensber_num_mortgage / rosstat_population) as mortgage_ratio",
+              "avg(opensber_num_customer_loan / rosstat_population) as customer_loan_ratio",
+              "avg(opensber_num_new_deposits / rosstat_population) as new_deposits_ratio",
+              "avg(rosstat_doctors) as rosstat_doctors",
+              "avg(rosstat_crime_rate) as rosstat_crime_rate",
+              "avg(rosstat_population / rosstat_land_area) as population_density"
+            ]
+          },
+          "all_profs": {
+            "db": "cdm_scoring",
+            "table": "all_profs",
+            "partition_conf": {
+              "uid_type": [
+                "VKID",
+                "OKID",
+                "EMAIL"
+              ]
+            },
+            "period": 8,
+            "features": [
+              "{{ \"avg(if({e} between 6 and 100, {e}, null)) as age\".format(e=\"(datediff('{}', birth_day) / 365.25)\".format(vars.date)) }}",
+              "avg(sex) as sex",
+              "max(if(uid_type = 'VKID', coalesce(log2(2 + datediff('{{ vars.date }}', joined)), 0.0), 0.0)) as vk_acc_age",
+              "max(if(uid_type = 'OKID', coalesce(log2(2 + datediff('{{ vars.date }}', joined)), 0.0), 0.0)) as ok_acc_age",
+              "max(if(uid_type = 'EMAIL', coalesce(log2(2 + datediff('{{ vars.date }}', joined)), 0.0), 0.0)) as mail_acc_age"
+            ]
+          },
+          "sn_epf": {
+            "db": "cdm_scoring",
+            "table": "sn_epf",
+            "partition_conf": {
+              "uid_type": [
+                "VKID",
+                "OKID"
+              ]
+            },
+            "period": 66,
+            "features": [
+              "avg(log1p(acc_age)) as acc_age",
+              "avg(log1p(friends_acc_age)) as friends_acc_age",
+              "avg(log1p((pow(e(), friending_speed) - 1) / (24 * 3600))) as friending_speed",
+              "avg(friends_count) as friends_count",
+              "avg(log1p(friends_have_university)) as friends_have_university"
+            ]
+          },
+          "sn_topics100": {
+            "db": "cdm_scoring",
+            "table": "user_sn_group_topics_100",
+            "partition_conf": {
+              "uid_type": [
+                "VKID",
+                "OKID"
+              ]
+            },
+            "period": 127,
+            "features": "{% set exprs = [] %} {% for i in range(100) %} {% set _ = exprs.append('max(topic_{i}) as topic_{i}'.format(i=i)) %} {% endfor %} {{ exprs }}"
+          },
+          "installed_app_features": {
+            "db": "cdm_device",
+            "table": "installed_app_features",
+            "partition_conf": {
+              "uid_type": [
+                "GAID",
+                "IDFA"
+              ]
+            },
+            "period": 37,
+            "features": "{% set exprs = [ \"min(features['nearest_install']) as nearest_install\", \"max(features['latest_install']) as latest_install\", \"max(features['install_range']) as install_range\", \"avg(features['mean_inst_diff']) as mean_inst_diff\" ] %} {% for i in range(100) %} {% set _ = exprs.append(\"max(features['topic_{i}']) as topic_{i}\".format(i=i)) %} {% endfor %} {{ exprs }}"
+          },
+          "tp_device_features": {
+            "db": "cdm_device",
+            "table": "tp_device_features",
+            "partition_conf": {
+              "uid_type": [
+                "VKID",
+                "OKID",
+                "EMAIL"
+              ]
+            },
+            "period": 66,
+            "features": [
+              "{{ \"sum(if({os} > 0, {os}, null)) as win\".format(os=\"(logs_count * os_win)\") }}",
+              "{{ \"sum(if({os} > 0, {os}, null)) as lin\".format(os=\"(logs_count * os_lin)\") }}",
+              "{{ \"sum(if({os} > 0, {os}, null)) as mac\".format(os=\"(logs_count * os_mac)\") }}",
+              "{{ \"sum(if({os} > 0, {os}, null)) as tv\".format(os=\"(logs_count * os_tv)\") }}",
+              "{{ \"sum(if({os} > 0, {os}, null)) as chrome\".format(os=\"(logs_count * os_chrome_os)\") }}",
+              "{{ \"sum(if({os} > 0, {os}, null)) as robots\".format(os=\"(logs_count * os_robots)\") }}",
+              "{{ \"sum(if({os} > 0, {os}, null)) as android\".format(os=\"(logs_count * os_mob * os_mob_android)\") }}",
+              "{{ \"sum(if({os} > 0, {os}, null)) as ios\".format(os=\"(logs_count * os_mob * os_mob_ios)\") }}",
+              "{{ \"sum(if({os} > 0, {os}, null)) as other\".format(os=\"(logs_count * (os_others + os_mob * os_mob_others))\") }}",
+              "avg(log1p(logs_count * touch_false)) as touch_false",
+              "avg(log1p(logs_count * touch_true)) as touch_true",
+              "avg(hds_ratio_mean) as hds_ratio_mean"
+            ]
+          },
+          "mytracker_feature": {
+            "db": "cdm_scoring",
+            "table": "mytracker_feature",
+            "partition_conf": {
+              "uid_type": [
+                "VKID",
+                "OKID",
+                "EMAIL",
+                "GAID",
+                "IDFA"
+              ]
+            },
+            "period": 66,
+            "features": [
+              "gmax(app_category_stats) as app_category_stats",
+              "gmax(mob_operator_stats) as mob_operator_stats",
+              "gmax(device_stats) as device_stats",
+              "max(log1p(num_installations)) as installs",
+              "max(log1p(num_purchases)) as purchases",
+              "max(log1p(num_achievements)) as achievements"
+            ]
+          },
+          "onelink_features": {
+            "db": "cdm_scoring",
+            "table": "onelink_features",
+            "partition_conf": {
+              "uid_type": [
+                "VKID",
+                "OKID",
+                "EMAIL",
+                "PHONE",
+                "GAID",
+                "IDFA"
+              ]
+            },
+            "period": 19,
+            "features": [
+              "gmax(payment_amounts) as payment_amounts",
+              "gmax(login_counts) as login_counts",
+              "gmin(if(size(login_recency) > 0, map_from_entries(transform(user_dmdesc.map_key_values(login_recency), x -> (x['key'], x['value'] + 1))), null)) as login_recency"
+            ]
+          },
+          "topgoal_topics200": {
+            "db": "cdm_weblog_profiles",
+            "table": "topgoal_feature",
+            "partition_conf": {
+              "uid_type": [
+                "VKID",
+                "OKID",
+                "EMAIL"
+              ]
+            },
+            "period": 37,
+            "features": "{% set exprs = [] %} {% for i in range(200) %} {% set _ = exprs.append('max(if(topic_{i} > 0, topic_{i}, null)) as topic_{i}'.format(i=i)) %} {% endfor %} {{ exprs }}"
+          },
+          "mpop_senders": {
+            "db": "cdm_scoring",
+            "table": "mpop_top_sender_feature",
+            "partition_conf": {
+              "uid_type": "EMAIL"
+            },
+            "period": 37,
+            "features": [
+              "gmax(senders) as senders"
+            ]
+          },
+          "app_cats_pc_cri_wscore_180d": {
+            "db": "dmgrinder_source",
+            "table": "adratio_feature",
+            "partition_conf": {
+              "feature_name": "user_app_cats_pc_cri_wscore",
+              "aggregation_period": "180_days",
+              "uid_type": [
+                "GAID",
+                "IDFA"
+              ]
+            },
+            "period": 4,
+            "features": [
+              "gmax(feature) as feature"
+            ]
+          },
+          "user_app_installed": {
+            "db": "dmgrinder_source",
+            "table": "user_app_installed",
+            "partition_conf": {
+              "uid_type": [
+                "GAID",
+                "IDFA"
+              ]
+            },
+            "period": 15,
+            "features": [
+              "gmax(categories) as categories"
+            ]
+          }
+        },
+        "join_rule": "shows_activity LEFT banner_cats_ctr_wscore_30d LEFT hw_osm_features LEFT topics_motor200 LEFT living_regions LEFT all_profs LEFT sn_epf LEFT sn_topics100 LEFT installed_app_features LEFT tp_device_features LEFT mytracker_feature LEFT onelink_features LEFT topgoal_topics200 LEFT mpop_senders LEFT app_cats_pc_cri_wscore_180d LEFT user_app_installed",
+        "domains": [
+          {
+            "name": "shows_activity",
+            "type": "array<float>",
+            "columns": [
+              "shows_activity.*"
+            ]
+          },
+          {
+            "name": "banner_cats_ctr_wscore_30d",
+            "type": "map<string,float>",
+            "columns": [
+              "banner_cats_ctr_wscore_30d.*"
+            ]
+          },
+          {
+            "name": "hw_osm_ratios",
+            "type": "map<string,float>",
+            "columns": "{% set exprs = [] %} {% for n in vars.hw_osm_names[2:] %} {% set _ = exprs.append('hw_osm_features.work_{}'.format(n)) %} {% set _ = exprs.append('hw_osm_features.home_{}'.format(n)) %} {% endfor %} {{ exprs }}"
+          },
+          {
+            "name": "hw_osm_stats",
+            "type": "array<float>",
+            "columns": [
+              "hw_osm_features.work_buildings_cnt",
+              "hw_osm_features.work_levels_mean",
+              "hw_osm_features.work_levels_max",
+              "hw_osm_features.work_area_density",
+              "hw_osm_features.home_buildings_cnt",
+              "hw_osm_features.home_levels_mean",
+              "hw_osm_features.home_levels_max",
+              "hw_osm_features.home_area_density"
+            ]
+          },
+          {
+            "name": "topics_motor200",
+            "type": "map<string,float>",
+            "columns": [
+              "topics_motor200.*"
+            ]
+          },
+          {
+            "name": "living_region_ids",
+            "type": "map<string,float>",
+            "columns": [
+              "living_regions.country_map",
+              "living_regions.region_map",
+              "living_regions.city_map"
+            ]
+          },
+          {
+            "name": "living_region_stats",
+            "type": "array<float>",
+            "columns": [
+              "living_regions.num_countries",
+              "living_regions.num_regions",
+              "living_regions.num_cities",
+              "living_regions.gdp",
+              "living_regions.deposit",
+              "living_regions.opensber_avg_mortgage_sum",
+              "living_regions.opensber_avg_customer_loan_sum",
+              "living_regions.salary",
+              "living_regions.opensber_avg_card_spendings",
+              "living_regions.mortgage_ratio",
+              "living_regions.customer_loan_ratio",
+              "living_regions.new_deposits_ratio",
+              "living_regions.rosstat_doctors",
+              "living_regions.rosstat_crime_rate",
+              "living_regions.population_density"
+            ]
+          },
+          {
+            "name": "all_profs",
+            "type": "array<float>",
+            "columns": [
+              "all_profs.*"
+            ]
+          },
+          {
+            "name": "sn_epf",
+            "type": "array<float>",
+            "columns": [
+              "sn_epf.*"
+            ]
+          },
+          {
+            "name": "sn_topics100",
+            "type": "array<float>",
+            "columns": [
+              "sn_topics100.*"
+            ]
+          },
+          {
+            "name": "app_stats",
+            "type": "array<float>",
+            "columns": [
+              "installed_app_features.nearest_install",
+              "installed_app_features.latest_install",
+              "installed_app_features.install_range",
+              "installed_app_features.mean_inst_diff"
+            ]
+          },
+          {
+            "name": "app_topics100",
+            "type": "map<string,float>",
+            "columns": "{% set exprs = [] %} {% for i in range(100) %} {% set _ = exprs.append(\"installed_app_features.topic_{i}\".format(i=i)) %} {% endfor %} {{ exprs }}"
+          },
+          {
+            "name": "tp_os_counts",
+            "type": "map<string,float>",
+            "columns": "{% set exprs = [] %} {% for n in ['win', 'lin', 'mac', 'tv', 'chrome', 'robots', 'android', 'ios', 'other'] %} {% set _ = exprs.append(\"tp_device_features.{n} as {n}\".format(n=n)) %} {% endfor %} {{ exprs }}"
+          },
+          {
+            "name": "tp_device_stats",
+            "type": "array<float>",
+            "columns": [
+              "tp_device_features.touch_false",
+              "tp_device_features.touch_true",
+              "tp_device_features.hds_ratio_mean"
+            ]
+          },
+          {
+            "name": "app_cats_activity",
+            "type": "map<string,float>",
+            "columns": [
+              "mytracker_feature.app_category_stats"
+            ]
+          },
+          {
+            "name": "mob_operators",
+            "type": "map<string,float>",
+            "columns": [
+              "mytracker_feature.mob_operator_stats"
+            ]
+          },
+          {
+            "name": "device_vendors",
+            "type": "map<string,float>",
+            "columns": [
+              "mytracker_feature.device_stats"
+            ]
+          },
+          {
+            "name": "app_events",
+            "type": "map<string,float>",
+            "columns": [
+              "mytracker_feature.installs",
+              "mytracker_feature.purchases",
+              "mytracker_feature.achievements"
+            ]
+          },
+          {
+            "name": "onelink_payments",
+            "type": "map<string,float>",
+            "columns": [
+              "onelink_features.payment_amounts"
+            ]
+          },
+          {
+            "name": "onelink_logins",
+            "type": "map<string,float>",
+            "columns": [
+              "onelink_features.login_counts"
+            ]
+          },
+          {
+            "name": "onelink_login_recencies",
+            "type": "map<string,float>",
+            "columns": [
+              "onelink_features.login_recency"
+            ]
+          },
+          {
+            "name": "topgoal_topics200",
+            "type": "map<string,float>",
+            "columns": [
+              "topgoal_topics200.*"
+            ]
+          },
+          {
+            "name": "mpop_senders",
+            "type": "map<string,float>",
+            "columns": [
+              "mpop_senders.*"
+            ]
+          },
+          {
+            "name": "app_cats_pc_cri_wscore_180d",
+            "type": "map<string,float>",
+            "columns": [
+              "app_cats_pc_cri_wscore_180d.*"
+            ]
+          },
+          {
+            "name": "app_cats_installed",
+            "type": "map<string,float>",
+            "columns": [
+              "user_app_installed.*"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

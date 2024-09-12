@@ -23,17 +23,11 @@ Integration test, bash scripts
 - [Spark Java UDF tests, runner](./run-spark-local/spark-submit-java-udf-test.sh)
 - [Spark Java UDF tests, script](./run-spark-local/java_udf_test.py)
 
-JVM procedure wrapper
+JVM procedure Python wrapper
 - [InsertIntoHive python wrapper](luigi-pyspark-apps/spark_utils.py#insert_into_hive)
 - [UDF/UDAF registration, register_all_udf](luigi-pyspark-apps/spark_utils.py#register_all_udf)
 
-Scala-Apply wrappers and helpers for JVM implementation of the ScalaApply project
-- [Luigi 'Apply' task and 'apply_scala_models' method](luigi-pyspark-apps/scala_apply/apply_task.py#apply_scala_models)
-- [Spark.ml transformer ApplyModelsTransformer](luigi-pyspark-apps/scala_apply/apply_models_transformer.py#ApplyModelsTransformer)
-- [Three ML models adopted for Scala-Apply](luigi-pyspark-apps/scala_apply/ml_models_binary_rank.py)
-- [Models json serialization code](luigi-pyspark-apps/scala_apply/sa_repr.py)
-
-Spark.ml wrappers for JVM implementation of estimators and models (see spark.ml lib)
+Spark.ml Python wrappers for JVM implementation of estimators and models (see spark.ml lib)
 - [ScoreEqualizeTransformer + ScoreEqualizeTransformerModel](spark_ml/postprocessing.py#ScoreEqualizeTransformer)
 - [NEPriorClassProbaTransformer + NEPriorClassProbaTransformerModel](spark_ml/postprocessing.py#NEPriorClassProbaTransformer)
 - [ScoreQuantileThresholdTransformer + ScoreQuantileThresholdTransformerModel](spark_ml/postprocessing.py#ScoreQuantileThresholdTransformer)
@@ -42,8 +36,18 @@ ML model inference, first migration steps (to Scala-Apply)
 - [Convert npz file](./simple-pyspark-apps/npz_to_json.py) (from numpy.savez_compressed) to json file
 - [Simple spark job](./simple-pyspark-apps/score_audience.py), apply ML model to test data
 
+Scala-Apply Python app and wrappers for JVM implementation
+- [Luigi 'Apply' spark-submit task and 'apply_scala_models' method](luigi-pyspark-apps/scala_apply/apply_task.py#apply_scala_models)
+- [Spark.ml transformer ApplyModelsTransformer](luigi-pyspark-apps/scala_apply/apply_models_transformer.py#ApplyModelsTransformer)
+- [Three ML models adopted for Scala-Apply](luigi-pyspark-apps/scala_apply/ml_models_binary_rank.py)
+- [Models json serialization code](luigi-pyspark-apps/scala_apply/sa_repr.py)
+
+Join-Features Python app
+- [Luigi 'JoinFeatures' spark-submit task](./luigi-pyspark-apps/join_features/app.py)
+
 ???
 
-- apps: join, learn, apply, export
+- apps: export
+- aux
 
-TODO: all scripts should run successfully, in proper docker container.
+TODO: all test scripts should run successfully (in proper docker container).
