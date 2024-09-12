@@ -1,0 +1,206 @@
+{
+  "docs": {
+    "description": "Json schema for app config"
+  },
+  "schema": {
+    "$defs": {
+      "partition_conf": {
+        "type": "object",
+        "propertyNames": {
+          "pattern": "^(?!dt|uid_type).*$"
+        },
+        "required": [],
+        "additionalProperties": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          ]
+        }
+      }
+    },
+    "type": "object",
+    "properties": {
+      "audience_id": {
+        "type": "integer",
+        "description": "Output audience id value"
+      },
+      "uid_type": {
+        "type": "string",
+        "description": "Source uid_type value"
+      },
+      "life_time": {
+        "type": "integer",
+        "description": "Days before expiration",
+        "minimum": -1
+      },
+      "exclude_audience_ids": {
+        "type": "array",
+        "description": "Expired audiences",
+        "items": {
+          "type": "integer"
+        },
+        "uniqueItems": true,
+        "default": []
+      },
+      "target_dt": {
+        "type": "string",
+        "format": "date",
+        "description": "Output dt value"
+      },
+      "source_db": {
+        "type": "string",
+        "description": "Hive db name"
+      },
+      "source_table": {
+        "type": "string",
+        "description": "Hive table name"
+      },
+      "source_partition_conf": {
+        "$ref": "#/$defs/partition_conf"
+      },
+      "max_dt_diff": {
+        "anyOf": [
+          {
+            "type": "null"
+          },
+          {
+            "type": "integer",
+            "minimum": 0
+          }
+        ],
+        "description": "Search for a source date, formula max(dt | target_dt - max_dt_diff <= dt <= target_dt). By default there is no lower bound.",
+        "default": null
+      },
+      "source_where": {
+        "anyOf": [
+          {
+            "type": "null"
+          },
+          {
+            "type": "string"
+          }
+        ],
+        "description": "Input filter, sql where clause",
+        "default": null
+      },
+      "min_score": {
+        "anyOf": [
+          {
+            "type": "null"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "description": "Input filter: avg(score) > min_score",
+        "default": null
+      },
+      "max_score": {
+        "anyOf": [
+          {
+            "type": "null"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "description": "Input filter: avg(score) <= max_score",
+        "default": null
+      },
+      "extra_filters": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "db": {
+              "type": "string"
+            },
+            "table": {
+              "type": "string"
+            },
+            "partition_conf": {
+              "$ref": "#/$defs/partition_conf"
+            },
+            "max_dt_diff": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "where": {
+              "type": "string"
+            },
+            "filter_type": {
+              "enum": [
+                "intersection",
+                "subtraction"
+              ]
+            }
+          },
+          "required": [
+            "db",
+            "table",
+            "filter_type"
+          ],
+          "additionalProperties": false
+        },
+        "uniqueItems": true,
+        "description": "Extra audience filter configurations",
+        "default": []
+      },
+      "min_target_rows": {
+        "type": "integer",
+        "description": "Minimum audience size limit",
+        "minimum": 1,
+        "default": 1
+      },
+      "max_target_rows": {
+        "type": "integer",
+        "description": "Maximum audience size limit",
+        "default": 0
+      },
+      "shuffle_partitions": {
+        "type": "integer",
+        "description": "spark.sql.shuffle.partitions",
+        "minimum": 1,
+        "default": 100
+      }
+    },
+    "required": [
+      "audience_id",
+      "uid_type",
+      "life_time",
+      "exclude_audience_ids",
+      "target_dt",
+      "source_db",
+      "source_table",
+      "source_partition_conf",
+      "max_dt_diff",
+      "source_where",
+      "min_score",
+      "max_score",
+      "extra_filters",
+      "min_target_rows",
+      "max_target_rows",
+      "shuffle_partitions"
+    ],
+    "additionalProperties": false
+  },
+  "batching": [],
+  "constraints": {
+    "unique_together": [
+      [
+        "/audience_id",
+        "/uid_type"
+      ]
+    ],
+    "empty_intersection": []
+  }
+}

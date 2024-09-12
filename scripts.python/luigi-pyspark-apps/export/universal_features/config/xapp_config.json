@@ -1,0 +1,184 @@
+{
+  "docs": {
+    "description": "Json schema for app config"
+  },
+  "schema": {
+    "type": "object",
+    "properties": {
+      "target_dt": {
+        "type": "string",
+        "format": "date",
+        "description": "Output dt value, date"
+      },
+      "features_subdir": {
+        "type": "string",
+        "description": "HDFS directory for unique named set of features, e.g. `banner_pad_cats_ctr_wscore_1d`"
+      },
+      "source_db": {
+        "type": "string",
+        "description": "Hive db name"
+      },
+      "source_table": {
+        "type": "string",
+        "description": "Hive table name"
+      },
+      "source_partition_conf": {
+        "type": "object",
+        "propertyNames": {
+          "pattern": "^(?!dt$)"
+        },
+        "required": [],
+        "additionalProperties": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          ]
+        }
+      },
+      "max_dt_diff": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "minimum": 0
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Search for a source date, formula: max(dt | target_dt - max_dt_diff <= dt <= target_dt). By default there is no lower bound."
+      },
+      "export_columns": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "string",
+            "description": "Spark SQL expression to get `uid` column from source table."
+          },
+          "uid_type": {
+            "type": "string",
+            "description": "Spark SQL expression to get `uid_type` column from source table."
+          },
+          "bu_link_id": {
+            "type": "object",
+            "properties": {
+              "expr": {
+                "type": "string",
+                "description": "Spark SQL expression to get `bu_link_id` column from source table."
+              },
+              "link_type": {
+                "enum": [
+                  "BannerId",
+                  "DummyStrLink",
+                  "AggBannerTopic",
+                  "AppId",
+                  "PadGroup"
+                ],
+                "description": "Banner-User link type."
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "expr",
+              "link_type"
+            ]
+          },
+          "features": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Name for output feature column.",
+                  "not": {
+                    "enum": [
+                      "uid",
+                      "uid_type",
+                      "bu_link_id"
+                    ]
+                  }
+                },
+                "expr": {
+                  "type": "string",
+                  "description": "Spark SQL expression to compute feature from aggregated source."
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "expr"
+              ]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "uid",
+          "uid_type",
+          "features"
+        ]
+      },
+      "min_target_rows": {
+        "type": "integer",
+        "description": "A number of output rows, acceptable minimum",
+        "minimum": 1,
+        "default": 1000000
+      },
+      "output_max_rows_per_file": {
+        "type": "integer",
+        "description": "A maximum number of rows per output file",
+        "minimum": 1,
+        "maximum": 20000000,
+        "default": 1000000
+      },
+      "max_collection_size": {
+        "type": "integer",
+        "description": "A maximum number of items in a collection-type feature",
+        "minimum": 1,
+        "maximum": 10000,
+        "default": 100
+      },
+      "shuffle_partitions": {
+        "type": "integer",
+        "description": "spark.sql.shuffle.partitions",
+        "minimum": 1,
+        "default": 400
+      }
+    },
+    "required": [
+      "target_dt",
+      "features_subdir",
+      "source_db",
+      "source_table",
+      "source_partition_conf",
+      "max_dt_diff",
+      "export_columns",
+      "min_target_rows",
+      "output_max_rows_per_file",
+      "max_collection_size",
+      "shuffle_partitions"
+    ],
+    "additionalProperties": false
+  },
+  "batching": [],
+  "constraints": {
+    "unique_together": [
+      "/features_subdir"
+    ],
+    "empty_intersection": [
+      "{{ export_columns.features | map(attribute='name') | list }}"
+    ]
+  }
+}

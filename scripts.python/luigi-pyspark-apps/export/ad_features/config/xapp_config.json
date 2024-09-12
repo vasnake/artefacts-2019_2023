@@ -1,0 +1,200 @@
+{
+  "docs": {
+    "descr": "Json schema for app parameters"
+  },
+  "schema": {
+    "$defs": {
+      "partition_conf": {
+        "type": "object",
+        "propertyNames": {
+          "pattern": "^(?!dt$)"
+        },
+        "required": [],
+        "additionalProperties": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          ]
+        }
+      },
+      "key_names": {
+        "enum": [
+          "advertiser_id",
+          "app",
+          "banner",
+          "campaign_id",
+          "image_id",
+          "package_id",
+          "pattern_id",
+          "banner_template_id",
+          "bundle",
+          "device_type_id",
+          "pad_format_id",
+          "pad_id",
+          "platform_id",
+          "rtb_publisher_id",
+          "ssp_id",
+          "tagid"
+        ]
+      }
+    },
+    "type": "object",
+    "properties": {
+      "target_dt": {
+        "type": "string",
+        "format": "date",
+        "description": "Output dt value, date"
+      },
+      "features_subdir": {
+        "type": "string",
+        "description": "HDFS sub-directory for a unique set of features, e.g. `banner_pad_cats_ctr_wscore_1d`"
+      },
+      "source_db": {
+        "type": "string",
+        "description": "Hive db name"
+      },
+      "source_table": {
+        "type": "string",
+        "description": "Hive table name"
+      },
+      "source_partition_conf": {
+        "$ref": "#/$defs/partition_conf"
+      },
+      "max_dt_diff": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "minimum": 0
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Search for a source date, formula max(dt | target_dt - max_dt_diff <= dt <= target_dt). By default there is no lower bound."
+      },
+      "export_columns": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "object",
+            "description": "Key column specification",
+            "properties": {
+              "name": {
+                "$ref": "#/$defs/key_names",
+                "description": "Name for output key column."
+              },
+              "expr": {
+                "type": "string",
+                "description": "Spark SQL expression to get key column from source table."
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "expr"
+            ]
+          },
+          "features": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Name for output feature column.",
+                  "not": {
+                    "$ref": "#/$defs/key_names"
+                  }
+                },
+                "expr": {
+                  "type": "string",
+                  "description": "Spark SQL expression to compute feature from aggregated source."
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "expr"
+              ]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "uid",
+          "features"
+        ]
+      },
+      "min_target_rows": {
+        "type": "integer",
+        "description": "A number of output rows, acceptable minimum",
+        "minimum": 1,
+        "maximum": 1000000,
+        "default": 10
+      },
+      "max_target_rows": {
+        "type": "integer",
+        "description": "A total maximum number of rows in output files",
+        "minimum": 1,
+        "maximum": 10000000,
+        "default": 1000000
+      },
+      "output_max_rows_per_file": {
+        "type": "integer",
+        "description": "A maximum number of rows per output file",
+        "minimum": 1,
+        "maximum": 1000000,
+        "default": 1000000
+      },
+      "max_collection_size": {
+        "type": "integer",
+        "description": "A maximum number of items in a collection-type feature",
+        "minimum": 1,
+        "maximum": 1000,
+        "default": 100
+      },
+      "shuffle_partitions": {
+        "type": "integer",
+        "description": "spark.sql.shuffle.partitions",
+        "minimum": 1,
+        "default": 8
+      }
+    },
+    "required": [
+      "target_dt",
+      "features_subdir",
+      "source_db",
+      "source_table",
+      "source_partition_conf",
+      "max_dt_diff",
+      "export_columns",
+      "min_target_rows",
+      "max_target_rows",
+      "output_max_rows_per_file",
+      "max_collection_size",
+      "shuffle_partitions"
+    ],
+    "additionalProperties": false
+  },
+  "batching": [],
+  "constraints": {
+    "unique_together": [
+      "/features_subdir"
+    ],
+    "empty_intersection": [
+      "{{ export_columns.features | map(attribute='name') | list }}"
+    ]
+  }
+}

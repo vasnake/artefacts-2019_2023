@@ -45,9 +45,11 @@ Scala-Apply Python app and wrappers for JVM implementation
 Join-Features Python app
 - [Luigi 'JoinFeatures' spark-submit task](./luigi-pyspark-apps/join_features/app.py)
 
+Export (scored) records apps
+- [Luigi 'Export' spark-submit tasks](./luigi-pyspark-apps/export/README.md)
+
 ???
 
-- apps: export
 - aux
 
 TODO: all test scripts should run successfully (in proper docker container).
