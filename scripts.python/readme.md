@@ -23,6 +23,9 @@ Integration test, bash scripts
 - [Spark Java UDF tests, runner](./run-spark-local/spark-submit-java-udf-test.sh)
 - [Spark Java UDF tests, script](./run-spark-local/java_udf_test.py)
 
+- [Run python tests](./run-spark-local/run_tests.sh)
+- [PySpark env setup snippets](./run-spark-local/setup-pyspark-env.sh)
+
 JVM procedure Python wrapper
 - [InsertIntoHive python wrapper](luigi-pyspark-apps/spark_utils.py#insert_into_hive)
 - [UDF/UDAF registration, register_all_udf](luigi-pyspark-apps/spark_utils.py#register_all_udf)
@@ -41,6 +44,7 @@ Scala-Apply Python app and wrappers for JVM implementation
 - [Spark.ml transformer ApplyModelsTransformer](luigi-pyspark-apps/scala_apply/apply_models_transformer.py#ApplyModelsTransformer)
 - [Three ML models adopted for Scala-Apply](luigi-pyspark-apps/scala_apply/ml_models_binary_rank.py)
 - [Models json serialization code](luigi-pyspark-apps/scala_apply/sa_repr.py)
+- [Tests for dynamic ML models serialization and Scala-Apply wrappers](./ml_models_repr/)
 
 Join-Features Python app
 - [Luigi 'JoinFeatures' spark-submit task](./luigi-pyspark-apps/join_features/app.py)
@@ -51,7 +55,7 @@ Export (scored) records apps
 
 ???
 
-- c:\Users\valik\Downloads\gitlab\dm.dmgrinder-workdir-local\dmgrinder\.local\
+- combine app
 - c:\Users\valik\data\github\dmgrinder_aux\
 
 TODO: all test scripts should run successfully (in proper docker container).
