@@ -1,0 +1,376 @@
+{
+  "docs": {
+    "description": "Json schema for app config"
+  },
+  "schema": {
+    "$defs": {
+      "partition_conf": {
+        "type": "object",
+        "propertyNames": {
+          "pattern": "^(?!dt$)"
+        },
+        "required": [],
+        "additionalProperties": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          ]
+        }
+      },
+      "max_dt_diff": {
+        "type": "integer",
+        "minimum": 0,
+        "description": "Search for a date, formula: max(dt | target_dt - max_dt_diff <= dt <= target_dt)"
+      }
+    },
+    "type": "object",
+    "properties": {
+      "target_dt": {
+        "type": "string",
+        "format": "date",
+        "description": "Output dt value, date"
+      },
+      "target_db": {
+        "type": "string",
+        "description": "Hive db name"
+      },
+      "target_table": {
+        "type": "string",
+        "description": "Hive table name"
+      },
+      "uid_types": {
+        "type": "array",
+        "items": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^\\S+$"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "output": {
+                  "type": "string",
+                  "pattern": "^\\S+$"
+                },
+                "matching": {
+                  "type": "object",
+                  "properties": {
+                    "input": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "pattern": "^\\S+$"
+                      },
+                      "minItems": 1,
+                      "uniqueItems": true
+                    },
+                    "db": {
+                      "type": "string",
+                      "description": "Hive db name"
+                    },
+                    "table": {
+                      "type": "string",
+                      "description": "Hive table name"
+                    },
+                    "max_dt_diff": {
+                      "$ref": "#/$defs/max_dt_diff"
+                    }
+                  },
+                  "required": [
+                    "input",
+                    "db",
+                    "table"
+                  ],
+                  "additionalProperties": false
+                },
+                "shuffle_partitions": {
+                  "type": "integer",
+                  "description": "spark.sql.shuffle.partitions",
+                  "minimum": 1
+                },
+                "executor_memory_gb": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 28
+                },
+                "output_max_rows_per_bucket": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "min_target_rows": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "checkpoint_interval": {
+                  "type": "integer",
+                  "minimum": 5
+                }
+              },
+              "required": [
+                "output"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "minItems": 1,
+        "uniqueItems": true
+      },
+      "feature_sources": {
+        "type": "object",
+        "required": [],
+        "propertyNames": {
+          "pattern": "^\\S+$"
+        },
+        "minProperties": 1,
+        "additionalProperties": {
+          "type": "object",
+          "properties": {
+            "db": {
+              "type": "string",
+              "description": "Hive db name"
+            },
+            "table": {
+              "type": "string",
+              "description": "Hive table name"
+            },
+            "partition_conf": {
+              "$ref": "#/$defs/partition_conf"
+            },
+            "period": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "dt_selection_mode": {
+              "enum": [
+                "single_last",
+                "multiple_all",
+                "multiple_any",
+                "multiple_max_dt"
+              ],
+              "default": "single_last"
+            },
+            "read_as_big_orc": {
+              "type": "boolean",
+              "default": false
+            },
+            "md_sources": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "db": {
+                    "type": "string",
+                    "description": "Hive db name"
+                  },
+                  "table": {
+                    "type": "string",
+                    "description": "Hive table name"
+                  },
+                  "partition_conf": {
+                    "$ref": "#/$defs/partition_conf"
+                  },
+                  "max_dt_diff": {
+                    "$ref": "#/$defs/max_dt_diff"
+                  },
+                  "where": {
+                    "type": "string"
+                  },
+                  "select": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "minProperties": 1
+                  },
+                  "join_conf": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "enum": [
+                          "regular",
+                          "broadcast",
+                          "skewed"
+                        ],
+                        "default": "regular"
+                      },
+                      "how": {
+                        "enum": [
+                          "left",
+                          "inner"
+                        ],
+                        "default": "left"
+                      },
+                      "on": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "minItems": 1,
+                            "uniqueItems": true
+                          }
+                        ]
+                      },
+                      "salt_parts": {
+                        "type": "integer",
+                        "minimum": 1
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "how",
+                      "on"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "db",
+                  "table",
+                  "select",
+                  "join_conf"
+                ],
+                "additionalProperties": false
+              },
+              "uniqueItems": true
+            },
+            "where": {
+              "type": "string"
+            },
+            "agg": {
+              "type": "boolean",
+              "default": false
+            },
+            "features": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "minProperties": 1,
+                "maxProperties": 1
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "uids": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "minProperties": 1
+            },
+            "checkpoint": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          "required": [
+            "db",
+            "table",
+            "partition_conf",
+            "agg",
+            "features"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "join_rule": {
+        "type": "string",
+        "pattern": "\\w+"
+      },
+      "domains": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "source": {
+              "type": "string"
+            },
+            "columns": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "name",
+            "type",
+            "source"
+          ],
+          "additionalProperties": false
+        },
+        "minItems": 1,
+        "uniqueItems": true
+      },
+      "final_columns": {
+        "anyOf": [
+          {
+            "type": "null"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          }
+        ],
+        "default": null
+      },
+      "strict_check_array": {
+        "type": "boolean",
+        "default": true
+      }
+    },
+    "required": [
+      "target_dt",
+      "target_db",
+      "target_table",
+      "uid_types",
+      "feature_sources",
+      "join_rule",
+      "domains",
+      "final_columns",
+      "strict_check_array"
+    ],
+    "additionalProperties": false
+  },
+  "batching": [],
+  "constraints": {
+    "unique_together": [
+      [
+        "/target_db",
+        "/target_table"
+      ]
+    ],
+    "empty_intersection": []
+  }
+}

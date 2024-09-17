@@ -1,0 +1,545 @@
+{
+  "docs": {
+    "description": "app config example, illustratively complex pipeline"
+  },
+  "vars": {"date": "{{ datetime.date.today() - datetime.timedelta(days=1) }}"},
+  "stages": ["join"],
+  "jobs": {
+    "JoinAllIntoHid": {
+      "stage": "join",
+      "xapp": "JoinFeatures",
+      "trigger": "all_success",
+      "tags": ["default"],
+      "config": {
+
+        "target_db": "dmgrinder_source",
+        "target_table": "hid_dataset_3_0",
+        "target_dt": "{{ vars.date }}",
+
+        "uid_types": [
+          {
+            "output": "HID",
+            "input": [
+              "HID",
+              "VKID",
+              "OKID",
+              "EMAIL",
+              "PHONE",
+              "GAID",
+              "IDFA",
+              "VID"
+            ],
+            "matching_db": "cdm_hid",
+            "matching_table": "hid_stable_matching",
+            "matching_max_dt_diff": 33
+          }
+        ],
+
+        "final_columns": [
+          "shows_activity",
+          "banner_cats_ctr_wscore_30d",
+          "hw_osm_ratios",
+          "hw_osm_stats",
+          "topics_motor200",
+          "living_region_ids",
+          "living_region_stats",
+          "all_profs",
+          "sn_epf",
+          "sn_topics100",
+          "app_stats",
+          "app_topics100",
+          "tp_os_counts",
+          "tp_device_stats",
+          "app_cats_activity",
+          "mob_operators",
+          "device_vendors",
+          "app_events",
+          "onelink_payments",
+          "onelink_logins",
+          "onelink_login_recencies",
+          "topgoal_topics200",
+          "mpop_senders",
+          "app_cats_pc_cri_wscore_180d",
+          "app_cats_installed"
+        ],
+
+        "domains": [
+          {"name": "shows_activity", "type": "array<float>", "source": "shows_activity"},
+          {"name": "banner_cats_ctr_wscore_30d", "type": "map<string,float>", "source": "banner_cats_ctr_wscore_30d"},
+          {
+            "name": "hw_osm_ratios",
+            "type": "map<string,float>",
+            "source": "hw_osm_features",
+            "columns": [
+              "work_railway_station_150m",
+              "work_public_transport_stop_position_150m",
+              "work_public_transport_platform_150m",
+              "work_highway_traffic_signals_150m",
+              "work_highway_crossing_150m",
+              "work_office_150m",
+              "work_shop_alco_150m",
+              "work_shop_product_150m",
+              "work_shop_other_150m",
+              "work_leisure_150m",
+              "work_flat_150m",
+              "work_amenity_bank_150m",
+              "work_amenity_pharmacy_150m",
+              "work_amenity_restaurant_150m",
+              "work_amenity_fastfood_150m",
+              "work_commercial_150m",
+              "work_industrial_150m",
+              "work_marketplace_150m",
+              "work_natural_150m",
+              "work_school_150m",
+              "work_university_150m",
+              "work_college_150m",
+              "work_hospital_150m",
+              "home_railway_station_150m",
+              "home_public_transport_stop_position_150m",
+              "home_public_transport_platform_150m",
+              "home_highway_traffic_signals_150m",
+              "home_highway_crossing_150m",
+              "home_office_150m",
+              "home_shop_alco_150m",
+              "home_shop_product_150m",
+              "home_shop_other_150m",
+              "home_leisure_150m",
+              "home_flat_150m",
+              "home_amenity_bank_150m",
+              "home_amenity_pharmacy_150m",
+              "home_amenity_restaurant_150m",
+              "home_amenity_fastfood_150m",
+              "home_commercial_150m",
+              "home_industrial_150m",
+              "home_marketplace_150m",
+              "home_natural_150m",
+              "home_school_150m",
+              "home_university_150m",
+              "home_college_150m",
+              "home_hospital_150m"
+            ]
+          },
+          {
+            "name": "hw_osm_stats",
+            "type": "array<float>",
+            "source": "hw_osm_features",
+            "columns": [
+              "work_buildings_cnt",
+              "work_levels_mean",
+              "work_levels_max",
+              "work_area_density",
+              "home_buildings_cnt",
+              "home_levels_mean",
+              "home_levels_max",
+              "home_area_density"
+            ]
+          },
+          {"name": "topics_motor200", "type": "map<string,float>", "source": "topics_motor200"},
+          {"name": "living_region_ids", "type": "map<string,float>", "source": "living_regions", "columns": ["country_map", "region_map", "city_map"]},
+          {
+            "name": "living_region_stats",
+            "type": "array<float>",
+            "source": "living_regions",
+            "columns": [
+              "num_countries",
+              "num_regions",
+              "num_cities",
+              "gdp",
+              "deposit",
+              "opensber_avg_mortgage_sum",
+              "opensber_avg_customer_loan_sum",
+              "salary",
+              "opensber_avg_card_spendings",
+              "mortgage_ratio",
+              "customer_loan_ratio",
+              "new_deposits_ratio",
+              "rosstat_doctors",
+              "rosstat_crime_rate",
+              "population_density"
+            ]
+          },
+          {
+            "name": "all_profs",
+            "type": "array<float>",
+            "source": "all_profs",
+            "columns": [
+              "if(age between 6 and 100, age, null) as age",
+              "sex",
+              "-------------- N.B. domain assembly stage uses uid_type column: ----------",
+              "if(uid_type = 'VKID', acc_age, 0.0) as vk_acc_age",
+              "if(uid_type = 'OKID', acc_age, 0.0) as ok_acc_age",
+              "if(uid_type = 'EMAIL', acc_age, 0.0) as mail_acc_age"
+            ]
+          },
+          {
+            "name": "sn_epf",
+            "type": "array<float>",
+            "source": "sn_epf",
+            "columns": [
+              "acc_age",
+              "friends_acc_age",
+              "friending_speed",
+              "friends_count",
+              "friends_have_university"
+            ]
+          },
+          {"name": "sn_topics100", "type": "array<float>", "source": "sn_topics100"},
+          {"name": "app_stats", "type": "array<float>", "source": "installed_app_features", "columns": ["nearest_install", "latest_install", "install_range", "mean_inst_diff"]},
+          {
+            "name": "app_topics100",
+            "type": "map<string,float>",
+            "source": "installed_app_features",
+            "columns": "{% set exprs = [] %}{% for i in range(100) %}{% set _ = exprs.append(\"topic_{i}\".format(i=i)) %}{% endfor %}{{ exprs }}"
+          },
+          {
+            "name": "tp_os_counts",
+            "type": "map<string,float>",
+            "source": "tp_device_features",
+            "columns": [
+              "if(win > 0, win, null) as win",
+              "if(lin > 0, lin, null) as lin",
+              "if(mac > 0, mac, null) as mac",
+              "if(tv > 0, tv, null) as tv",
+              "if(chrome > 0, chrome, null) as chrome",
+              "if(robots > 0, robots, null) as robots",
+              "if(android > 0, android, null) as android",
+              "if(ios > 0, ios, null) as ios",
+              "if(other > 0, other, null) as other"
+            ]
+          },
+          {"name": "tp_device_stats", "type": "array<float>", "source": "tp_device_features", "columns": ["touch_false", "touch_true", "hds_ratio_mean"]},
+          {"name": "app_cats_activity", "type": "map<string,float>", "source": "mytracker_feature", "columns": ["app_category_stats"]},
+          {"name": "mob_operators", "type": "map<string,float>", "source": "mytracker_feature", "columns": ["mob_operator_stats"]},
+          {"name": "device_vendors", "type": "map<string,float>", "source": "mytracker_feature", "columns": ["device_stats"]},
+          {"name": "app_events", "type": "map<string,float>", "source": "mytracker_feature", "columns": ["installs", "purchases", "achievements"]},
+          {"name": "onelink_payments", "type": "map<string,float>", "source": "onelink_features", "columns": ["payment_amounts"]},
+          {"name": "onelink_logins", "type": "map<string,float>", "source": "onelink_features", "columns": ["login_counts"]},
+          {"name": "onelink_login_recencies", "type": "map<string,float>", "source": "onelink_features", "columns": ["login_recency"]},
+          {"name": "topgoal_topics200", "type": "map<string,float>", "source": "topgoal_topics200"},
+          {"name": "mpop_senders", "type": "map<string,float>", "source": "mpop_senders"},
+          {"name": "app_cats_pc_cri_wscore_180d", "type": "map<string,float>", "source": "app_cats_pc_cri_wscore_180d"},
+          {"name": "app_cats_installed", "type": "map<string,float>", "source": "user_app_installed"}
+        ],
+
+        "join_rule": "shows_activity left_outer banner_cats_ctr_wscore_30d left_outer hw_osm_features left_outer (topics_motor200 full_outer living_regions full_outer all_profs full_outer sn_epf full_outer sn_topics100 full_outer installed_app_features full_outer tp_device_features full_outer mytracker_feature full_outer onelink_features full_outer topgoal_topics200 full_outer mpop_senders full_outer app_cats_pc_cri_wscore_180d full_outer user_app_installed)",
+
+        "feature_sources": {
+          "shows_activity": {
+            "db": "ds_scoring",
+            "table": "dm_universal_feature",
+            "partition_conf": {
+              "uid_type": ["HID"],
+              "feature_name": "hid_shows_activity_scores"
+            },
+            "period": 3,
+            "dt_selection_mode": "single_last",
+            "features": [
+              {"name": "score_list", "expr": "cast(score_list as array<float>)", "agg": "gavg"}
+            ]
+          },
+          "banner_cats_ctr_wscore_30d": {
+            "db": "ds_scoring",
+            "table": "dm_universal_feature",
+            "partition_conf": {
+              "uid_type": "HID",
+              "feature_name": "hid_banner_text_taxons_ctr_wscore_30d"
+            },
+            "period": 3,
+            "dt_selection_mode": "single_last",
+            "features": [
+              {"name": "score_map", "expr": "score_map", "agg": "gavg"}
+            ]
+          },
+          "hw_osm_features": {
+            "db": "cdm_geomarts",
+            "table": "hw_osm_features",
+            "partition_conf": {
+              "uid_type": "HID"
+            },
+            "period": 65,
+            "dt_selection_mode": "single_last",
+            "default_agg": "gavg",
+            "features": [
+              "-------------- array hw_osm_stats, можно сразу собрать в массив: ----------------",
+              {"name": "work_buildings_cnt"},
+              {"name": "work_levels_mean", "expr": "if(work_levels_mean between 1 and 100, work_levels_mean, null)"},
+              {"name": "work_levels_max", "expr": "if(work_levels_max between 1 and 170, work_levels_max, null)"},
+              {"name": "work_area_density"},
+              {"name": "home_buildings_cnt"},
+              {"name": "home_levels_mean", "expr": "if(home_levels_mean between 1 and 100, home_levels_mean, null)"},
+              {"name": "home_levels_max", "expr": "if(home_levels_max between 1 and 170, home_levels_max, null)"},
+              {"name": "home_area_density"},
+              "--------------- map hw_osm_ratios, можно сразу собрать в мапку: ------------------",
+              {"name": "work_railway_station_150m"},
+              {"name": "work_public_transport_stop_position_150m"},
+              {"name": "work_public_transport_platform_150m"},
+              {"name": "work_highway_traffic_signals_150m"},
+              {"name": "work_highway_crossing_150m"},
+              {"name": "work_office_150m"},
+              {"name": "work_shop_alco_150m"},
+              {"name": "work_shop_product_150m"},
+              {"name": "work_shop_other_150m"},
+              {"name": "work_leisure_150m"},
+              {"name": "work_flat_150m"},
+              {"name": "work_amenity_bank_150m"},
+              {"name": "work_amenity_pharmacy_150m"},
+              {"name": "work_amenity_restaurant_150m"},
+              {"name": "work_amenity_fastfood_150"},
+              {"name": "work_commercial_150m"},
+              {"name": "work_industrial_150m"},
+              {"name": "work_marketplace_150m"},
+              {"name": "work_natural_150m"},
+              {"name": "work_school_150m"},
+              {"name": "work_university_150m"},
+              {"name": "work_college_150m"},
+              {"name": "work_hospital_150m"},
+              {"name": "home_railway_station_150m"},
+              {"name": "home_public_transport_stop_position_150m"},
+              {"name": "home_public_transport_platform_150m"},
+              {"name": "home_highway_traffic_signals_150m"},
+              {"name": "home_highway_crossing_150m"},
+              {"name": "home_office_150m"},
+              {"name": "home_shop_alco_150m"},
+              {"name": "home_shop_product_150m"},
+              {"name": "home_shop_other_150m"},
+              {"name": "home_leisure_150m"},
+              {"name": "home_flat_150m"},
+              {"name": "home_amenity_bank_150m"},
+              {"name": "home_amenity_pharmacy_150m"},
+              {"name": "home_amenity_restaurant_150m"},
+              {"name": "home_amenity_fastfood_150m"},
+              {"name": "home_commercial_150m"},
+              {"name": "home_industrial_150m"},
+              {"name": "home_marketplace_150m"},
+              {"name": "home_natural_150m"},
+              {"name": "home_school_150m"},
+              {"name": "home_university_150m"},
+              {"name": "home_college_150m"},
+              {"name": "home_hospital_150m"}
+            ]
+          },
+          "user_app_installed": {
+            "db": "dmgrinder_source",
+            "table": "user_app_installed",
+            "partition_conf": {
+              "uid_type": ["GAID", "IDFA"]
+            },
+            "period": 14,
+            "dt_selection_mode": "single_last",
+            "features": [
+              {"name": "categories", "agg": "gmax"}
+            ]
+          },
+          "app_cats_pc_cri_wscore_180d": {
+            "db": "dmgrinder_source",
+            "table": "adratio_feature",
+            "partition_conf": {
+              "uid_type": ["GAID", "IDFA"],
+              "feature_name": "user_app_cats_pc_cri_wscore",
+              "aggregation_period": "180_days"
+            },
+            "period": 3,
+            "dt_selection_mode": "single_last",
+            "features": [
+              {"name": "feature", "agg": "gmax"}
+            ]
+          },
+          "mpop_senders": {
+            "db": "cdm_scoring",
+            "table": "mpop_top_sender_feature",
+            "partition_conf": {
+              "uid_type": ["EMAIL"]
+            },
+            "period": 36,
+            "dt_selection_mode": "single_last",
+            "features": [
+              {"name": "senders", "agg": "gmax"}
+            ]
+          },
+          "topgoal_topics200": {
+            "db": "cdm_weblog_profiles",
+            "table": "topgoal_feature",
+            "partition_conf": {
+              "uid_type": ["VKID", "OKID", "EMAIL"]
+            },
+            "period": 36,
+            "dt_selection_mode": "single_last",
+            "default_agg": "gmax",
+            "features": "{% set exprs = [] %}{% for i in range(200) %}{% set _ = exprs.append( {'name': 'topic_{i}'.format(i=i), 'expr': 'if(topic_{i} > 0, topic_{i}, null)'.format(i=i)} ) %}{% endfor %}{{ exprs }}"
+          },
+          "onelink_features": {
+            "db": "cdm_scoring",
+            "table": "onelink_features",
+            "partition_conf": {
+              "uid_type": ["VKID", "OKID", "EMAIL", "PHONE", "GAID", "IDFA"]
+            },
+            "period": 18,
+            "dt_selection_mode": "single_last",
+            "features": [
+              "--------------- onelink_login_recencies domain: ------------",
+              {"name": "login_recency", "expr": "if(size(login_recency) > 0, map_from_entries(transform(user_dmdesc.map_key_values(login_recency), x -> (x['key'], x['value'] + 1))), null)", "agg": "gmin"},
+              "--------------- onelink_payments domain: ------------",
+              {"name": "payment_amounts", "agg": "gmax"},
+              "--------------- onelink_logins domain: --------------",
+              {"name": "login_counts", "agg": "gmax"}
+            ]
+          },
+          "mytracker_feature": {
+            "db": "cdm_scoring",
+            "table": "mytracker_feature",
+            "partition_conf": {
+              "uid_type": ["VKID", "OKID", "EMAIL", "GAID", "IDFA"]
+            },
+            "period": 65,
+            "dt_selection_mode": "single_last",
+            "default_agg": "gmax",
+            "features": [
+              "----------- app_cats_activity domain: ------------",
+              {"name": "app_category_stats"},
+              "------------ mob_operators domain: -------------",
+              {"name": "mob_operator_stats"},
+              "------------ device_vendors domain: -------------",
+              {"name": "device_stats"},
+              "------------ app_events domain: -------------",
+              {"name": "installs", "expr": "log1p(num_installations)"},
+              {"name": "purchases", "expr": "log1p(num_purchases)"},
+              {"name": "achievements", "expr": "log1p(num_achievements)"}
+            ]
+          },
+          "tp_device_features": {
+            "db": "cdm_device",
+            "table": "tp_device_features",
+            "partition_conf": {
+              "uid_type": ["VKID", "OKID", "EMAIL"]
+            },
+            "period": 65,
+            "dt_selection_mode": "single_last",
+            "default_agg": "gsum",
+            "features": [
+              "------------- tp_os_counts domain: -------------------",
+              {"name": "win", "expr": "if((logs_count * os_win) > 0, (logs_count * os_win), null)"},
+              {"name": "lin", "expr": "if((logs_count * os_lin) > 0, (logs_count * os_lin), null)"},
+              {"name": "mac", "expr": "if((logs_count * os_mac) > 0, (logs_count * os_mac), null)"},
+              {"name": "tv", "expr": "if((logs_count * os_tv) > 0, (logs_count * os_tv), null)"},
+              {"name": "chrome", "expr": "if((logs_count * os_chrome_os) > 0, (logs_count * os_chrome_os), null)"},
+              {"name": "robots", "expr": "if((logs_count * os_robots) > 0, (logs_count * os_robots), null)"},
+              {"name": "android", "expr": "if((logs_count * os_mob * os_mob_android) > 0, (logs_count * os_mob * os_mob_android), null)"},
+              {"name": "ios", "expr": "if((logs_count * os_mob * os_mob_ios) > 0, (logs_count * os_mob * os_mob_ios), null)"},
+              {"name": "other", "expr": "if((logs_count * (os_others + os_mob * os_mob_others)) > 0, (logs_count * (os_others + os_mob * os_mob_others)), null)"},
+              "--------- tp_device_stats domain: ------------------",
+              {"name": "touch_false", "expr": "log1p(logs_count * touch_false)", "agg": "gavg"},
+              {"name": "touch_true", "expr": "log1p(logs_count * touch_true)", "agg": "gavg"},
+              {"name": "hds_ratio_mean", "agg": "gavg"}
+            ]
+          },
+          "installed_app_features": {
+            "db": "cdm_device",
+            "table": "installed_app_features",
+            "partition_conf": {
+              "uid_type": ["GAID", "IDFA"]
+            },
+            "period": 36,
+            "dt_selection_mode": "single_last",
+            "default_agg": "gmax",
+            "features": "{% set exprs = [{'name': 'nearest_install', 'expr': \"features['nearest_install']\", 'agg': 'gmin'}, {'name': 'latest_install', 'expr': \"features['latest_install']\"}, {'name': 'install_range', 'expr': \"features['install_range']\"}, {'name': 'mean_inst_diff', 'expr': \"features['mean_inst_diff']\", 'agg': 'gavg'}] %}{% for i in range(100) %}{% set _ = exprs.append({'name': 'topic_{i}'.format(i=i), 'expr': \"features['topic_{i}']\".format(i=i)}) %}{% endfor %}{{ exprs }}"
+          },
+          "sn_topics100": {
+            "db": "cdm_scoring",
+            "table": "user_sn_group_topics_100",
+            "partition_conf": {
+              "uid_type": ["VKID", "OKID"]
+            },
+            "period": 65,
+            "dt_selection_mode": "single_last",
+            "default_agg": "gmax"
+          },
+          "sn_epf": {
+            "db": "cdm_scoring",
+            "table": "sn_epf",
+            "partition_conf": {
+              "uid_type": ["VKID", "OKID"]
+            },
+            "period": 65,
+            "dt_selection_mode": "single_last",
+            "default_agg": "gavg",
+            "features": [
+              {"name": "acc_age", "expr": "log1p(acc_age)"},
+              {"name": "friends_acc_age", "expr": "log1p(friends_acc_age)"},
+              {"name": "friending_speed", "expr": "log1p((pow(e(), friending_speed) - 1) / (24 * 3600))"},
+              {"name": "friends_count"},
+              {"name": "friends_have_university", "expr": "log1p(friends_have_university)"}
+            ]
+          },
+          "all_profs": {
+            "db": "cdm_scoring",
+            "table": "all_profs",
+            "partition_conf": {
+              "uid_type": ["VKID", "OKID", "EMAIL"]
+            },
+            "period": 7,
+            "dt_selection_mode": "single_last",
+            "default_agg": "gavg",
+            "features": [
+              "------- N.B. domain have 5 features ------",
+              {"name": "age", "expr": "datediff('{{ vars.date }}', birth_day) / 365.25"},
+              {"name": "sex"},
+              {"name": "acc_age", "expr": "coalesce(log2(2 + datediff('{{ vars.date }}', joined)), 0.0)", "agg": "gmax"}
+            ]
+          },
+          "living_regions": {
+            "db": "ds_geo",
+            "table": "living_region_features_v2",
+            "partition_conf": {
+              "uid_type": ["VKID", "OKID", "EMAIL", "GAID", "IDFA"],
+              "agg_type": "120days"
+            },
+            "period": 65,
+            "dt_selection_mode": "single_last",
+            "default_agg": "gavg",
+            "features": [
+              "---------- living_region_ids domain: ---------------",
+              {"name": "country_map", "expr": "if(country is null, map(), map(concat('country_', country), 1))", "agg": "gmax"},
+              {"name": "region_map", "expr": "if(region is null, map(), map(concat('region_', region), 1))", "agg": "gmax"},
+              {"name": "city_map", "expr": "if(city is null, map(), map(concat('city_', city), 1))", "agg": "gmax"},
+              "--------- living_region_stats domain: -----------",
+              {"name": "num_countries", "expr": "log1p(num_countries)", "agg": "gmax"},
+              {"name": "num_regions", "expr": "log1p(num_regions)", "agg": "gmax"},
+              {"name": "num_cities", "expr": "log1p(num_cities)", "agg": "gmax"},
+              {"name": "gdp", "expr": "coalesce((weighted_gdp + gdp_capital_ratio) / 2, weighted_gdp, gdp_capital_ratio)"},
+              {"name": "deposit", "expr": "((opensber_avg_deposits + opensber_avg_deposit_sum) / 2) + opensber_avg_account"},
+              {"name": "opensber_avg_mortgage_sum"},
+              {"name": "opensber_avg_customer_loan_sum"},
+              {"name": "salary", "expr": "coalesce((weighted_salary_region + opensber_avg_salary) / 2, weighted_salary_region, opensber_avg_salary)"},
+              {"name": "opensber_avg_card_spendings"},
+              {"name": "mortgage_ratio", "expr": "opensber_num_mortgage / rosstat_population"},
+              {"name": "customer_loan_ratio", "expr": "opensber_num_customer_loan / rosstat_population"},
+              {"name": "new_deposits_ratio", "expr": "opensber_num_new_deposits / rosstat_population"},
+              {"name": "rosstat_doctors"},
+              {"name": "rosstat_crime_rate"},
+              {"name": "population_density", "expr": "rosstat_population / rosstat_land_area"}
+            ]
+          },
+          "topics_motor200": {
+            "db": "cdm_weblog_profiles",
+            "table": "topics_motor200",
+            "partition_conf": {
+              "uid_type": ["VID", "VKID", "OKID", "EMAIL"]
+            },
+            "period": 1,
+            "dt_selection_mode": "single_last",
+            "default_agg": "gmax"
+          }
+        },
+
+        "defaults": {
+          "shuffle_partitions": 16384,
+          "min_target_rows": 100500,
+          "checkpoint_interval": 11,
+          "executor_memory_gb": 20,
+          "max_rows_per_bucket": 1200500
+        }
+
+      }
+    }
+  }
+}

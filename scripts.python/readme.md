@@ -44,12 +44,14 @@ Scala-Apply Python app and wrappers for JVM implementation
 
 Join-Features Python app
 - [Luigi 'JoinFeatures' spark-submit task](./luigi-pyspark-apps/join_features/app.py)
+- ['JoinFeatures' beta version, saved for history](./luigi-pyspark-apps/join_features_beta/app.py)
 
 Export (scored) records apps
 - [Luigi 'Export' spark-submit tasks](./luigi-pyspark-apps/export/README.md)
 
 ???
 
-- aux
+- c:\Users\valik\Downloads\gitlab\dm.dmgrinder-workdir-local\dmgrinder\.local\
+- c:\Users\valik\data\github\dmgrinder_aux\
 
 TODO: all test scripts should run successfully (in proper docker container).

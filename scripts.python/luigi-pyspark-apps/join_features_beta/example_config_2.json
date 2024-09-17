@@ -1,0 +1,247 @@
+{
+  "docs": {
+    "description": "app config example, illustratively complex pipeline"
+  },
+  "vars": {"date": "{{ datetime.date.today() - datetime.timedelta(days=1) }}"},
+  "stages": ["join"],
+  "jobs": {
+    "BuildBannerFeature": {
+      "stage": "join",
+      "xapp": "JoinFeatures",
+      "trigger": "all_success",
+      "tags": ["default"],
+      "config": {
+
+        "target_db": "dmgrinder_source",
+        "target_table": "banner_feature",
+        "target_dt": "{{ vars.date }}",
+
+        "uid_types": ["BANNER"],
+
+        "final_columns": [
+          "event_cats_score",
+          "platform",
+          "priced",
+          "text_taxons",
+          "content_taxons",
+          "pad_cats_ctr_wscore",
+          "text_embedding",
+          "topic_names",
+          "banner_age"
+        ],
+
+        "domains": [
+          {"name": "event_cats_score", "type": "map<string,float>", "source": "events", "columns": ["event_cats_score"]},
+
+          {"name": "topic_names", "type": "map<string,int>", "source": "banners", "columns": ["topic_names"]},
+          {"name": "banner_age", "type": "array<int>", "source": "banners", "columns": ["banner_age"]},
+          {"name": "platform", "type": "map<string,int>", "source": "banners", "columns": ["platform"]},
+          {"name": "priced", "type": "map<string,int>", "source": "banners", "columns": ["priced"]},
+
+          {"name": "text_taxons", "type": "map<string,float>", "source": "banner_text_taxons", "columns": ["text_taxons"]},
+          {"name": "text_embedding", "type": "map<string,int>", "source": "banner_text_embeddings", "columns": ["text_embedding"]},
+          {"name": "content_taxons", "type": "map<string,float>", "source": "banner_image_taxons", "columns": ["content_taxons"]},
+          {"name": "pad_cats_ctr_wscore", "type": "map<string,float>", "source": "adratio", "columns": ["pad_cats_ctr_wscore"]}
+        ],
+
+        "join_rule": "events left banners left banner_text_taxons left banner_text_embeddings left banner_image_taxons left adratio",
+
+        "feature_sources": {
+
+          "events": {
+            "comments": ["----- aggregate antifraud with custom UDAF ---------"],
+
+            "db": "ods_target_data",
+            "table": "antifraud",
+            "partition_conf": {},
+            "period": 1,
+            "dt_selection_mode": "single_last",
+            "where": [
+              "--------- сделано как список исключительно для облегчения чтения, where это строка а не список -------------",
+              "(banner != 0)",
+              "and (target_filter = 0)",
+              "and (campaign_id != 0)",
+              "and (coalesce(vid, vkid, okid, email, gaid, idfa, hid) is not null)",
+              "and (",
+              "  (ev_type in (0, 1, 80, 87, 91))",
+              "  or (ev_type=7 and conversion_type in (1, 2))",
+              "  or (ev_type=10 and banner_event in (1000, 1001, 1002, 1003, 1013))",
+              ")"
+            ],
+            "uid": "cast(banner as string)",
+            "uid_type": "'BANNER'",
+            "features": [
+              {
+                "name": "event_cats_score",
+                "expr": [
+                  "--------- сделано как список исключительно для облегчения чтения, expr это строка а не список -------------",
+                  "case ev_type",
+                  "    when 0  then 'SHOW'",
+                  "    when 1  then 'CLICK'",
+                  "    when 7  then",
+                  "        case conversion_type",
+                  "            when 1 then 'TOP_GOAL'",
+                  "            when 2 then 'INSTALL_POSTCLICK'",
+                  "            else null",
+                  "        end",
+                  "    when 10 then",
+                  "      case banner_event",
+                  "          when 1000 then 'BANNER_EVENT_view_start'",
+                  "          when 1001 then 'BANNER_EVENT_viewed_25_percent'",
+                  "          when 1002 then 'BANNER_EVENT_viewed_50_percent'",
+                  "          when 1003 then 'BANNER_EVENT_viewed_75_percent'",
+                  "          when 1013 then 'BANNER_EVENT_viewed_100_percent'",
+                  "          else null",
+                  "      end",
+                  "    when 80 then 'INAPP_POSTCLICK'",
+                  "    when 87 then 'INSTALL_POSTVIEW'",
+                  "    when 91 then 'INAPP_POSTVIEW'",
+                  "    else null",
+                  "end"
+                ],
+                "agg": "custom_udaf_map_event_category_to_count"
+              }
+            ],
+            "default_agg": "gmax",
+            "checkpoint": true
+          },
+
+          "banners": {
+            "comments": [
+              "----- banners(banner, topic_names, banner_age, campaign_id) -------",
+              "----- left-join campaigns(campaign_id, package_id) on campaign_id ---------",
+              "----- left-join packages(package_id, platform, priced) on package_id ------",
+              "----- drop(campaign_id, package_id)"
+            ],
+
+            "db": "ods_targetdb_data",
+            "table": "banner_topic",
+            "partition_conf": {},
+            "period": 1,
+            "dt_selection_mode": "single_last",
+            "md_sources": [
+              "------ Справочники для джойна с источниками признаков ---------",
+              "------ Справочники не агрегируют, им надо делать distinct по ключам джойна --------",
+              "------ После джойна надо не забыть дропнуть ключи (конфиг источника признаков), если это не стандартный ключ ------",
+
+              "----- packages used indirectly, via banners, drop package_id after join with campaigns --------",
+              "----- events(banner, event_cats_score) left-join banners(banner, topic_names, banner_age, campaign_id) on banner -------",
+              "----- left-join campaigns(campaign_id, package_id) on campaign_id ---------",
+              "----- left-join packages(package_id, platform, priced) on package_id ------",
+              "----- banners = banners left-join campaigns left-join packages"
+
+              {
+                "db": "ods_targetdb_data",
+                "table": "campaign",
+                "partition_conf": {},
+                "max_dt_diff": 33,
+                "select": {
+                  "campaign_id": "id",
+                  "package_id": "package_id"
+                },
+                "where": "id is not null",
+                "join_conf": {
+                  "on": ["campaign_id"],
+                  "how": "left"
+                }
+              },
+
+              {
+                "db": "ods_targetdb_data",
+                "table": "package_extended",
+                "partition_conf": {},
+                "max_dt_diff": 33,
+                "select": {
+                  "package_id": "package_id",
+                  "priced": "map(cpm_cpc, 1)",
+                  "platform": "map(platform, 1)"
+                },
+                "join_conf": {
+                  "on": ["package_id"],
+                  "how": "left"
+                }
+              }
+            ],
+
+            "default_agg": null,
+            "features": [
+              {"name": "topic_names", "expr": "map_from_arrays(topic_names, array_repeat(1, size(topic_names)))"},
+              {"name": "banner_age", "expr": "array(datediff(dt, created), datediff(dt, updated))"},
+              {"name": "platform"},
+              {"name": "priced"}
+            ],
+            "uid": "cast(id as string)",
+            "uid_type": "'BANNER'"
+          },
+
+          "banner_text_taxons": {
+            "db": "ods_target_data",
+            "table": "banner_text_taxons",
+            "partition_conf": {},
+            "period": 1,
+            "dt_selection_mode": "single_last",
+            "default_agg": null,
+            "features": [
+              {"name": "text_taxons", "expr": "text_taxons_map"}
+            ],
+            "uid": "cast(banner as string)",
+            "uid_type": "'BANNER'"
+          },
+
+          "banner_text_embeddings": {
+            "db": "ods_target_data",
+            "table": "banner_text_embedding",
+            "partition_conf": {},
+            "period": 1,
+            "dt_selection_mode": "single_last",
+            "default_agg": null,
+            "features": [
+              {"name": "text_embedding", "expr": "map_from_arrays(cast(text_embedding as array<string>), array_repeat(1, size(text_embedding)))"}
+            ],
+            "uid": "cast(banner as string)",
+            "uid_type": "'BANNER'"
+          },
+
+          "banner_image_taxons": {
+            "db": "ods_target_data",
+            "table": "banner_content_taxons",
+            "partition_conf": {},
+            "period": 1,
+            "dt_selection_mode": "single_last",
+            "default_agg": null,
+            "features": [
+              {"name": "content_taxons", "expr": "content_taxons_map"}
+            ],
+            "uid": "cast(banner as string)",
+            "uid_type": "'BANNER'"
+          },
+
+          "adratio": {
+            "db": "dmgrinder_source",
+            "table": "adratio_feature",
+            "partition_conf": {
+              "feature_name": "banner_pad_cats_ctr_wscore",
+              "aggregation_period": "1_days",
+              "uid_type": "BANNER"
+            },
+            "period": 1,
+            "dt_selection_mode": "single_last",
+            "default_agg": null,
+            "features": [
+              {"name": "pad_cats_ctr_wscore", "expr": "feature"}
+            ]
+          }
+        },
+
+        "defaults": {
+          "shuffle_partitions": 512,
+          "min_target_rows": 100,
+          "checkpoint_interval": 11,
+          "executor_memory_gb": 12,
+          "max_rows_per_bucket": 1200300
+        }
+
+      }
+    }
+  }
+}
