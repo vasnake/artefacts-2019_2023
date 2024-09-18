@@ -59,6 +59,10 @@ Combine ML features app
 Experimental test library
 - [Hive IO operations implemented on top of Spark](./luigi-pyspark-apps/combine/universal_features/test/_it/new_e2e/hive_io_spark.py#L120)
 
+One-time scripts (adhoc)
+- [A couple of adhoc scripts](./adhoc/)
+- [Jupyter notebooks, experiments and adhoc scripts](./adhoc/notebook/)
+
 ???
 
 - c:\Users\valik\data\github\dmgrinder_aux\
