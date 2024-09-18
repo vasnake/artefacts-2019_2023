@@ -1,0 +1,305 @@
+{
+  "docs": {
+    "description": "App config Json schema"
+  },
+  "schema": {
+    "$defs": {
+      "partition_conf": {
+        "type": "object",
+        "propertyNames": {
+          "pattern": "^(?!dt$)"
+        },
+        "required": [],
+        "additionalProperties": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          ]
+        }
+      },
+      "max_dt_diff": {
+        "type": "integer",
+        "minimum": 0,
+        "description": "Search for a date, formula: max(dt | target_dt - max_dt_diff <= dt <= target_dt)"
+      },
+      "filter_expression": {
+        "type": "string",
+        "description": "Spark SQL expression for table filter in `where` statement"
+      }
+    },
+    "type": "object",
+    "properties": {
+      "feature_name": {
+        "type": "string",
+        "description": "Output feature name"
+      },
+      "feature_hashing": {
+        "type": "boolean",
+        "default": false,
+        "description": "Transform map keys or array categorical features to uint32 using murmur3 hashing"
+      },
+      "target_dt": {
+        "type": "string",
+        "format": "date",
+        "description": "Output dt value, date"
+      },
+      "target_db": {
+        "type": "string",
+        "description": "Hive db name"
+      },
+      "target_table": {
+        "type": "string",
+        "description": "Hive table name"
+      },
+      "source_db": {
+        "type": "string",
+        "description": "Hive db name"
+      },
+      "source_table": {
+        "type": "string",
+        "description": "Hive table name"
+      },
+      "source_where": {
+        "anyOf": [
+          {
+            "type": "null"
+          },
+          {
+            "type": "string",
+            "description": "Spark SQL expression for table filter in `where` statement"
+          }
+        ],
+        "default": null
+      },
+      "source_partition_conf": {
+        "$ref": "#/$defs/partition_conf"
+      },
+      "period": {
+        "type": "integer",
+        "minimum": 1,
+        "default": 1
+      },
+      "dt_selection_mode": {
+        "enum": [
+          "single_last",
+          "multiple_all",
+          "multiple_any",
+          "multiple_max_dt"
+        ],
+        "default": "single_last"
+      },
+      "combine_columns": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "string",
+            "description": "Spark SQL expression to get `uid` column from source table."
+          },
+          "uid_type": {
+            "type": "string",
+            "description": "Spark SQL expression to get `uid_type` column from source table."
+          },
+          "bu_link_id": {
+            "type": "object",
+            "properties": {
+              "expr": {
+                "type": "string",
+                "description": "Spark SQL expression to get `bu_link_id` column from source table."
+              },
+              "matching_config": {
+                "type": "object",
+                "properties": {
+                  "db": {
+                    "type": "string",
+                    "description": "Hive db name"
+                  },
+                  "table": {
+                    "type": "string",
+                    "description": "Hive table name"
+                  },
+                  "where": {
+                    "$ref": "#/$defs/filter_expression"
+                  },
+                  "partition_conf": {
+                    "$ref": "#/$defs/partition_conf"
+                  },
+                  "max_dt_diff": {
+                    "$ref": "#/$defs/max_dt_diff"
+                  },
+                  "join_conf": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "enum": [
+                          "regular",
+                          "broadcast",
+                          "skewed"
+                        ],
+                        "default": "regular"
+                      },
+                      "salt_parts": {
+                        "type": "integer",
+                        "minimum": 1
+                      }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                      "type"
+                    ]
+                  },
+                  "bu_link_id_from": {
+                    "type": "string",
+                    "description": "Spark SQL expression to get `bu_link_id` join column from matching table."
+                  },
+                  "bu_link_id_to": {
+                    "type": "string",
+                    "description": "Spark SQL expression to get `bu_link_id` output column from matching table."
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "db",
+                  "table",
+                  "partition_conf",
+                  "join_conf",
+                  "bu_link_id_from",
+                  "bu_link_id_to"
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "expr"
+            ]
+          },
+          "feature": {
+            "type": "string",
+            "description": "Spark SQL aggregation expression to combine target feature column from source table."
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "uid",
+          "uid_type",
+          "feature"
+        ]
+      },
+      "filter_config": {
+        "anyOf": [
+          {
+            "type": "null"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "db": {
+                "type": "string",
+                "description": "Hive db name"
+              },
+              "table": {
+                "type": "string",
+                "description": "Hive table name"
+              },
+              "where": {
+                "$ref": "#/$defs/filter_expression"
+              },
+              "partition_conf": {
+                "$ref": "#/$defs/partition_conf"
+              },
+              "max_dt_diff": {
+                "$ref": "#/$defs/max_dt_diff"
+              },
+              "columns": {
+                "type": "object",
+                "default": {
+                  "uid": "uid",
+                  "uid_type": "uid_type"
+                },
+                "properties": {
+                  "uid": {
+                    "type": "string",
+                    "description": "Spark SQL expression to get `uid` column from table."
+                  },
+                  "uid_type": {
+                    "type": "string",
+                    "description": "Spark SQL expression to get `uid_type` column from table."
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "uid",
+                  "uid_type"
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "db",
+              "table",
+              "partition_conf"
+            ]
+          }
+        ],
+        "default": null
+      },
+      "min_target_rows": {
+        "type": "integer",
+        "description": "Output rows amount, acceptable minimum",
+        "minimum": 1,
+        "default": 1
+      },
+      "max_collection_size": {
+        "type": "integer",
+        "description": "Maximum size for feature stored as a collection (array or map)",
+        "minimum": 1,
+        "maximum": 10000,
+        "default": 100
+      },
+      "shuffle_partitions": {
+        "type": "integer",
+        "description": "spark.sql.shuffle.partitions",
+        "minimum": 1,
+        "default": 400
+      }
+    },
+    "required": [
+      "feature_name",
+      "feature_hashing",
+      "target_dt",
+      "target_db",
+      "target_table",
+      "source_db",
+      "source_table",
+      "source_where",
+      "source_partition_conf",
+      "period",
+      "dt_selection_mode",
+      "combine_columns",
+      "filter_config",
+      "min_target_rows",
+      "max_collection_size",
+      "shuffle_partitions"
+    ],
+    "additionalProperties": false
+  },
+  "batching": [],
+  "constraints": {
+    "unique_together": [
+      [
+        "/target_db",
+        "/target_table",
+        "/feature_name"
+      ]
+    ],
+    "empty_intersection": []
+  }
+}

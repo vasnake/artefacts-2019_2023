@@ -50,12 +50,17 @@ Join-Features Python app
 - [Luigi 'JoinFeatures' spark-submit task](./luigi-pyspark-apps/join_features/app.py)
 - ['JoinFeatures' beta version, saved for history](./luigi-pyspark-apps/join_features_beta/app.py)
 
-Export (scored) records apps
+Export (scored) records app
 - [Luigi 'Export' spark-submit tasks](./luigi-pyspark-apps/export/README.md)
+
+Combine ML features app
+- [Luigi 'Combine' spark-submit task](./luigi-pyspark-apps/combine/README.md)
+
+Experimental test library
+- [Hive IO operations implemented on top of Spark](./luigi-pyspark-apps/combine/universal_features/test/_it/new_e2e/hive_io_spark.py#L120)
 
 ???
 
-- combine app
 - c:\Users\valik\data\github\dmgrinder_aux\
 
 TODO: all test scripts should run successfully (in proper docker container).
