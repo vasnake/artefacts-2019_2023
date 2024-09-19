@@ -26,6 +26,8 @@ Integration test, bash scripts
 - [Run python tests](./run-spark-local/run_tests.sh)
 - [PySpark env setup snippets](./run-spark-local/setup-pyspark-env.sh)
 
+- [Spark-submit wrapper, add timeout for yarn job 'accept' stage](./spark_submit_with_job_start_check/)
+
 JVM procedure Python wrapper
 - [InsertIntoHive python wrapper](luigi-pyspark-apps/spark_utils.py#insert_into_hive)
 - [UDF/UDAF registration, register_all_udf](luigi-pyspark-apps/spark_utils.py#register_all_udf)
@@ -62,9 +64,5 @@ Experimental test library
 One-time scripts (adhoc)
 - [A couple of adhoc scripts](./adhoc/)
 - [Jupyter notebooks, experiments and adhoc scripts](./adhoc/notebook/)
-
-???
-
-- c:\Users\valik\data\github\dmgrinder_aux\
 
 TODO: all test scripts should run successfully (in proper docker container).
