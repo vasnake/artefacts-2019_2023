@@ -43,7 +43,7 @@ class SampleFastTest extends AnyFlatSpec with should.Matchers with LocalSpark wi
     val df = spark.sql("SELECT id FROM t1")
     show(df, message = "source")
 
-    val sampleDS: Dataset[Long] = SampleFast(df, sampleSize)
+    val sampleDS: Dataset[Long] = SampleFast(df, sampleSize).as[Long]
     val actual = sampleDS.as[Long].collect()
 
     actual should contain theSameElementsAs expected
