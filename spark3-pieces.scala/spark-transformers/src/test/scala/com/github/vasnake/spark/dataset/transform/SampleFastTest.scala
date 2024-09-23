@@ -43,10 +43,8 @@ class SampleFastTest extends AnyFlatSpec with should.Matchers with LocalSpark wi
     val df = spark.sql("SELECT id FROM t1")
     show(df, message = "source")
 
-    val sampleDS: Dataset[Long] = SampleFast.apply(df, sampleSize)
-      .as[Long]
-
-    val actual = sampleDS.collect()
+    val sampleDS: Dataset[Long] = SampleFast(df, sampleSize)
+    val actual = sampleDS.as[Long].collect()
 
     actual should contain theSameElementsAs expected
   }
@@ -59,9 +57,7 @@ class SampleFastTest extends AnyFlatSpec with should.Matchers with LocalSpark wi
 
     val df = spark.sql("SELECT id FROM t1")
 
-    val sampleDS: Dataset[Long] = SampleFast.apply(df, sampleSize)
-      .as[Long]
-
+    val sampleDS: Dataset[Long] = SampleFast(df.as[Long], sampleSize)
     val actual = sampleDS.limit(sampleSize).collect()
 
     actual should contain theSameElementsAs expected
@@ -78,12 +74,11 @@ class SampleFastTest extends AnyFlatSpec with should.Matchers with LocalSpark wi
       v
     }}
 
-    val df = spark.sql("SELECT id FROM t1")
+    val ds = spark.sql("SELECT id FROM t1")
       .as[Long]
       .map(processOneRow)
 
-    val sampleDS: Dataset[Long] = SampleFast.apply(df.toDF, sampleSize) // first action
-      .as[Long]
+    val sampleDS: Dataset[Long] = SampleFast(ds, sampleSize) // first action
 
     assert(accum.value == sampleSize) // rows touched while counting num partitions that we need
 
