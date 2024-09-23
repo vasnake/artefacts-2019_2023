@@ -56,7 +56,7 @@ object SampleFast {
       // part idx => rows.count
       val partLimitSize: Array[Int] = sc.runJob(
         rdd,
-        (it: Iterator[Row]) => it.take(left).size,
+        (it: Iterator[Row]) => it.take(left).size, // materialize min(left, it.size) rows
         p
       )
 

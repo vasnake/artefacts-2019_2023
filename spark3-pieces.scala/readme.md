@@ -10,7 +10,7 @@ uber-jar (`sbt assembly`): `target/scala-2.12/etl-ml-pieces-1923-assembly-1.0.0.
 
 ## new modules
 
-Modules existing only here.
+Modules existing only here
 
 ### spark-transformers
 
