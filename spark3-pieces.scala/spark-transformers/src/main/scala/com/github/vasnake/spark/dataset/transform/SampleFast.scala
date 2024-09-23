@@ -1,10 +1,13 @@
 /**
  * Created by vasnake@gmail.com on 2024-09-19
+ *
+ * Original: https://gist.github.com/xhumanoid/51d3cb21675ff035fe057d0c0ae29dce
  */
 package com.github.vasnake.spark.dataset.transform
 
 import org.apache.spark.rdd.{PartitionCoalescer, PartitionGroup, RDD}
 import org.apache.spark.sql.{DataFrame, Dataset, Row}
+import org.apache.spark.Partition
 
 import scala.annotation.tailrec
 
@@ -26,17 +29,19 @@ object SampleFast {
 
   def apply[T](rdd: RDD[T], sampleSize: Int): RDD[T] = {
     // start with first partition
-    val numParts = findFirstNPartitions(rdd, sampleSize, partsIndices = Array(0))
+    val numParts = findFirstNPartitions(rdd, sampleSize)
 
     rdd.coalesce(
-      numPartitions = 1, // should be N
+      numParts,
       shuffle = false,
-      partitionCoalescer = Option(new FirstNCoalescer(numParts))
+      Option(new FirstNCoalescer(numParts))
     )
   }
 
   @tailrec
-  def findFirstNPartitions[_](rdd: RDD[_], needRows: Int, partsIndices: Array[Int]): Int = {
+  def findFirstNPartitions[_](rdd: RDD[_], needRows: Int, partsIndices: Array[Int] = Array(0)): Int = {
+    // TODO: add tests
+
     val rowsInPartition: Iterator[_] => Int =
       it => it.take(needRows).size // materialize min(needRows, it.size) rows
 
@@ -46,15 +51,14 @@ object SampleFast {
       // enough rows
       val (_, idx) = partsSize.zip(partsIndices)
         .foldLeft((needRows, partsIndices.head)) {
-          case ((rowsCount, currIdx), (pSize, pIdx)) => {
+          case ((rowsCount, currIdx), (pSize, pIdx)) =>
             if (rowsCount <= 0) (rowsCount, currIdx)
             else (rowsCount - pSize, pIdx)
-          }
         }
       idx + 1 // convert index to count (we need partitions with indices 0 .. idx)
     } else {
       // not enough rows, need more partitions
-      val ratio = needRows / partsSize.sum // 11/6=1; 12/6=2 // tune-up number of partitions to check
+      val ratio = needRows / partsSize.sum // 2/3=0; 11/6=1; 12/6=2 // tune-up number of partitions to check
       val firstIdx = partsIndices.last + 1
       val lastIdx = firstIdx + (partsSize.length * ratio)
       val newPartsIndices: Seq[Int] = firstIdx until lastIdx
@@ -65,18 +69,30 @@ object SampleFast {
 
   class FirstNCoalescer(val firstNPartitions: Int) extends PartitionCoalescer with Serializable {
     override def coalesce(maxPartitions: Int, parent: RDD[_]): Array[PartitionGroup] = {
-      // one group of N partitions, should be N groups
-      val group: PartitionGroup = new PartitionGroup()
-      group.partitions ++= parent.partitions.slice(0, firstNPartitions)
+      val parts = parent.partitions.slice(0, firstNPartitions)
 
-      // one part. out, should be N parts
-      Array(group)
+      if (maxPartitions >= firstNPartitions) {
+        // 1:1 mapping
+        parts.map(p => newPartsGroup(Array(p)))
+      }
+      else {
+        // pack N parts to M groups, M < N
+        val ratio = firstNPartitions / maxPartitions // e.g. 3/1=3, or 3/2=1
+        val groups: Array[Array[Partition]] = parts.grouped(ratio+1).toArray
+        groups map newPartsGroup
+      }
+    }
+
+    private def newPartsGroup(ps: Array[Partition]): PartitionGroup = {
+      val group: PartitionGroup = new PartitionGroup()
+      group.partitions ++= ps
+      group
     }
   }
 
 }
 
-// Original code, saved for teaching purposes.
+// Original code, saved for demo purposes.
 // First X rows will be taken from first Y partitions of input dataset.
 object SampleFast_V1 {
   // Got from https://gist.github.com/xhumanoid/51d3cb21675ff035fe057d0c0ae29dce
