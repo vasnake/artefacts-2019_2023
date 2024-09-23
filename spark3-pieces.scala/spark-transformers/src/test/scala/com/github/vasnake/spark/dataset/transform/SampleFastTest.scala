@@ -41,7 +41,7 @@ class SampleFastTest extends AnyFlatSpec with should.Matchers with LocalSpark wi
     val df = spark.sql("SELECT id FROM t1")
     show(df, message = "source")
 
-    val sampleDS: Dataset[Long] = SampleFast.approxLazyLimit(df, sampleSize)
+    val sampleDS: Dataset[Long] = SampleFast.apply(df, sampleSize)
       .as[Long]
 
     val actual = sampleDS.collect()
@@ -57,7 +57,7 @@ class SampleFastTest extends AnyFlatSpec with should.Matchers with LocalSpark wi
 
     val df = spark.sql("SELECT id FROM t1")
 
-    val sampleDS: Dataset[Long] = SampleFast.approxLazyLimit(df, sampleSize)
+    val sampleDS: Dataset[Long] = SampleFast.apply(df, sampleSize)
       .as[Long]
 
     val actual = sampleDS.limit(sampleSize).collect()
@@ -80,7 +80,7 @@ class SampleFastTest extends AnyFlatSpec with should.Matchers with LocalSpark wi
       .as[Long]
       .map(processOneRow)
 
-    val sampleDS: Dataset[Long] = SampleFast.approxLazyLimit(df.toDF, sampleSize) // first action
+    val sampleDS: Dataset[Long] = SampleFast.apply(df.toDF, sampleSize) // first action
       .as[Long]
 
     assert(accum.value == sampleSize) // rows touched while counting num partitions that we need
