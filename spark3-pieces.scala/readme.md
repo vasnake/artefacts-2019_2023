@@ -1,6 +1,6 @@
 # Bits and pieces for Spark3
 
-Some modules from [etl-ml-pieces](../etl-ml-pieces.scala/readme.md), after migration to Spark3.
+Some modules from [etl-ml Scala stuff](../etl-ml-pieces.scala/readme.md), after migration to Spark3.
 
 Spark 3.5.2; Scala 2.12.19; sbt 1.10.1; java 1.8; Hadoop 3.3.4; Hive 2.3.9
 
