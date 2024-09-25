@@ -8,14 +8,44 @@ import com.github.vasnake.`etl-core`.aggregate.config._
 
 /** list of stages
   */
-trait AggregationPipeline extends Aggregator[Double] {
+
+trait VectorAggregator[T] {
+  def start(vectorLength: Int): Unit // create vector
+  def add(item: T): Unit // collect data
+  def result: T // commit compute and get result
+}
+
+trait AggregationPipeline extends VectorAggregator[Double] { // vector in - vector out pipeline
   def copy(): AggregationPipeline
 }
 
-trait Aggregator[T] {
-  def start(vectorLength: Int): Unit
-  def add(item: T): Unit
-  def result: T
+// pipelines implementation
+
+case class AggregationStagesPipeline(stages: Seq[AggregationStage]) extends AggregationPipeline {
+  @transient private var values: Array[Double] = _
+  @transient private var idx: Int = 0
+
+  // mutable state should not be shared!
+  override def copy(): AggregationPipeline = AggregationStagesPipeline(stages)
+
+  def start(vectorLength: Int): Unit = {
+    values = new Array[Double](vectorLength)
+    idx = 0
+  }
+
+  def add(item: Double): Unit = {
+    values(idx) = item
+    idx += 1
+  }
+
+  def result: Double = applyStages(stages, values).head // result expected to be in the first element
+
+  @tailrec
+  private def applyStages(stages: Seq[AggregationStage], data: Array[Double]): Array[Double] =
+    stages match {
+      case Nil => data
+      case h :: t => applyStages(t, h.transform(data))
+    }
 }
 
 // build pipeline from config
@@ -40,9 +70,7 @@ object AggregationPipeline {
 
   def filterStage(name: String, params: Map[String, String]): AggregationStage =
     name match {
-      case "drop_null" => FilterDropNull()
-      case "drop_le_threshold" => ??? // TODO: threshold value, compare le|ge
-      case "drop_ge_threshold" => ???
+      case "drop_null" => ReplaceInvalid2Zero()
       case _ => sys.error(s"Unknown filter function name `${name}`")
     }
 
@@ -54,34 +82,5 @@ object AggregationPipeline {
       case "sum" => AggSum()
       case "most_freq" => AggMostFreq(params)
       case _ => sys.error(s"Unknown aggregation function name `${name}`")
-    }
-}
-
-// pipelines implementation
-
-case class AggregationStagesPipeline(stages: Seq[AggregationStage]) extends AggregationPipeline {
-  // TODO: possible optimization: process items w/o acc buffer
-  private var acc: Array[Double] = _
-  private var idx: Int = 0
-  // mutable state should not be shared!
-  override def copy(): AggregationPipeline = AggregationStagesPipeline(stages)
-
-  def start(vectorLength: Int): Unit = {
-    acc = new Array[Double](vectorLength)
-    idx = 0
-  }
-
-  def add(item: Double): Unit = {
-    acc(idx) = item
-    idx += 1
-  }
-
-  def result: Double = applyStages(stages, acc).head // nan or value
-
-  @tailrec
-  private def applyStages(stages: Seq[AggregationStage], data: Array[Double]): Array[Double] =
-    stages match {
-      case Nil => data
-      case h :: t => applyStages(t, h.transform(data))
     }
 }
