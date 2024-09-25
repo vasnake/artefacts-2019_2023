@@ -6,9 +6,6 @@ import scala.annotation.tailrec
 
 import com.github.vasnake.`etl-core`.aggregate.config._
 
-/** list of stages
-  */
-
 trait VectorAggregator[T] {
   def start(vectorLength: Int): Unit // create vector
   def add(item: T): Unit // collect data
@@ -21,6 +18,8 @@ trait AggregationPipeline extends VectorAggregator[Double] { // vector in - vect
 
 // pipelines implementation
 
+/** list of stages
+ */
 case class AggregationStagesPipeline(stages: Seq[AggregationStage]) extends AggregationPipeline {
   @transient private var values: Array[Double] = _
   @transient private var idx: Int = 0
