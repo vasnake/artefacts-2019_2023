@@ -7,14 +7,16 @@ import scala.util.control.NonFatal
 
 import com.github.vasnake.core.text.{ StringToolbox => stb }
 import com.github.vasnake.spark.io.{ Logging => CustomLogging }
+
 import org.apache.hadoop.conf.Configuration
 import org.apache.spark._
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.util.Utils
+
 import org.apache.spark.sql.catalyst.catalog._
+import org.apache.spark.sql.internal.StaticSQLConf._
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.hive.client.HiveClient
 import org.apache.spark.sql.hive.{ HiveExternalCatalog => HiveExternalCatalog_Orig }
-import org.apache.spark.sql.internal.StaticSQLConf._
-import org.apache.spark.util.Utils
 
 object HiveExternalCatalog extends CustomLogging {
 

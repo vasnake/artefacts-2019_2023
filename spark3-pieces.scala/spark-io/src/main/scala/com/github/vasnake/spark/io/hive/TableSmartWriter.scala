@@ -2,27 +2,29 @@
   */
 package com.github.vasnake.spark.io.hive
 
-import scala.util._
-
 import com.github.vasnake.common.num.{ FastMath => fm }
 import com.github.vasnake.core.text.StringToolbox.repr
 import com.github.vasnake.spark.io.stats.DataFrameBucketsStats
 import com.github.vasnake.spark.io.{ Logging => CustomLogging }
+
+import scala.util._
+
 import org.apache.spark.Partitioner
 import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.rdd.RDD
+import org.apache.spark.util.LongAccumulator
+
+import org.apache.spark.sql.{ functions => sqlfn, _ }
 import org.apache.spark.sql.catalog.{ Column => CatalogColumn }
 import org.apache.spark.sql.catalyst.catalog._
 import org.apache.spark.sql.catalyst.expressions.{ Expression => CatalystExpression }
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.hive.vasnake.MetastoreQueryProcessorWithConnPool
 import org.apache.spark.sql.types.DataTypes
-import org.apache.spark.sql.{ functions => sqlfn, _ }
-import org.apache.spark.util.LongAccumulator
+
 import org.slf4j.Logger
 
 class TableSmartWriter(partitionMethodOrNull: String) extends CustomLogging {
-  // TODO: there must be logging to Control using given task url (or task id)
 
   // default constructor
   def this() = this(TableSmartWriter.DEFAULT_PARTITIONER)
@@ -531,21 +533,15 @@ object TableSmartWriter {
     log: Logger,
     spark: SparkSession
   ): Seq[B] = {
-    // use an optional pool of connections to speed-up queries processing
-
     assert(chunks.nonEmpty, "Queries list must not be empty")
 
-    // TODO: rewrite using mqpOpt.map(...).getOrElse(...)
-    if (chunks.length == 1 || mqpOpt.isEmpty) {
-      log.info(s"Using single global externalCatalog connection for ${chunks.length} queries")
-
-      chunks.flatMap(chunk => askCatalogFun(chunk, spark.sharedState.externalCatalog))
-    }
-    else {
-      val qp = mqpOpt.getOrElse(sys.error("At this moment it's impossible"))
+    // use an optional pool of connections to speed-up queries processing
+    mqpOpt.map {qp => {
       log.info(s"Using ${qp.poolActualSize} connections for ${chunks.length} queries")
-
       qp.processQueries(chunks, askCatalogFun)
+    }} getOrElse {
+      log.info(s"Using single global externalCatalog connection for ${chunks.length} queries")
+      chunks.flatMap(chunk => askCatalogFun(chunk, spark.sharedState.externalCatalog))
     }
   }
 
