@@ -1,32 +1,37 @@
-# Spark/Scala modules (mainly)
+# Spark/Scala modules
 
 Collection of some interesting bits and pieces from my projects.
 
 Spark 2.4.8; Scala 2.12.19; sbt 1.10.1; java 1.8
 
-[Migration to Spark 3](../spark3-pieces.scala/readme.md)
+[Migration to Spark 3](../spark3-pieces.scala/readme.md).
+
+After migrating this collection to Spark3 platform,
+I don't need (and don't want) Spark2-related code. Consider it deprecated, it sits here just for educational reasons.
 
 My local station env (win11 + wsl2)
 ```sh
 # coursier update
 cs setup
 
-# etl-ml-pieces-1923
+# goto project dir etl-ml-pieces-1923
 pushd /mnt/c/Users/vlk/data/github/artefacts-2019_2023/etl-ml-pieces.scala/
+# create new sbt project
 sbt new devinsideyou/scala-seed.g8
 
 # produced project with this parameters:
     name [etl-ml-pieces-1923]:
     organization [com.github.vasnake]:
     package [interesting.pieces.1923]:
-# some tuning required ...
 
-# start project sbt
-alias psbt='export JAVA_OPTS="-XX:MaxMetaspaceSize=1G -Xmx4G -XX:+UseParallelGC" && pushd /mnt/c/Users/vlk/data/github/artefacts-2019_2023/etl-ml-pieces.scala/ && sbt -v && popd'
+# some tuning required ... edit sbt files
 
-psbt
+# start sbt console
+alias sa='export JAVA_OPTS="-XX:MaxMetaspaceSize=1G -Xmx4G -XX:+UseParallelGC" && pushd /mnt/c/Users/vlk/data/github/artefacts-2019_2023/etl-ml-pieces.scala/ && sbt -v && popd'
+
+sa
 ```
-WSL shit.
+WSL2
 
 Sometimes I want to run sbt in PowerShell
 ```s
@@ -35,13 +40,13 @@ pushd .\data\github\artefacts-2019_2023\etl-ml-pieces.scala\
 $OutputEncoding = [console]::InputEncoding = [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
 sbt -v "-Dfile.encoding=UTF-8"
 ```
-PowerShell shit.
+PS
 
-For `build.sbt` tricks see
+`build.sbt` tricks, see
 - https://github.com/DevInsideYou/tagless-final/blob/master/expression-problem/build.sbt
 - https://github.com/tofu-tf/tofu/blob/master/build.sbt#L555
 
-Other sbt related resources
+Other sbt-related resources
 - https://www.scala-sbt.org/1.x/docs/Multi-Project.html
 - https://www.scala-lang.org/download/all.html
 - https://docs.scala-lang.org/overviews/compiler-options/index.html#targeting-a-version-of-the-jvm
@@ -55,9 +60,9 @@ Other sbt related resources
 - set envvars for sbt `export JAVA_OPTS="-XX:MaxMetaspaceSize=1G -Xmx4G -XX:+UseParallelGC" JAVA_HOME=$(/usr/libexec/java_home -v 1.8) && sbt -v`
 - set envvars for tests `sbt> set ThisBuild / Test / envVars := Map("DEBUG_MODE" -> "true", "SPARK_LOCAL_IP" -> "127.0.0.1")`; `sbt> set Test/logBuffered := false`
 - select individual test `sbt> testQuick *InverseVariabilityTransformer* -- -z "reference"`
-- logs selectors/tuning `test/resources/log4j*.properties`
+- logs selectors/tuning `edit test/resources/log4j*.properties`
 
-## project modules
+## Project modules
 
 All modules packed to uber-jar (via `sbt assembly`) and can be used in spark apps,
 you should add library to spark session: `spark-submit ... --jars hdfs:/lib/custom-transformers-SNAPSHOT.jar`.
@@ -148,7 +153,7 @@ The set of non-generic trivial UDF
 - com.github.vasnake.spark.udf.`java-api`.MapJoinUDF
 - com.github.vasnake.spark.udf.`java-api`.Uid2UserUDF
 
-### other
+### Other
 
 - core
     * com.github.vasnake.core.text.StringToolbox
@@ -203,7 +208,7 @@ The set of non-generic trivial UDF
     * com.github.vasnake.spark.app.external_catalog.Alter_HMS_PartitionsApp
     * com.github.vasnake.spark.app.datasets.CompareDatasetsApp
 
-## unit tests
+## Unit tests
 
 unit tests for each module
     * com.github.vasnake.core.num.NumPyTest
@@ -241,7 +246,7 @@ unit tests for each module
     * com.github.vasnake.spark.app.datasets.CompareDatasetsAppTest
     * com.github.vasnake.text.parser.JoinExpressionParserTest
 
-## integration tests, scripts
+## Integration tests, scripts
 
 [See scripts directory](../scripts.python/readme.md)
 
