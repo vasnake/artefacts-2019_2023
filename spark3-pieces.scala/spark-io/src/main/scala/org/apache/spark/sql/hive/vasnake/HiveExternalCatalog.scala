@@ -21,6 +21,12 @@ object HiveExternalCatalog extends CustomLogging {
   // API
   def openConnection(spark: SparkSession): ExternalCatalog = externalCatalog(spark.sparkContext)
 
+  /**
+   * Invoke 'close' on hive.ql.session.SessionState.
+   * Should help to save resources.
+   * Closing state doesn't render catalog instance useless. Next call to catalog will recreate closed state.
+   * @param conn catalog instance
+   */
   def closeConnection(conn: ExternalCatalog): Unit = {
     // Spark uses Hive and SessionState singleton in ThreadLocal wrapper, therefore correct pipeline looks like:
     // start thread -> open-or-use-already-opened thread connection -> do work -> close connection -> stop thread.

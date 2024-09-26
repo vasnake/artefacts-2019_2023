@@ -466,7 +466,7 @@ object TableSmartWriter {
           }
           else log.info("Have no partitions to update.")
 
-          // close if optional mqp exists
+          // close if optional pool exists
           mqpOpt.foreach(_.closeConnections())
         } // params.nonEmpty
       // partStats.nonEmpty

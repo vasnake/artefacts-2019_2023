@@ -5,10 +5,14 @@ package org.apache.spark.sql.hive.vasnake
 import scala.util._
 
 import com.github.vasnake.spark.io.{ Logging => CustomLogging }
-import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.catalyst.catalog._
-import org.apache.spark.sql.hive.{ HiveExternalCatalog => HiveExternalCatalog_Orig }
-import org.apache.spark.sql.internal.StaticSQLConf._
+
+import org.apache.spark.sql
+import sql.catalyst.catalog._
+import sql.internal.StaticSQLConf._
+import sql.SparkSession
+import sql.hive.{ HiveExternalCatalog => HiveExternalCatalog_Orig }
+
+import java.util.concurrent.atomic.AtomicBoolean
 
 /** Use custom HiveExternalCatalog to work with metastore in concurrent mode.
   * @param spark session
@@ -38,18 +42,8 @@ class MetastoreQueryProcessorWithConnPool(
 
   def poolActualSize: Int = connections.length
 
-  def closeConnections(): Unit =
-    // FYI: calling this on pool.exit make no difference in envoy total_connections monitoring graph
-    connections.zipWithIndex.foreach {
-      case (conn, idx) =>
-        Try {
-          HiveExternalCatalog.closeConnection(conn)
-        } match {
-          case Failure(exception) =>
-            log.warn(s"Failed closing connection ${idx + 1}: ${exception.getMessage}", exception)
-          case _ => log.debug(s"Connection ${idx + 1} successfully closed.")
-        }
-    }
+  // FYI: calling this on pool.exit make no difference in envoy total_connections monitoring graph
+  def closeConnections(): Unit = closePool()
 
   def processQueries[A, B](queries: IndexedSeq[A], oneQueryFun: (A, ExternalCatalog) => Seq[B])
     : IndexedSeq[B] = {
@@ -121,6 +115,11 @@ class MetastoreQueryProcessorWithConnPool(
   }
 }
 
+/**
+ * You preparePool, use it, and closePool.
+ * You can't preparePool more than once w/o closePool.
+ * You can use one pool in any number of concurrent threads, but better not to.
+ */
 object MetastoreQueryProcessorWithConnPool extends CustomLogging {
 
   // pool constructor, preferable way to create pool
@@ -137,7 +136,8 @@ object MetastoreQueryProcessorWithConnPool extends CustomLogging {
 
   val METASTORE_CONNECTIONS_POOL_SIZE_MAX: Int = 32
 
-  private var connections: Seq[ExternalCatalog] = Seq.empty // TODO: consider use cases with concurrent pool clients
+  private var connections: Seq[ExternalCatalog] = Seq.empty
+  private val inUse = new AtomicBoolean(false) // when in use, you can't change the pool of connections
 
   def preparePool(poolSize: Int, spark: SparkSession): Unit = {
     require(
@@ -148,10 +148,34 @@ object MetastoreQueryProcessorWithConnPool extends CustomLogging {
     if (connections.length >= poolSize)
       log.debug(s"Pool(${connections.length}) prepared already")
     else {
-      val newItemsCount = poolSize - connections.length
-      connections =
-        connections ++ (1 to newItemsCount).map(_ => HiveExternalCatalog.openConnection(spark))
-      log.debug(s"Pool(${connections.length}) prepared")
+      this.synchronized {
+        if (inUse.compareAndSet(false, true)) {
+          val newItemsCount = poolSize - connections.length
+          connections =
+            connections ++ (1 to newItemsCount).map(_ => HiveExternalCatalog.openConnection(spark))
+          log.debug(s"Pool(${connections.length}) prepared")
+        }
+        else log.warn(s"Pool prepared already, actual size: ${connections.length}")
+      }
+    }
+  }
+
+  def closePool(): Unit = {
+    connections.zipWithIndex.foreach {
+      case (conn, idx) =>
+        Try {
+          HiveExternalCatalog.closeConnection(conn)
+        } match {
+          case Failure(exception) =>
+            log.warn(s"Failed closing connection ${idx + 1}: ${exception.getMessage}", exception)
+          case _ => log.debug(s"Connection ${idx + 1} successfully closed.")
+        }
+    }
+    this.synchronized {
+      if (inUse.compareAndSet(true, false)) {
+        connections = Seq.empty
+        log.debug("Pool closed, 0 connections")
+      }
     }
   }
 
