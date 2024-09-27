@@ -7,7 +7,7 @@ Spark 2.4.8; Scala 2.12.19; sbt 1.10.1; java 1.8
 [Migration to Spark 3](../spark3-pieces.scala/readme.md).
 
 After migrating this collection to Spark3 platform,
-I don't need (and don't want) Spark2-related code. Consider it deprecated, it sits here just for educational reasons.
+I don't need (and don't want) Spark2-related code. Consider it deprecated, it sits here just for educational purposes.
 
 My local station env (win11 + wsl2)
 ```sh
@@ -64,15 +64,15 @@ Other sbt-related resources
 
 ## Project modules
 
-All modules packed to uber-jar (via `sbt assembly`) and can be used in spark apps,
-you should add library to spark session: `spark-submit ... --jars hdfs:/lib/custom-transformers-SNAPSHOT.jar`.
+All modules could be packed to uber-jar (via `sbt assembly`) and can be used in spark apps.
+To do that, you should add library to spark session, e.g: `spark-submit ... --jars hdfs:/lib/fat.jar`.
 
 ### hive-udaf-java
 
 Class `com.github.vasnake.hive.java.udaf.GenericAvgUDAF`: generic UDAF based on the old Hive API `hive.ql.udf.generic`.
-Can be used on columns of type `array<numeric>`, `map<string, numeric>` along with plain numeric types.
+Can be used on columns of type `array<numeric>`, `map<string, numeric>`, along with plain numeric types.
 
-I don't recommend it, use Spark Catalyst API for UDF/UDAF development.
+I don't recommend it, you should use Spark Catalyst API for UDF/UDAF development.
 
 ### spark-io
 
@@ -81,11 +81,11 @@ if table is not partitioned, overwrite table.
 Uses `df.write.insertInto(tableFQN)` under the hood.
 
 Method has two distinct features:
-- resulting files size are even and under control of `maxRowsPerBucket` parameter;
-- in HMS the boolean flag maintained for each written partition. It's semantics similar to `SUCCESS_` flag for HDFS.
+- resulting files size are even, and under control of `maxRowsPerBucket` parameter;
+- in HMS, the boolean flag maintained for each written partition. It's semantics similar to `SUCCESS_` flag for HDFS.
 
-The second feature implemented on top of custom ExternalCatalog implementation combined with parallel-query-processor
-based on the managed pool of HMS (Hive Meta Store) query processors.
+The second feature implemented using custom ExternalCatalog implementation combined with the parallel-query-processor
+based on the managed pool of HMS (Hive Meta Store) query connections.
 Custom external catalog: `org.apache.spark.sql.hive.vasnake.HiveExternalCatalog`.
 HMS query processor: `org.apache.spark.sql.hive.vasnake.MetastoreQueryProcessorWithConnPool`.
 This implementation was created to solve the problem with spark ExternalCatalog inability to process queries concurrently.
