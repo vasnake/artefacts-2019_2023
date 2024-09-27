@@ -24,8 +24,6 @@ class PrimitiveDoubleTest extends AnyFlatSpec with should.Matchers with LocalSpa
 
   val resultColumnType: String = "DoubleType"
 
-  // TODO: add tests for min/max/avg/most_freq API's
-
   // testOnly *PrimitiveDoubleTest* -- -z "smoke"
   it should "pass smoke test, generic sum" in {
     functions.registerAs("generic_sum", "generic_sum", spark, overrideIfExists = true)
