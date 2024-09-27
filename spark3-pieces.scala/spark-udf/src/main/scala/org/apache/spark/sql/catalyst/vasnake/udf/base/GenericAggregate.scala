@@ -95,9 +95,8 @@ abstract class GenericAggregate()
   }
 
   override def eval(buffer: NumericAccumulator): Any =
-    // must returns dataType object, spark sql ArrayData, MapData, InternalRow or primitive
+    // must return dataType object, spark sql ArrayData, MapData, InternalRow or primitive
     // logDebug(s"eval enter: buffer: ${buffer}")
-
     if (isArray)
       if (buffer.containerIsNull) null else generateOutputArray(buffer)
     else if (isMap)

@@ -3,15 +3,18 @@
 package org.apache.spark.sql.catalyst.vasnake.udf
 
 import com.github.vasnake.spark.test.LocalSpark
+import Fixtures._
+import functions._
+
 import org.apache.spark.sql
+import sql.DataFrame
+import sql.catalyst.expressions.Expression
+
 //import org.scalatest._
 import org.scalatest.flatspec._
 import org.scalatest.matchers._
 
 class PrimitiveDoubleTest extends AnyFlatSpec with should.Matchers with LocalSpark with Checks {
-  import sql.DataFrame
-  import Fixtures._
-  import functions.generic_sum
 
   lazy val inputDF: DataFrame = cache(
     createInputDF(spark)
@@ -22,27 +25,73 @@ class PrimitiveDoubleTest extends AnyFlatSpec with should.Matchers with LocalSpa
   val resultColumnType: String = "DoubleType"
 
   // TODO: add tests for min/max/avg/most_freq API's
-  it should "pass smoke test, imperative sum" in {
+
+  // testOnly *PrimitiveDoubleTest* -- -z "smoke"
+  it should "pass smoke test, generic sum" in {
+    functions.registerAs("generic_sum", "generic_sum", spark, overrideIfExists = true)
     val input = inputDF.where("part = 'A'")
+    input.createOrReplaceTempView("features")
     show(input, message = "input")
 
-    // DataFrame API
-    def nativeCall = input
-      .groupBy("part")
-      .agg(sql.Column(GenericSum(sql.Column("feature").expr).toAggregateExpression))
-    val output = input.groupBy("part").agg(generic_sum("feature"))
-    output.explain(extended = true)
-    show(output, message = "generic imperative sum output, DataFrame API", force = true)
-    show(nativeCall)
+    show(
+      input.groupBy("part").agg(sql.Column(GenericSum(sql.Column("feature").expr).toAggregateExpression)),
+      message = "generic_sum output, DataFrame API, native",
+      force = true
+    )
 
-    // SQL API
-    functions.registerAs("generic_sum", "generic_sum", spark, overrideIfExists = true)
-    input.createOrReplaceTempView("features")
+    show(
+      input.groupBy("part").agg(generic_sum("feature")),
+      message = "generic_sum output, DataFrame API, shortcut",
+      force = true
+    )
+
     show(
       spark.sql("select part, generic_sum(feature) from features group by part"),
       message = "generic_sum output, SQL API",
       force = true
     )
+  }
+
+  it should "pass smoke test, generic min/max/avg/most_freq" in {
+    val input = inputDF.where("part = 'A'")
+    input.createOrReplaceTempView("features")
+    show(input, message = "input")
+
+    def c(s: String):Expression = sql.Column(s).expr
+    def e(s: String): Expression = sql.functions.expr(s).expr
+
+    val funcsTable: Seq[(String, Expression, String => sql.Column)] = Seq(
+      ("generic_min", GenericMin(c("feature")).toAggregateExpression, generic_min),
+      ("generic_max", GenericMax(c("feature")).toAggregateExpression, generic_max),
+      ("generic_avg", GenericAvg(c("feature")).toAggregateExpression, generic_avg),
+      (
+        "generic_most_freq",
+        GenericMostFreq(c("feature"), e("null"), e("null"), e("null")).toAggregateExpression,
+        s => generic_most_freq(s, "null", "null", "null")
+      )
+    )
+
+    for {
+      (fName, aggregateExpr, aggregateFun) <- funcsTable
+    } yield {
+      functions.registerAs(fName, fName, spark, overrideIfExists = true)
+      show(
+        input.groupBy("part").agg(sql.Column(aggregateExpr)),
+        message = s"$fName output, DataFrame API, native",
+        force = true
+      )
+      show(
+        input.groupBy("part").agg(aggregateFun("feature")),
+        message = s"$fName output, DataFrame API, shortcut",
+        force = true
+      )
+
+      show(
+        spark.sql(s"select part, $fName(feature) from features group by part"),
+        message = s"$fName output, SQL API",
+        force = true
+      )
+    }
   }
 
   it should "produce null if all values are null, part B" in {

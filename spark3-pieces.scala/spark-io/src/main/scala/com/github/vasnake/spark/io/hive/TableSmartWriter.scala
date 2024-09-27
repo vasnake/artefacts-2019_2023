@@ -718,4 +718,4 @@ object TableSmartWriter {
 
   val DEBUG_MODE: Boolean = false
 }
-// TODO: refactor, make it readable; de-couple modules (parameters, stats, metastore, repartition, write)
+// TODO: re-write: make it readable; de-couple modules (parameters, stats, metastore, repartition, write)
