@@ -4,7 +4,10 @@ package org.apache.spark.sql.catalyst.vasnake.udf.base
 
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions._
+
 import org.apache.spark.sql.catalyst.expressions.codegen
+import codegen.{CodegenContext, CodeGenerator, ExprCode, FalseLiteral}
+import codegen.Block.BlockHelper
 
 trait GenericUnaryPredicateNotNull
     extends UnaryExpression
@@ -19,9 +22,6 @@ trait GenericUnaryPredicateNotNull
   private def nullUnsafeEval(input: Any): Any =
     if (input == null) onNullInput
     else nullSafeEval(input)
-
-  import codegen._
-  import codegen.Block.BlockHelper
 
   override def doGenCode(ctx: CodegenContext, ev: ExprCode): ExprCode = {
     val eval = child.genCode(ctx)

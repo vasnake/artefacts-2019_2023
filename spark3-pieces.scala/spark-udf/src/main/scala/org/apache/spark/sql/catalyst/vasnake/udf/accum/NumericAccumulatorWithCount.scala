@@ -15,17 +15,14 @@ import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types.UTF8String
 
 class NumericAccumulatorWithCount[K, V] extends Accumulator with Iterable[(K, V)] {
-  import org.apache.spark.sql.catalyst.vasnake.udf.accum.{ NumericAccumulatorWithCount => CO }
-
-  override def toString(): String = s"NumericAccumulatorWithCount{accum = ${accum}"
+  import org.apache.spark.sql.catalyst.vasnake.udf.accum.{ NumericAccumulatorWithCount => CO } // companion object
 
   private val accum = mutable.Map.empty[K, V] // new OpenHashMap[K, V]() // import org.apache.spark.util.collection.OpenHashMap
   implicit val keyValueOps: MapKVOps[K, V] = CO.kvOps.asInstanceOf[MapKVOps[K, V]]
 
+  override def toString(): String = s"NumericAccumulatorWithCount{accum = ${accum}"
   override def iterator: Iterator[(K, V)] = itemsIterator
-
   override def serialize: Array[Byte] = _serialize
-
   override def deserialize(bytes: Array[Byte]): Accumulator = CO.deserialize(bytes)(CO.kvOps)
 
   def _serialize(
@@ -114,7 +111,9 @@ object NumericAccumulatorWithCount {
   type A = NumericAccumulatorWithCount[K, V]
   val PRIMITIVE_KEY: String = "1"
 
-  def apply(): NumericAccumulatorWithCount[K, V] = new NumericAccumulatorWithCount[K, V]()
+  def apply(): NumericAccumulatorWithCount[K, V] =
+    new NumericAccumulatorWithCount[K, V]()
+
   def apply(accum: Accumulator): NumericAccumulatorWithCount[K, V] =
     accum.asInstanceOf[NumericAccumulatorWithCount[K, V]]
 
@@ -161,8 +160,7 @@ object NumericAccumulatorWithCount {
   def nullValue: V = AccumulatorValue(1, null.asInstanceOf[VN])
 
   val kvOps: MapKVOps[K, V] = new MapKVOps[K, V] {
-    override def makeValue[A, B](a: A, b: B): V =
-      AccumulatorValue(a.asInstanceOf[VC], b.asInstanceOf[VN])
+    override def makeValue[A, B](a: A, b: B): V = AccumulatorValue(a.asInstanceOf[VC], b.asInstanceOf[VN])
     override def positiveValue: V = AccumulatorValue(1, 1.0)
     override def negativeValue: V = AccumulatorValue(1, -1.0)
     override def isValuePositive(v: V): Boolean = v.value > 0

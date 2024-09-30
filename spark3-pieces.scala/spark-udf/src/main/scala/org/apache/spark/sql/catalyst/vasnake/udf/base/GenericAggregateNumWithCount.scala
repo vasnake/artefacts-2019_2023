@@ -25,6 +25,7 @@ abstract class GenericAggregateNumWithCount()
     extends TypedImperativeAggregate[Accumulator]
        with ImplicitCastInputTypes
        with Logging {
+
   @inline protected def debug(msg: => String): Unit = {
     // logDebug(msg)
   }
@@ -35,17 +36,15 @@ abstract class GenericAggregateNumWithCount()
   @inline def evalItem(x: AccImpl.V): AccImpl.VN
 
   override def serialize(buff: Accumulator): Array[Byte] = buff.serialize
-  override def deserialize(bytes: Array[Byte]): Accumulator =
-    createAggregationBuffer().deserialize(bytes)
+  override def deserialize(bytes: Array[Byte]): Accumulator = createAggregationBuffer().deserialize(bytes)
 
   override def children: Seq[Expression] = child :: Nil
   override def nullable: Boolean = true
   override def dataType: DataType = codec.resultType
   override def createAggregationBuffer(): Accumulator = AccImpl.apply()
 
-  override def inputTypes: Seq[AbstractDataType] =
-    // TODO: compute values from codec object and children seq
-    children.map(_ => AnyDataType)
+  // TODO: try to compute values from codec object and children seq
+  override def inputTypes: Seq[AbstractDataType] = children.map(_ => AnyDataType)
 
   override def checkInputDataTypes(): TypeCheckResult =
     Try {
@@ -106,7 +105,6 @@ abstract class GenericAggregateNumWithCount()
 
     if (!other.containerIsNull) accum.containerIsNull(false)
 
-    // TODO: refactor interfaces
     AccImpl.apply(other).foreach { case (key, value) => updateBuffer(accum, key, value) }
 
     debug(s"merge exit: buffer: ${accum}")
@@ -118,15 +116,11 @@ abstract class GenericAggregateNumWithCount()
     debug(s"eval enter: buffer: ${accum}")
 
     if (isArray) {
-      debug(
-        s"eval: array, buffer.isEmpty: ${accum.isEmpty}, containerIsNull: ${accum.containerIsNull}"
-      )
+      debug(s"eval: array, buffer.isEmpty: ${accum.isEmpty}, containerIsNull: ${accum.containerIsNull}")
       if (accum.containerIsNull) null else generateOutputArray(accum)
     }
     else if (isMap) {
-      debug(
-        s"eval: map, buffer.isEmpty: ${accum.isEmpty}, containerIsNull: ${accum.containerIsNull}"
-      )
+      debug(s"eval: map, buffer.isEmpty: ${accum.isEmpty}, containerIsNull: ${accum.containerIsNull}")
       if (accum.containerIsNull) null else generateOutputMap(accum)
     }
     else { // primitive
@@ -151,9 +145,7 @@ abstract class GenericAggregateNumWithCount()
   @inline protected def parseInputElem(value: Any): AccImpl.V =
     AccImpl
       .kvOps
-      .decodeValue(
-        codec.decodeValue(value)
-      )
+      .decodeValue(codec.decodeValue(value))
 
   @inline protected def parseInputElem(map: MapData, value: Any): AccImpl.V =
     if (value == null) AccImpl.nullValue

@@ -5,6 +5,8 @@ package org.apache.spark.sql.catalyst.vasnake.udf.base
 import scala.util._
 
 import org.apache.spark.internal.Logging
+import org.apache.spark.sql.types._
+
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.analysis.TypeCheckResult
 import org.apache.spark.sql.catalyst.expressions._
@@ -12,13 +14,13 @@ import org.apache.spark.sql.catalyst.expressions.aggregate.TypedImperativeAggreg
 import org.apache.spark.sql.catalyst.util._
 import org.apache.spark.sql.catalyst.vasnake.udf.accum.NumericAccumulator
 import org.apache.spark.sql.catalyst.vasnake.udf.codec._
-import org.apache.spark.sql.types._
 
+// There are two GenericAggregate..., TODO: DRY
 abstract class GenericAggregate()
     extends TypedImperativeAggregate[NumericAccumulator]
        with ImplicitCastInputTypes
        with Logging {
-  // imperative agg uses primitives: InternalRow, buffer, update, merge, eval, ser/des
+  // imperative agg uses: InternalRow, buffer, update, merge, eval, ser/des
 
   // spec and examples:
   // abstract class ImperativeAggregate extends AggregateFunction with CodegenFallback { ... }
@@ -26,6 +28,7 @@ abstract class GenericAggregate()
   // abstract class TypedImperativeAggregate[T] extends ImperativeAggregate { ... }
   // import org.apache.spark.sql.catalyst.expressions.aggregate.Percentile
   // import org.apache.spark.sql.hive.HiveUDAFFunction
+
   @inline protected def debug(msg: => String): Unit = {}
 
   def child: Expression
@@ -33,17 +36,13 @@ abstract class GenericAggregate()
   @inline def combineItems(x: NumericAccumulator.V, y: NumericAccumulator.V): NumericAccumulator.V
 
   override def serialize(buff: NumericAccumulator): Array[Byte] = buff.serialize
-  override def deserialize(bytes: Array[Byte]): NumericAccumulator =
-    NumericAccumulator.deserialize(bytes)
+  override def deserialize(bytes: Array[Byte]): NumericAccumulator = NumericAccumulator.deserialize(bytes)
   override def createAggregationBuffer(): NumericAccumulator = new NumericAccumulator()
 
   override def children: Seq[Expression] = child :: Nil
   override def nullable: Boolean = true
   override def dataType: DataType = codec.resultType
-
-  override def inputTypes: Seq[AbstractDataType] =
-    // TODO: compute values from codec object and children seq
-    children.map(_ => AnyDataType)
+  override def inputTypes: Seq[AbstractDataType] = children.map(_ => AnyDataType)
 
   override def checkInputDataTypes(): TypeCheckResult = Try {
     dataType.isInstanceOf[DecimalType] || dataType.acceptsType(child.dataType)

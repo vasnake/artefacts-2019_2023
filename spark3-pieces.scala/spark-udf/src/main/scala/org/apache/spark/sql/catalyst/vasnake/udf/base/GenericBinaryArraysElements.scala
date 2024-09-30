@@ -2,17 +2,17 @@
   */
 package org.apache.spark.sql.catalyst.vasnake.udf.base
 
-import java.lang.{ Double => jDouble, Float => jFloat }
-
-import scala.collection.mutable
+import java.lang.{ Double => jDouble }
 
 import org.apache.spark.sql.AnalysisException
-import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.catalyst.expressions.codegen._
 import org.apache.spark.sql.catalyst.util._
 import org.apache.spark.sql.types._
 
+import org.apache.spark.sql.catalyst.expressions._
+import org.apache.spark.sql.catalyst.expressions.codegen._
+
 trait GenericBinaryArraysElements extends ArrayBinaryLike with ComplexTypeMergingExpression {
+
   def binaryOp(x1: jDouble, x2: jDouble): jDouble
 
   override def nullable: Boolean = true // Can't say "it's not null" before looking at actual data
@@ -103,9 +103,4 @@ trait GenericBinaryArraysElements extends ArrayBinaryLike with ComplexTypeMergin
     case DecimalType.Fixed(precision, scale) => x => Decimal(BigDecimal(x), precision, scale)
     case _ => throw new AnalysisException(s"Unsupported element type: ${elementType.sql}")
   }
-}
-
-object Types {
-  type MWAJF = mutable.WrappedArray[jFloat]
-  type AJF = Array[jFloat]
 }
