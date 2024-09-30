@@ -3,16 +3,15 @@
 package org.apache.spark.sql.catalyst.vasnake.udf.accum
 
 import java.io._
-
 import scala.annotation.tailrec
 
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions._
+import org.apache.spark.sql.catalyst.vasnake.udf.accum.NumericAccumulator.serializationBufferSize
 import org.apache.spark.sql.types._
+
 import org.apache.spark.unsafe.types.UTF8String
 import org.apache.spark.util.collection.OpenHashMap
-
-// TODO: make it more generic, I'm not happy with K and V beeng hardcoded
 
 class NumericAccumulator extends OpenHashMap[NumericAccumulator.K, NumericAccumulator.V] {
   import NumericAccumulator.{ K, V, SK, SV, decodeKey, encodeKey }
@@ -53,7 +52,7 @@ class NumericAccumulator extends OpenHashMap[NumericAccumulator.K, NumericAccumu
   }
 
   def serialize: Array[Byte] = {
-    val itemBuff = new Array[Byte](4 << 10) // 4K item size
+    val itemBuff = new Array[Byte](serializationBufferSize)
     val bos = new ByteArrayOutputStream()
     val out = new DataOutputStream(bos)
     try {
@@ -114,6 +113,12 @@ object NumericAccumulator {
 
   private val SK = StringType
   private val SV = DoubleType
+
+  // The right way to make it configurable is: pass a serializable 'config' object all the way down from the udf registration point.
+  // On the time of registration get config from the SparkConf obj.
+  // see KryoSerializer https://github.com/apache/spark/blob/3065dd92ab8f36b019c7be06da59d47c1865fe60/core/src/main/scala/org/apache/spark/serializer/KryoSerializer.scala#L62C1-L62C38
+  val serializationBufferSize: Int = 32 << 10 // 32Kb buffer for off-heap serialization
+
   private def decodeKey(key: Any): Any = key.asInstanceOf[UTF8String]
   private def encodeKey(key: K): Any = UTF8String.fromString(key)
 

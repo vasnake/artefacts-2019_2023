@@ -128,8 +128,6 @@ case class GenericMostFreq(
   }
 }
 
-// TODO: accumulator should be generic; actual accum. type should be derived from codec
-
 abstract class GenericCountItems()
     extends TypedImperativeAggregate[Accumulator]
        with ImplicitCastInputTypes

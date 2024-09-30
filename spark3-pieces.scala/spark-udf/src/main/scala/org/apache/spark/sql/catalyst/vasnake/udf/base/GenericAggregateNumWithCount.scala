@@ -5,6 +5,7 @@ package org.apache.spark.sql.catalyst.vasnake.udf.base
 import scala.util._
 
 import org.apache.spark.internal.Logging
+
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.analysis.TypeCheckResult
 import org.apache.spark.sql.catalyst.expressions._
@@ -12,8 +13,14 @@ import org.apache.spark.sql.catalyst.expressions.aggregate.TypedImperativeAggreg
 import org.apache.spark.sql.catalyst.util._
 import org.apache.spark.sql.catalyst.vasnake.udf.accum.{ NumericAccumulatorWithCount => AccImpl, _ }
 import org.apache.spark.sql.catalyst.vasnake.udf.codec._
+
 import org.apache.spark.sql.types._
 
+// The most complicated machinery in that aggregator,
+// TODO: I should redesign it to make: 1) data type agnostic; 2) configurable.
+// It means: abstract logic over data type (type parameter); add config/env parameter to constructor or interface
+// (self => withConfig)
+// Accumulator should be generic; actual accum. type should be derived from codec.
 abstract class GenericAggregateNumWithCount()
     extends TypedImperativeAggregate[Accumulator]
        with ImplicitCastInputTypes

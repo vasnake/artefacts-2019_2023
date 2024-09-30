@@ -11,6 +11,7 @@ import scala.collection.mutable
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.types._
+
 import org.apache.spark.unsafe.types.UTF8String
 
 class NumericAccumulatorWithCount[K, V] extends Accumulator with Iterable[(K, V)] {
@@ -31,7 +32,7 @@ class NumericAccumulatorWithCount[K, V] extends Accumulator with Iterable[(K, V)
     implicit
     kv: MapKVOps[K, V]
   ): Array[Byte] = {
-    val itemBuff = new Array[Byte](4 << 10) // 4K item size, TODO: make it a configurable parameter
+    val itemBuff = new Array[Byte](NumericAccumulator.serializationBufferSize)
     val bos = new ByteArrayOutputStream()
     val out = new DataOutputStream(bos)
 
