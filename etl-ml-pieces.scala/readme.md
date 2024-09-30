@@ -9,7 +9,7 @@ Spark 2.4.8; Scala 2.12.19; sbt 1.10.1; java 1.8
 After migrating this collection to Spark3 platform,
 I don't need (and don't want) Spark2-related code. Consider it deprecated, it sits here just for educational purposes.
 
-My local station env (win11 + wsl2)
+My local station env: win11 + wsl2
 ```sh
 # coursier update
 cs setup
@@ -57,10 +57,11 @@ Other sbt-related resources
 - https://stackoverflow.com/questions/57521738/how-to-solve-sbt-dependency-problem-with-spark-and-whisklabs-docker-it-scala
 - https://github.com/sbt/sbt-assembly
 
-- set envvars for sbt `export JAVA_OPTS="-XX:MaxMetaspaceSize=1G -Xmx4G -XX:+UseParallelGC" JAVA_HOME=$(/usr/libexec/java_home -v 1.8) && sbt -v`
-- set envvars for tests `sbt> set ThisBuild / Test / envVars := Map("DEBUG_MODE" -> "true", "SPARK_LOCAL_IP" -> "127.0.0.1")`; `sbt> set Test/logBuffered := false`
-- select individual test `sbt> testQuick *InverseVariabilityTransformer* -- -z "reference"`
-- logs selectors/tuning `edit test/resources/log4j*.properties`
+And a few more
+- set envvars for sbt: `export JAVA_OPTS="-XX:MaxMetaspaceSize=1G -Xmx4G -XX:+UseParallelGC" JAVA_HOME=$(/usr/libexec/java_home -v 1.8) && sbt -v`
+- set envvars for tests: `sbt> set ThisBuild / Test / envVars := Map("DEBUG_MODE" -> "true", "SPARK_LOCAL_IP" -> "127.0.0.1")`; `sbt> set Test/logBuffered := false`
+- select individual test: `sbt> testQuick *InverseVariabilityTransformer* -- -z "reference"`
+- logs selectors/tuning: `edit test/resources/log4j*.properties`
 
 ## Project modules
 
