@@ -13,6 +13,10 @@ For full description see docs inside.
 
 ## CI/CD
 
+- To build uber-jar use `sbt assembly` command.
+- To run unit tests use `sbt test` command.
+- To run integration tests ... TBD.
+
 Manual directory cleanup: `find . -depth -type d \( -name target -or -name .bloop -or -name .bsp -or -name .metals -or -name metastore_db -or -name spark-warehouse \) -exec echo rm -rfv {} \;`
 
 Bash script, [build fat-jar for Spark](cicd/build_uber_jar.sh).
