@@ -104,13 +104,12 @@ lazy val json =
     .settings(commonSettings)
     .settings(commonDependencies)
     .settings(
-      // TODO: try to simplify, you have to many dependencies
       libraryDependencies ++= Seq(
+        // TODO: consider the possibility to cover all your needs with only one library
         dio.circe.`circe-core`,
         dio.circe.`circe-generic`,
         dio.circe.`circe-parser`,
         org.json4s.`json4s-jackson`
-        // org.json4s.`json4s-ast`
       )
     )
 

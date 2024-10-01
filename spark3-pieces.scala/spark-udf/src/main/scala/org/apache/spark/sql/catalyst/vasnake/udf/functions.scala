@@ -12,13 +12,22 @@ import org.apache.spark.sql.catalyst.catalog.CatalogFunction
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.expressions.aggregate.AggregateFunction
 
-// TODO: add proper docstring
+/**
+ * UDF (UDF and UDAF actually) catalog and public interface to it.
+ */
 object functions {
 
-  // Functions registry interface
-  // Possible usage examples:
-  // in scala code: `functions.registerAs("generic_avg", "gavg", spark, overrideIfExists = true)`
-  // in python code: `spark._jvm.org.apache.spark.sql.catalyst.vasnake.udf.functions.registerAs("generic_avg", "gavg", spark._jsparkSession, True)`
+  /**
+   * UDF registry interface. Usage examples: <pre>
+   *   from scala code: `functions.registerAs("generic_avg", "gavg", spark, overrideIfExists = true)`
+   *   from python code: `spark._jvm.org.apache.spark.sql.catalyst.vasnake.udf.functions.registerAs("generic_avg", "gavg", spark._jsparkSession, True)`
+   * </pre>
+   *
+   * @param funcName UDF original name from catalog, see `names` property
+   * @param targetName UDF target name, after registration UDF will be accessible under this name in SQL
+   * @param spark session
+   * @param overrideIfExists ignore the fact that some UDF could be registered already under this name
+   */
   def registerAs(
     funcName: String,
     targetName: String,
@@ -41,6 +50,11 @@ object functions {
       )
   }
 
+  /**
+   * Register all functions from this catalog
+   * @param spark session
+   * @param overrideIfExists ignore already registered under the same name functions
+   */
   def registerAll(spark: SparkSession, overrideIfExists: Boolean = false): Unit =
     // Little late for builtins, it don't work here, see:
     // import org.apache.spark.sql.catalyst.analysis.FunctionRegistry
@@ -51,7 +65,7 @@ object functions {
         registerAs(name, alias, spark, overrideIfExists)
     }
 
-  /** Provide access to `private[sql] def registerJava ...` function from `org.apache.spark.sql.UDFRegistration`.
+  /** Provide access to `private[sql] def registerJava(...)` function from `org.apache.spark.sql.UDFRegistration`.
     * @param funcName UDF name
     * @param classPath fully qualified class name that implements `org.apache.spark.sql.api.java`
     * @param spark session
@@ -65,7 +79,10 @@ object functions {
 
   // Functions collection
 
-  // catalyst expressions collection: (name, alias)
+  /**
+   * Catalyst expressions collection: (name, alias)
+   * @return list of tuples (name, alias) for all Catalyst functions in this catalog
+   */
   def names: Iterable[(String, String)] = expressions.map(rec => (rec._1, rec._2._3))
 
   // Custom Catalyst expressions, inspired by:
@@ -73,10 +90,10 @@ object functions {
   // def stddev_pop(e: Column): Column = withAggregateFunction { StddevPop(e.expr) }
   // def stddev_pop(columnName: String): Column = stddev_pop(Column(columnName))
   // def map_concat(cols: Column*): Column = withExpr { MapConcat(cols.map(_.expr)) }
-  // Also, look at:
+  // Also, take a look at:
   // import org.apache.spark.sql.catalyst.analysis.FunctionRegistry
 
-  // Declarations for DataFrame API
+  // Declarations for DataFrame API, usage example: `df.groupBy("dt").agg(generic_sum("feature"))`
 
   def generic_sum(columnName: String): Column = generic_sum(Column(columnName))
   def generic_sum(e: Column): Column = withAggregateFunction(GenericSum(e.expr))
