@@ -77,26 +77,24 @@ I don't recommend it, you should use Spark Catalyst API for UDF/UDAF development
 
 ### spark-io
 
-Method `com.github.vasnake.spark.io.hive.TableSmartWriter.insertIntoHive`: insert partition into Hive (partitioned) table or,
+Method `com.github.vasnake.spark.io.hive.TableSmartWriter.insertIntoHive`: insert partitions into Hive (partitioned) table or,
 if table is not partitioned, overwrite table.
 Uses `df.write.insertInto(tableFQN)` under the hood.
 
 Method has two distinct features:
-- resulting files size are even, and under control of `maxRowsPerBucket` parameter;
-- in HMS, the boolean flag maintained for each written partition. It's semantics similar to `SUCCESS_` flag for HDFS.
+- Resulting files size are even, and under control of `maxRowsPerBucket` parameter;
+- In HMS, the boolean flag maintained for each written partition. It's semantics similar to `SUCCESS_` flag for HDFS directory.
 
 The second feature implemented using custom ExternalCatalog implementation combined with the parallel-query-processor
 based on the managed pool of HMS (Hive Meta Store) query connections.
 Custom external catalog: `org.apache.spark.sql.hive.vasnake.HiveExternalCatalog`.
 HMS query processor: `org.apache.spark.sql.hive.vasnake.MetastoreQueryProcessorWithConnPool`.
-This implementation was created to solve the problem with spark ExternalCatalog inability to process queries concurrently.
+This implementation was created to solve the problem with Spark ExternalCatalog inability to process queries concurrently.
 
 Other spark-io modules:
 * com.github.vasnake.spark.io.HDFSFileToolbox
 * com.github.vasnake.spark.io.CheckpointService
-* com.github.vasnake.spark.io.Logging
 * com.github.vasnake.spark.io.hive.SQLHiveWriter
-* com.github.vasnake.spark.io.hive.SQLWriterFactoryImpl
 * com.github.vasnake.spark.io.hive.TableSmartReader.readTableAsUnionOrcFiles
 
 ### spark-apps
