@@ -255,3 +255,16 @@ unit tests for each module
 - https://spark.apache.org/releases/
 - [Project Matrix: Linear Models revisit and refactor / Blockification (vectorization of vectors)](https://issues.apache.org/jira/browse/SPARK-30641)
 - [BLAS, LAPACK, Breeze, netlib-java acceleration](https://spark.apache.org/docs/latest/ml-linalg-guide.html#mllib-linear-algebra-acceleration-guide)
+
+Some materials about Spark generic UDF/UDAF (and Catalyst)
+- https://blog.cloudera.com/working-with-udfs-in-apache-spark/
+- https://stackoverflow.com/questions/46474610/spark-udaf-generics-type-mismatch
+- https://stackoverflow.com/questions/43248719/spark-udaf-using-generics-as-input-type
+- https://stackoverflow.com/questions/32100973/how-to-define-and-use-a-user-defined-aggregate-function-in-spark-sql
+- [grep](FunctionRegistry registerFunction genCode Spark)
+
+Advanced Spark, Catalyst, Tangsten, etc
+- Apache Spark Meetup 10-07-2015 https://www.youtube.com/watch?v=XxPXrMUXExM
+- https://www.slideshare.net/slideshow/advanced-apache-spark-meetup-project-tungsten-nov-12-2015/55064824
+- Care and Feeding of Catalyst Optimizer https://youtu.be/IjqC2Y2Hd5k?feature=shared
+- Chris Fregly https://www.youtube.com/results?search_query=Chris+Fregly

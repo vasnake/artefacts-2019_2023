@@ -1,5 +1,7 @@
 # artefacts-2019_2023
 
+> Data engineering is the software engineering that enables data scientists to work effectively
+
 Collection of some interesting pieces from my projects (2019 .. 2023). Spark, Scala, Python, sh
 
 Two main categories:
