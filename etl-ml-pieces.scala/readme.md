@@ -121,6 +121,9 @@ Used for transforming regression scores to class labels, keeping class distribut
 
 ### spark-udf
 
+Spark Catalyst generic UDFs and UDAFs, accesible from Spark SQL and PySpark.
+Those custom functions works just like Spark native (builtin) SQL functions.
+
 Before using mentioned here UDF/UDAF in your spark session you have to register them: `com.github.vasnake.spark.udf.catalog.registerAll(spark)`
 
 The set of generic SQL UDAF functions: `gavg, gsum, gmin, gmax, most_freq`.
