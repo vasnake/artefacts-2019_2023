@@ -68,6 +68,42 @@ And a few more
 All modules could be packed to uber-jar (via `sbt assembly`) and can be used in spark apps.
 To do that, you should add library to spark session, e.g: `spark-submit ... --jars hdfs:/lib/fat.jar`.
 
+### spark-udf
+
+Generic UDFs and UDAFs using Spark Catalyst, accessible from Spark SQL and PySpark.
+Those custom functions work just like Spark native (builtin) SQL functions.
+
+Before using mentioned here UDF/UDAF in your spark session you have to register them: `com.github.vasnake.spark.udf.catalog.registerAll(spark)`
+
+The set of generic SQL UDAF functions: `gavg, gsum, gmin, gmax, most_freq`.
+Supported data types: primitive numeric types, arrays of primitive numeric types, and maps
+with keys: `float`, `double`, `int`, `byte`, `long`, `short`, `bool`, `date`, `timestamp`, `string`;
+and values: `float`, `double`, `int`, `byte`, `long`, `short`, `decimal`
+- org.apache.spark.sql.catalyst.vasnake.udf.GenericMin
+- org.apache.spark.sql.catalyst.vasnake.udf.GenericMax
+- org.apache.spark.sql.catalyst.vasnake.udf.GenericSum
+- org.apache.spark.sql.catalyst.vasnake.udf.GenericAvg
+- org.apache.spark.sql.catalyst.vasnake.udf.GenericMostFreq
+
+The set of generic vector/matrix UDF
+- org.apache.spark.sql.catalyst.vasnake.udf.GenericVectorCooMul
+- org.apache.spark.sql.catalyst.vasnake.udf.GenericVectorSemiSum
+- org.apache.spark.sql.catalyst.vasnake.udf.GenericVectorSemiDiff
+- org.apache.spark.sql.catalyst.vasnake.udf.GenericVectorMatMul
+
+Two generic functions, complementary to builtin `isnan`
+- org.apache.spark.sql.catalyst.vasnake.udf.GenericIsInf
+- org.apache.spark.sql.catalyst.vasnake.udf.GenericIsFinite
+
+The set of non-generic trivial UDF
+- com.github.vasnake.spark.udf.`java-api`.HtmlUnescapeUDF
+- com.github.vasnake.spark.udf.`java-api`.MapValuesOrderedUDF
+- com.github.vasnake.spark.udf.`java-api`.CheckUINT32UDF
+- com.github.vasnake.spark.udf.`java-api`.HashToUINT32UDF
+- com.github.vasnake.spark.udf.`java-api`.MurmurHash3_32UDF
+- com.github.vasnake.spark.udf.`java-api`.MapJoinUDF
+- com.github.vasnake.spark.udf.`java-api`.Uid2UserUDF
+
 ### hive-udaf-java
 
 Class `com.github.vasnake.hive.java.udaf.GenericAvgUDAF`: generic UDAF based on the old Hive API `hive.ql.udf.generic`.
@@ -118,42 +154,6 @@ Used for transforming scores to meet a given prior class label distribution, aft
 
 `com.github.vasnake.spark.ml.estimator.ScoreQuantileThresholdEstimator` + `com.github.vasnake.spark.ml.model.ScoreQuantileThresholdModel`
 Used for transforming regression scores to class labels, keeping class distribution close to a given prior distribution.
-
-### spark-udf
-
-Spark Catalyst generic UDFs and UDAFs, accessible from Spark SQL and PySpark.
-Those custom functions work just like Spark native (builtin) SQL functions.
-
-Before using mentioned here UDF/UDAF in your spark session you have to register them: `com.github.vasnake.spark.udf.catalog.registerAll(spark)`
-
-The set of generic SQL UDAF functions: `gavg, gsum, gmin, gmax, most_freq`.
-Supported data types: primitive numeric types, arrays of primitive numeric types, and maps
-with keys: `float`, `double`, `int`, `byte`, `long`, `short`, `bool`, `date`, `timestamp`, `string`;
-and values: `float`, `double`, `int`, `byte`, `long`, `short`, `decimal`
-- org.apache.spark.sql.catalyst.vasnake.udf.GenericMin
-- org.apache.spark.sql.catalyst.vasnake.udf.GenericMax
-- org.apache.spark.sql.catalyst.vasnake.udf.GenericSum
-- org.apache.spark.sql.catalyst.vasnake.udf.GenericAvg
-- org.apache.spark.sql.catalyst.vasnake.udf.GenericMostFreq
-
-The set of generic vector/matrix UDF
-- org.apache.spark.sql.catalyst.vasnake.udf.GenericVectorCooMul
-- org.apache.spark.sql.catalyst.vasnake.udf.GenericVectorSemiSum
-- org.apache.spark.sql.catalyst.vasnake.udf.GenericVectorSemiDiff
-- org.apache.spark.sql.catalyst.vasnake.udf.GenericVectorMatMul
-
-Two generic functions, complementary to `isnan` from stdlib
-- org.apache.spark.sql.catalyst.vasnake.udf.GenericIsInf
-- org.apache.spark.sql.catalyst.vasnake.udf.GenericIsFinite
-
-The set of non-generic trivial UDF
-- com.github.vasnake.spark.udf.`java-api`.HtmlUnescapeUDF
-- com.github.vasnake.spark.udf.`java-api`.MapValuesOrderedUDF
-- com.github.vasnake.spark.udf.`java-api`.CheckUINT32UDF
-- com.github.vasnake.spark.udf.`java-api`.HashToUINT32UDF
-- com.github.vasnake.spark.udf.`java-api`.MurmurHash3_32UDF
-- com.github.vasnake.spark.udf.`java-api`.MapJoinUDF
-- com.github.vasnake.spark.udf.`java-api`.Uid2UserUDF
 
 ### Other
 
@@ -213,37 +213,18 @@ The set of non-generic trivial UDF
 ## Unit tests
 
 unit tests for each module
-    * com.github.vasnake.core.num.NumPyTest
-    * com.github.vasnake.core.num.SciPyTest
+    * com.github.vasnake.core.num.*
     * com.github.vasnake.core.text.StringToolboxTest
     * com.github.vasnake.common.num.NumPyTest
     * com.github.vasnake.`etl-core`.GroupedFeaturesTest
-    * com.github.vasnake.`ml-core`.models.BinarizerTest
-    * com.github.vasnake.`ml-core`.models.GroupedFeaturesTfidfTest
-    * com.github.vasnake.`ml-core`.models.ImputerTest
-    * com.github.vasnake.`ml-core`.models.ScalerTest
-    * com.github.vasnake.`ml-core`.models.SlicerTest
-    * com.github.vasnake.`ml-core`.models.SGDClassifierTest
-    * com.github.vasnake.`ml-models`.complex.LalBinarizedMultinomialNbTest
-    * com.github.vasnake.`ml-models`.complex.LalTfidfScaledSgdcTest
-    * com.github.vasnake.`ml-models`.complex.GroupedTransformerTest
-    * com.github.vasnake.`ml-models`.complex.ScoreEqualizerTest
-    * com.github.vasnake.`ml-models`.complex.MultinomialNBTest
-    * com.github.vasnake.`ml-models`.complex.PredictorWrapperTest
+    * com.github.vasnake.`ml-core`.models.*
+    * com.github.vasnake.`ml-models`.complex.*
     * com.github.vasnake.spark.features.vector.FeaturesRowDecoderTest
-    * com.github.vasnake.spark.io.hive.TableSmartWriterTest
-    * com.github.vasnake.spark.io.hive.SQLHiveWriterTest
-    * com.github.vasnake.spark.ml.transformer.ApplyModelsTransformerTest
-    * com.github.vasnake.spark.ml.transformer.ScoreAudienceTest
-    * com.github.vasnake.spark.ml.estimator.NEPriorClassProbaTest
-    * com.github.vasnake.spark.ml.estimator.ScoreEqualizerTest
-    * com.github.vasnake.spark.ml.estimator.ScoreQuantileThresholdTest
-    * com.github.vasnake.spark.ml.transformer.ApplyModelsTransformerBenchApp
-    * com.github.vasnake.spark.udf.`java-api`.MurmurHash3_32UDFTest
-    * com.github.vasnake.spark.udf.`java-api`.Uid2UserUDFTest
-    * com.github.vasnake.spark.udf.`java-api`.MapJoinUDFTest
-    * com.github.vasnake.spark.udf.`java-api`.MapValuesOrderedUDFTest
-    * org.apache.spark.sql.catalyst.vasnake.udf.*Test
+    * com.github.vasnake.spark.io.hive.*
+    * com.github.vasnake.spark.ml.transformer.*
+    * com.github.vasnake.spark.ml.estimator.*
+    * com.github.vasnake.spark.udf.`java-api`.*
+    * org.apache.spark.sql.catalyst.vasnake.udf.*
     * org.apache.spark.sql.hive.vasnake.MetastoreQueryProcessorWithConnPoolTest
     * com.github.vasnake.spark.app.datasets.CompareDatasetsAppTest
     * com.github.vasnake.text.parser.JoinExpressionParserTest
@@ -264,7 +245,6 @@ Some materials about Spark generic UDF/UDAF (and Catalyst)
 - https://stackoverflow.com/questions/46474610/spark-udaf-generics-type-mismatch
 - https://stackoverflow.com/questions/43248719/spark-udaf-using-generics-as-input-type
 - https://stackoverflow.com/questions/32100973/how-to-define-and-use-a-user-defined-aggregate-function-in-spark-sql
-- [grep](FunctionRegistry registerFunction genCode Spark)
 
 Advanced Spark, Catalyst, Tangsten, etc
 - Apache Spark Meetup 10-07-2015 https://www.youtube.com/watch?v=XxPXrMUXExM
