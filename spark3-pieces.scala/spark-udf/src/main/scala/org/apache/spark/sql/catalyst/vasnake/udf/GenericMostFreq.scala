@@ -35,18 +35,14 @@ case class GenericMostFreq(
     this(child, indexExpression, thresholdExpression, preferExpression, 0, 0)
 
   override def prettyName: String = "generic_most_freq"
-
-  override protected def withNewChildrenInternal(newChildren: IndexedSeq[Expression]): Expression =
-    copy(child = newChildren.head)
+  override protected def withNewChildrenInternal(newChildren: IndexedSeq[Expression]): Expression = copy(child = newChildren.head)
+  override def children: Seq[Expression] = child :: indexExpression :: thresholdExpression :: preferExpression :: Nil
 
   override def withNewMutableAggBufferOffset(newMutableAggBufferOffset: Int): ImperativeAggregate =
     copy(mutableAggBufferOffset = newMutableAggBufferOffset)
 
   override def withNewInputAggBufferOffset(newInputAggBufferOffset: Int): ImperativeAggregate =
     copy(inputAggBufferOffset = newInputAggBufferOffset)
-
-  override def children: Seq[Expression] =
-    child :: indexExpression :: thresholdExpression :: preferExpression :: Nil // TODO: inputTypes should reflect children types
 
   @inline def combineItems(x: AccImpl.V, y: AccImpl.V): AccImpl.V =
     if (x == null) y
@@ -56,11 +52,11 @@ case class GenericMostFreq(
       AccImpl.kvOps.makeValue(x.count + y.count, 0.0)
     }
 
-  @transient private lazy val randomGen = new scala.util.Random() // new scala.util.Random(7333L)
+  @transient private lazy val randomGen = new scala.util.Random()
 
   @inline def evalItem(a: Accumulator): AccImpl.K = {
     debug(s"evalItem enter, accum: ${a}")
-    // if prefer and prefer in accum: return prefer
+    // if prefer, and prefer in accum: return prefer
     // if threshold: total = sum(accum.counts); accum = accum.filter(count / total >= threshold)
     // if accum is empty: return null
     // accum.selectTopItem(index): find list of top items; calc idx(index, top.size); return top(idx)
@@ -110,7 +106,8 @@ case class GenericMostFreq(
 
   }
 
-  // N.B. in docs these parameters described as constants, not dynamic expressions
+  // Function extra parameters.
+  // N.B. in docs these parameters described as constants, not dynamic expressions.
 
   @transient private lazy val prefer: Option[AccImpl.K] = {
     debug(s"prefer, expr ${preferExpression}")
@@ -132,41 +129,37 @@ abstract class GenericCountItems()
     extends TypedImperativeAggregate[Accumulator]
        with ImplicitCastInputTypes
        with Logging {
-  @inline protected def debug(msg: => String): Unit = {}
+  @inline protected def debug(msg: => String): Unit = ()
 
   def child: Expression
+
+  // TODO: Accumulator should be re-designed, abstract types + interface and concrete implementation based on runtime types (see codec)
   @inline def combineItems(x: AccImpl.V, y: AccImpl.V): AccImpl.V
   @inline def evalItem(a: Accumulator): AccImpl.K
 
   override def nullable: Boolean = true
   override def children: Seq[Expression] = child :: Nil
   override def serialize(buff: Accumulator): Array[Byte] = buff.serialize
-  override def deserialize(bytes: Array[Byte]): Accumulator =
-    AccImpl.deserialize(bytes)(AccImpl.kvOps)
+  override def deserialize(bytes: Array[Byte]): Accumulator = AccImpl.deserialize(bytes)(AccImpl.kvOps)
   override def createAggregationBuffer(): Accumulator = AccImpl.apply()
 
   override def dataType: DataType = codec.resultType
 
-  override def inputTypes: Seq[AbstractDataType] =
-    // TODO: compute values from codec object and children seq
-    children.map(_ => AnyDataType)
+  // TODO: compute values from codec object
+  override def inputTypes: Seq[AbstractDataType] = children.map(_ => AnyDataType)
 
-  override def checkInputDataTypes(): TypeCheckResult =
-    // TODO: add tests for unsupported data types
+  override def checkInputDataTypes(): TypeCheckResult = {
     Try {
       dataType.isInstanceOf[DecimalType] || dataType.acceptsType(child.dataType)
     } match {
       case Success(ok) =>
         if (ok) TypeCheckResult.TypeCheckSuccess
         else
-          TypeCheckResult.TypeCheckFailure(
-            s"function $prettyName, unknown type: ${child.dataType.catalogString}"
-          )
+          TypeCheckResult.TypeCheckFailure(s"function $prettyName, unknown type: ${child.dataType.catalogString}")
       case Failure(err) =>
-        TypeCheckResult.TypeCheckFailure(
-          s"function $prettyName, input type mismatch: ${err.getMessage}"
-        )
+        TypeCheckResult.TypeCheckFailure(s"function $prettyName, input type mismatch: ${err.getMessage}")
     }
+  }
 
   override def update(accum: Accumulator, input: InternalRow): Accumulator = {
     val exprValue: Any = child.eval(input)
@@ -180,7 +173,7 @@ abstract class GenericCountItems()
   override def merge(accum: Accumulator, other: Accumulator): Accumulator = {
     debug(s"merge enter: buffer: ${accum}, other: ${other}")
 
-    // TODO: refactor Accumulator interface
+    // it should be delegated to `accum.combine(other)`
     AccImpl.apply(other).foreach { case (key, value) => updateBuffer(accum, key, value) }
 
     debug(s"merge exit: buffer: ${accum}")
@@ -188,7 +181,7 @@ abstract class GenericCountItems()
   }
 
   override def eval(accum: Accumulator): Any = {
-    // return dataType object, spark sql ArrayData, MapData, InternalRow or primitive
+    // return dataType object: spark sql ArrayData, MapData, InternalRow or primitive
     debug(s"eval enter: buffer: ${accum}, isEmpty: ${accum.isEmpty}")
 
     if (accum.isEmpty) null else generateOutputPrimitive(accum)
@@ -198,7 +191,7 @@ abstract class GenericCountItems()
     accum: Accumulator,
     key: AccImpl.K,
     value: AccImpl.V
-  ): Unit =
+  ): Unit = {
     // debug(s"updateBuffer enter, key `${key}`, value `${value}`, accum: ${accum}")
 
     // If the key doesn't exist yet in the hash map, add key and set its value to defaultValue;
@@ -206,6 +199,7 @@ abstract class GenericCountItems()
     AccImpl.changeValue(accum, key, defaultValue = value, mergeValue = x => combineItems(x, value))
 
     // debug(s"updateBuffer exit, accum ${accum}")
+  }
 
   @inline protected def isInvalidInput(value: Any): Boolean =
     if (value == null) true
@@ -218,7 +212,7 @@ abstract class GenericCountItems()
 
   protected def generateOutputPrimitive(accum: Accumulator): Any = {
     // not-null input guaranteed
-    // eval result, return dataType object, spark sql primitive
+    // eval result, return dataType object: spark sql primitive
     debug(s"generateOutputPrimitive enter: accum: ${accum}")
 
     val res = evalItem(accum)
@@ -239,11 +233,8 @@ abstract class GenericCountItems()
       case FloatType => FloatColumnCodec()
       case DoubleType => DoubleColumnCodec()
       case DecimalType.Fixed(precision, scale) => DecimalColumnCodec(precision, scale)
-      // TODO: possible additions: DateType, TimestampType
       case _ =>
-        throw new IllegalArgumentException(
-          s"GenericCountItems: unknown expression data type: ${child.dataType}"
-        )
+        throw new IllegalArgumentException(s"GenericCountItems: unknown expression data type: ${child.dataType}")
     }
 
     debug(s"codec init exit, codec: ${res}")
