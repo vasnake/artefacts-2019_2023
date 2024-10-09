@@ -121,11 +121,11 @@ Method has two distinct features:
 - Resulting files size are even, and under control of `maxRowsPerBucket` parameter;
 - In HMS, the boolean flag maintained for each written partition. It's semantics similar to `SUCCESS_` flag for HDFS directory.
 
-The second feature implemented using custom ExternalCatalog implementation combined with the parallel-query-processor
+The second feature use custom ExternalCatalog implementation combined with the parallel-query-processor
 based on the managed pool of HMS (Hive Meta Store) query connections.
-Custom external catalog: `org.apache.spark.sql.hive.vasnake.HiveExternalCatalog`.
-HMS query processor: `org.apache.spark.sql.hive.vasnake.MetastoreQueryProcessorWithConnPool`.
-This implementation was created to solve the problem with Spark ExternalCatalog inability to process queries concurrently.
+This code was written to solve the problem with Spark ExternalCatalog inability to process queries concurrently.
+- Custom external catalog: `org.apache.spark.sql.hive.vasnake.HiveExternalCatalog`.
+- HMS query processor: `org.apache.spark.sql.hive.vasnake.MetastoreQueryProcessorWithConnPool`.
 
 Other spark-io modules:
 * com.github.vasnake.spark.io.HDFSFileToolbox
