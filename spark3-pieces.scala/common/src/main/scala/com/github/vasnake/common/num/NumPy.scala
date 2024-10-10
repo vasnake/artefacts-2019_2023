@@ -3,10 +3,6 @@
 package com.github.vasnake.common.num
 
 import org.apache.commons.math3.stat.descriptive.rank.Percentile
-import org.apache.commons.math3.stat.descriptive.rank.Percentile.EstimationType
-//import org.apache.commons.math3.stat.ranking.NaNStrategy
-//import org.apache.commons.math3.util.KthSelector
-//import org.apache.commons.math3.util.MedianOf3PivotingStrategy
 
 object NumPy {
 
@@ -22,13 +18,10 @@ object NumPy {
     ps: Array[Double],
     sorted: Boolean = false
   ): Array[Double] = {
-    // TODO: add tests, make it faster
-    // https://github.com/scalanlp/breeze/blob/master/math/src/main/scala/breeze/stats/DescriptiveStats.scala
+    // it could be faster, see https://github.com/scalanlp/breeze/blob/master/math/src/main/scala/breeze/stats/DescriptiveStats.scala
 
     val pc = new Percentile()
-      .withEstimationType(EstimationType.R_7)
-    // .withNaNStrategy(NaNStrategy.REMOVED)
-    // .withKthSelector(new KthSelector(new MedianOf3PivotingStrategy))
+      .withEstimationType(Percentile.EstimationType.R_7)
 
     pc.setData(if (sorted) xs else xs.sorted)
 
