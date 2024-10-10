@@ -145,7 +145,7 @@ abstract class GenericCountItems()
 
   override def dataType: DataType = codec.resultType
 
-  // TODO: compute values from codec object
+  // TODO: derive input types from codec object
   override def inputTypes: Seq[AbstractDataType] = children.map(_ => AnyDataType)
 
   override def checkInputDataTypes(): TypeCheckResult = {

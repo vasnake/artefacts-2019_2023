@@ -15,7 +15,7 @@ import org.apache.spark.sql.catalyst.util._
 import org.apache.spark.sql.catalyst.vasnake.udf.accum.NumericAccumulator
 import org.apache.spark.sql.catalyst.vasnake.udf.codec._
 
-// There are two GenericAggregate..., TODO: DRY
+// TODO: DRY, GenericAggregate, GenericAggregateNumWithCount, GenericMostFreq - re-design abstractions
 abstract class GenericAggregate()
     extends TypedImperativeAggregate[NumericAccumulator]
        with ImplicitCastInputTypes

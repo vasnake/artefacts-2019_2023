@@ -43,7 +43,7 @@ abstract class GenericAggregateNumWithCount()
   override def dataType: DataType = codec.resultType
   override def createAggregationBuffer(): Accumulator = AccImpl.apply()
 
-  // TODO: try to compute values from codec object and children seq
+  // TODO: derive input types from codec object
   override def inputTypes: Seq[AbstractDataType] = children.map(_ => AnyDataType)
 
   override def checkInputDataTypes(): TypeCheckResult =
