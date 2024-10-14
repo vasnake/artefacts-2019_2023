@@ -85,7 +85,7 @@ abstract class GenericAggregateNumWithCount()
         valueDataType,
         {
           case (k, v) =>
-            updateBuffer(accum, AccImpl.kvOps.decodeKey(k), parseInputElem(map, v))
+            updateBuffer(accum, AccImpl.kvOps.decodeKey(k), parseInputMapElem(v))
         }
       )
     }
@@ -147,7 +147,7 @@ abstract class GenericAggregateNumWithCount()
       .kvOps
       .decodeValue(codec.decodeValue(value))
 
-  @inline protected def parseInputElem(map: MapData, value: Any): AccImpl.V =
+  @inline protected def parseInputMapElem(value: Any): AccImpl.V =
     if (value == null) AccImpl.nullValue
     else if (codec.isInvalidValue(value)) AccImpl.nullValue
     else parseInputElem(value)

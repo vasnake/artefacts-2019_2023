@@ -25,6 +25,7 @@ trait ColumnCodec {
 
   // sql => accum
   def isInvalidValue(value: Any): Boolean = {
+    // TODO: check if 'invalid' state could be done before 'decode'. If not: make sure that 'decode' run only in one-value-processing pipeline
     assume(value != null, "NULL value should be handled upstream")
     false // valid by default, float and double override this default
   }
