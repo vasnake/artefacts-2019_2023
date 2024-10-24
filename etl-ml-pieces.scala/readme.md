@@ -4,64 +4,11 @@ Collection of some interesting bits and pieces from my projects.
 
 Spark 2.4.8; Scala 2.12.19; sbt 1.10.1; java 1.8
 
-[Migration to Spark 3](../spark3-pieces.scala/readme.md).
+[Spark 3 version](../spark3-pieces.scala/readme.md).
 
 After migrating this collection to Spark3 platform,
-I don't need (and don't want) Spark2-related code. Consider it deprecated, it sits here just for educational purposes.
-
-My local station env: win11 + wsl2
-```sh
-# coursier update
-cs setup
-
-# goto project dir etl-ml-pieces-1923
-pushd /mnt/c/Users/vlk/data/github/artefacts-2019_2023/etl-ml-pieces.scala/
-# create new sbt project
-sbt new devinsideyou/scala-seed.g8
-
-# produced project with this parameters:
-    name [etl-ml-pieces-1923]:
-    organization [com.github.vasnake]:
-    package [interesting.pieces.1923]:
-
-# some tuning required ... edit sbt files
-
-# start sbt console
-alias sa='export JAVA_OPTS="-XX:MaxMetaspaceSize=1G -Xmx4G -XX:+UseParallelGC" && pushd /mnt/c/Users/vlk/data/github/artefacts-2019_2023/etl-ml-pieces.scala/ && sbt -v && popd'
-
-sa
-```
-WSL2
-
-Sometimes I want to run sbt in PowerShell
-```s
-pushd ($env:HOMEDRIVE + $env:HOMEPATH + "\.")
-pushd .\data\github\artefacts-2019_2023\etl-ml-pieces.scala\
-$OutputEncoding = [console]::InputEncoding = [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
-sbt -v "-Dfile.encoding=UTF-8"
-```
-PS
-
-`build.sbt` tricks, see
-- https://github.com/DevInsideYou/tagless-final/blob/master/expression-problem/build.sbt
-- https://github.com/tofu-tf/tofu/blob/master/build.sbt#L555
-
-Other sbt-related resources
-- https://www.scala-sbt.org/1.x/docs/Multi-Project.html
-- https://www.scala-lang.org/download/all.html
-- https://docs.scala-lang.org/overviews/compiler-options/index.html#targeting-a-version-of-the-jvm
-- https://scalacenter.github.io/scalafix/docs/users/installation.html#settings-and-tasks
-- https://www.scalatest.org/user_guide/using_scalatest_with_sbt
-- https://scastie.scala-lang.org/
-- https://mvnrepository.com/artifact/org.unbescape/unbescape/1.1.6.RELEASE
-- https://stackoverflow.com/questions/57521738/how-to-solve-sbt-dependency-problem-with-spark-and-whisklabs-docker-it-scala
-- https://github.com/sbt/sbt-assembly
-
-And a few more
-- set envvars for sbt: `export JAVA_OPTS="-XX:MaxMetaspaceSize=1G -Xmx4G -XX:+UseParallelGC" JAVA_HOME=$(/usr/libexec/java_home -v 1.8) && sbt -v`
-- set envvars for tests: `sbt> set ThisBuild / Test / envVars := Map("DEBUG_MODE" -> "true", "SPARK_LOCAL_IP" -> "127.0.0.1")`; `sbt> set Test/logBuffered := false`
-- select individual test: `sbt> testQuick *InverseVariabilityTransformer* -- -z "reference"`
-- logs selectors/tuning: `edit test/resources/log4j*.properties`
+I don't need (and don't want) Spark2-related code.
+Consider it deprecated, it sits here just for educational purposes.
 
 ## Project modules
 
@@ -70,7 +17,7 @@ To do that, you should add library to spark session, e.g: `spark-submit ... --ja
 
 ### spark-udf
 
-Generic UDFs and UDAFs using Spark Catalyst, accessible from Spark SQL and PySpark.
+Spark extension, generic UDFs and UDAFs using Spark Catalyst, accessible from Spark SQL and PySpark.
 Those custom functions work just like Spark native (builtin) SQL functions.
 
 Before using mentioned here UDF/UDAF in your spark session you have to register them: `com.github.vasnake.spark.udf.catalog.registerAll(spark)`
@@ -85,17 +32,17 @@ and values: `float`, `double`, `int`, `byte`, `long`, `short`, `decimal`
 - org.apache.spark.sql.catalyst.vasnake.udf.GenericAvg
 - org.apache.spark.sql.catalyst.vasnake.udf.GenericMostFreq
 
-The set of generic vector/matrix UDF
+The set of generic vector/matrix UDF:
 - org.apache.spark.sql.catalyst.vasnake.udf.GenericVectorCooMul
 - org.apache.spark.sql.catalyst.vasnake.udf.GenericVectorSemiSum
 - org.apache.spark.sql.catalyst.vasnake.udf.GenericVectorSemiDiff
 - org.apache.spark.sql.catalyst.vasnake.udf.GenericVectorMatMul
 
-Two generic functions, complementary to builtin `isnan`
+Two generic functions, complementary to builtin `isnan`:
 - org.apache.spark.sql.catalyst.vasnake.udf.GenericIsInf
 - org.apache.spark.sql.catalyst.vasnake.udf.GenericIsFinite
 
-The set of non-generic trivial UDF
+The set of non-generic trivial UDF:
 - com.github.vasnake.spark.udf.`java-api`.HtmlUnescapeUDF
 - com.github.vasnake.spark.udf.`java-api`.MapValuesOrderedUDF
 - com.github.vasnake.spark.udf.`java-api`.CheckUINT32UDF
@@ -123,7 +70,7 @@ Method has two distinct features:
 
 The second feature use custom ExternalCatalog implementation combined with the parallel-query-processor
 based on the managed pool of HMS (Hive Meta Store) query connections.
-This code was written to solve the problem with Spark ExternalCatalog inability to process queries concurrently.
+This code was written to solve the problem with Spark ExternalCatalog inability to process queries concurrently, in the context of a single session.
 - Custom external catalog: `org.apache.spark.sql.hive.vasnake.HiveExternalCatalog`.
 - HMS query processor: `org.apache.spark.sql.hive.vasnake.MetastoreQueryProcessorWithConnPool`.
 
@@ -140,11 +87,11 @@ and main workhorse for that app `com.github.vasnake.spark.ml.transformer.ApplyMo
 This app takes a batch of ML models, trained earlier in some 'learn' app, and apply them to each row of an input dataset (DataFrame).
 Each ML model transform an input features vector to a score value, so that each input row transformed (exploded) to a batch of output rows.
 
-* com.github.vasnake.spark.app.datasets.JoinerApp
+Spark-submit app `com.github.vasnake.spark.app.datasets.JoinerApp` TBD.
 
 ### spark-ml
 
-Three spark.ml (estimator + model). All three support stratification and sampling inside stratas.
+Three spark.ml packages (estimator + model). All three support stratification and sampling inside stratas.
 
 `com.github.vasnake.spark.ml.estimator.ScoreEqualizerEstimator` + `com.github.vasnake.spark.ml.model.ScoreEqualizerModel`
 Used for fixing values distribution.
@@ -251,3 +198,57 @@ Advanced Spark, Catalyst, Tangsten, etc
 - https://www.slideshare.net/slideshow/advanced-apache-spark-meetup-project-tungsten-nov-12-2015/55064824
 - Care and Feeding of Catalyst Optimizer https://youtu.be/IjqC2Y2Hd5k?feature=shared
 - Chris Fregly https://www.youtube.com/results?search_query=Chris+Fregly
+
+## Build
+
+My local station env: win11 + wsl2
+```sh
+# coursier update
+cs setup
+
+# goto project dir etl-ml-pieces-1923
+pushd /mnt/c/Users/vlk/data/github/artefacts-2019_2023/etl-ml-pieces.scala/
+# create new sbt project
+sbt new devinsideyou/scala-seed.g8
+
+# produced project with this parameters:
+    name [etl-ml-pieces-1923]:
+    organization [com.github.vasnake]:
+    package [interesting.pieces.1923]:
+
+# some tuning required ... edit sbt files
+
+# start sbt console
+alias sa='export JAVA_OPTS="-XX:MaxMetaspaceSize=1G -Xmx4G -XX:+UseParallelGC" && pushd /mnt/c/Users/vlk/data/github/artefacts-2019_2023/etl-ml-pieces.scala/ && sbt -v && popd'
+
+sa
+```
+
+Sometimes I want to run sbt in PowerShell
+```s
+pushd ($env:HOMEDRIVE + $env:HOMEPATH + "\.")
+pushd .\data\github\artefacts-2019_2023\etl-ml-pieces.scala\
+$OutputEncoding = [console]::InputEncoding = [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
+sbt -v "-Dfile.encoding=UTF-8"
+```
+
+`build.sbt` tricks, see:
+- https://github.com/DevInsideYou/tagless-final/blob/master/expression-problem/build.sbt
+- https://github.com/tofu-tf/tofu/blob/master/build.sbt#L555
+
+Other sbt-related resources:
+- https://www.scala-sbt.org/1.x/docs/Multi-Project.html
+- https://www.scala-lang.org/download/all.html
+- https://docs.scala-lang.org/overviews/compiler-options/index.html#targeting-a-version-of-the-jvm
+- https://scalacenter.github.io/scalafix/docs/users/installation.html#settings-and-tasks
+- https://www.scalatest.org/user_guide/using_scalatest_with_sbt
+- https://scastie.scala-lang.org/
+- https://mvnrepository.com/artifact/org.unbescape/unbescape/1.1.6.RELEASE
+- https://stackoverflow.com/questions/57521738/how-to-solve-sbt-dependency-problem-with-spark-and-whisklabs-docker-it-scala
+- https://github.com/sbt/sbt-assembly
+
+And a few more:
+- set envvars for sbt: `export JAVA_OPTS="-XX:MaxMetaspaceSize=1G -Xmx4G -XX:+UseParallelGC" JAVA_HOME=$(/usr/libexec/java_home -v 1.8) && sbt -v`
+- set envvars for tests: `sbt> set ThisBuild / Test / envVars := Map("DEBUG_MODE" -> "true", "SPARK_LOCAL_IP" -> "127.0.0.1")`; `sbt> set Test/logBuffered := false`
+- select individual test: `sbt> testQuick *InverseVariabilityTransformer* -- -z "reference"`
+- logs selectors/tuning: `edit test/resources/log4j*.properties`
